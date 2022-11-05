@@ -32,7 +32,7 @@ workspace.DescendantAdded:Connect(function(v)
 			end
 		end
 	end
-	if name=="rafter"or name=="potted_plant"or name=="wardrobe"or name=="bookcase"or name=="piece"or name=="rug"or name=="carpet"or name=="pillar"or name=="painting_small"or name="typewriter"or name=="seek_arm"or name=="painting_verybig"or name=="painting_big"or name=="light_fixtures"or name=="fireplace"or name=="chandelierobstruction"or name=="chandelier"or name=="window"then
+	if name=="rafter"or name=="potted_plant"or name=="wardrobe"or name=="bookcase"or name=="piece"or name=="rug"or name=="carpet"or name=="pillar"or name=="painting_small"or name=="typewriter"or name=="seek_arm"or name=="painting_verybig"or name=="painting_big"or name=="light_fixtures"or name=="fireplace"or name=="chandelierobstruction"or name=="chandelier"or name=="window"then
 		wait(0.25)
 		v:Destroy()
 	end
