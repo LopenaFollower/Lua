@@ -1,0 +1,48 @@
+--ver 18
+--Doors esp
+function box(yes)
+	local a = Instance.new("BoxHandleAdornment")
+	a.Name = "ffie"
+	a.Parent = yes
+	a.Adornee = yes
+	a.AlwaysOnTop = true
+	a.ZIndex = 0
+	a.Size = yes.Size*1.20
+	a.Transparency = 0.35
+	a.Color = yes.BrickColor
+end
+local light=game:GetService("Lighting")
+light.Brightness = 2
+light.ClockTime = 14
+light.FogEnd = 10000
+light.GlobalShadows = false
+light.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+workspace.DescendantAdded:Connect(function(v)
+	local name=v.Name:lower()
+	if v:IsA"BasePart" then
+		if name=="hitbox"or
+		name=="door"or
+		name=="rails"or
+		name=="ribcage"or
+		name=="hintbook"or
+		name=="actualroot"or
+		name=="livehintbook"then
+			if not v:FindFirstChild"ffie"then
+				box(v)
+			end
+		end
+	end
+	if name=="rafter"or name=="potted_plant"or name=="wardrobe"or name=="bookcase"or name=="piece"or name="rug"or name=="carpet"then
+		wait(0.75)
+		v:Destroy()
+	end
+	if v:IsA("Decal")then
+		v.Transparency = 1
+	end
+	if v:IsA("ParticleEmitter")or v:IsA("Trail")then
+		v.Lifetime=NumberRange.new(0)
+	end
+	if v:IsA('ForceField')or v:IsA('Sparkles')or v:IsA('Smoke')or v:IsA('Fire')then
+		v:Destroy()
+	end
+end)
