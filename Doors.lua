@@ -1,4 +1,4 @@
---ver 2
+--ver 3
 --Doors
 local chr = game.Players.LocalPlayer.Character
 local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
