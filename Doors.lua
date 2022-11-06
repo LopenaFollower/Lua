@@ -1,4 +1,4 @@
---ver 4
+--ver 6
 --Doors Gui
 local chr = game.Players.LocalPlayer.Character
 local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
@@ -17,14 +17,18 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	if skipping==true then
 		local room=workspace.CurrentRooms:GetChildren()
 		local last=room[#room]
+		if last.Name=="100" then
+			return
+		end
 		for _,v in pairs(last:GetDescendants())do
 			if v.Name:lower()=="keyobtain"then
 				KeyObtain=v
 			end
 		end
 		if haskey(last) and not workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Key" then
-			chr:TranslateBy(((KeyObtain.Hitbox.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,0,0))*0.25)
-			if hrp.Position.y<KeyObtain.Hitbox.Position.y+2 then
+			--chr:TranslateBy(((KeyObtain.Hitbox.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,0,0))*0.25)
+			chr:TranslateBy(((room[tostring(tonumber(last.Name)-1)].RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*0.25)
+			if hrp.Position.y<KeyObtain.Hitbox.Position.y-3 then
 				hum:ChangeState(Enum.HumanoidStateType.Jumping)
 			end
 		else
@@ -35,6 +39,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		end
 		last.Door.ClientOpen:FireServer()
 	end
+	game:GetService("ReplicatedStorage").Bricks.EBF:FireServer()
 end)
 
 --ver 19
