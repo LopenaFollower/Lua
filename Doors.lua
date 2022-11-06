@@ -1,4 +1,4 @@
---ver 6
+--ver 7
 --Doors Gui
 local chr = game.Players.LocalPlayer.Character
 local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
@@ -27,7 +27,11 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		end
 		if haskey(last) and not workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Key" then
 			--chr:TranslateBy(((KeyObtain.Hitbox.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,0,0))*0.25)
-			chr:TranslateBy(((room[tostring(tonumber(last.Name)-1)].RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*0.25)
+			if not haskey(workspace.CurrentRooms:FindFirstChild(tostring(tonumber(last.Name)-1))) and not workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Key" then
+				chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild(tostring(tonumber(last.Name)-1)).RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*0.25)
+			else
+				chr:TranslateBy(((KeyObtain.Hitbox.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,0,0))*0.25)
+			end
 			if hrp.Position.y<KeyObtain.Hitbox.Position.y-3 then
 				hum:ChangeState(Enum.HumanoidStateType.Jumping)
 			end
@@ -39,7 +43,15 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		end
 		last.Door.ClientOpen:FireServer()
 	end
-	game:GetService("ReplicatedStorage").Bricks.EBF:FireServer()
+	game:GetService("LogService").MessageOut:Connect(function(message)
+		wait(2.5)
+		while message =="SENT SIGNAL" and wait(.1) do
+			chr:TranslateBy((game:GetService("Workspace").CurrentRooms[100].ElevatorCar.IndustrialLight.Top.ElevatorLight.Position-chr.HumanoidRootPart.Position)*0.25)
+			if hrp.Position.y<game:GetService("Workspace").CurrentRooms[100].ElevatorCar.IndustrialLight.Top.ElevatorLight.RoomEnd.Position.y then
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)
+			end 
+		end
+	end)
 end)
 
 --ver 19
