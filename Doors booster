@@ -32,8 +32,8 @@ workspace.DescendantAdded:Connect(function(v)
 			end
 		end
 	end
-	if name=="rafter"or name=="potted_plant"or name=="wardrobe"or name=="bookcase"or name=="piece"or name=="rug"or name=="carpet"or name=="desk_globe"or name=="pillar"or name=="wall_strip"or name=="painting_small"or name=="painting_tall"or name=="typewriter"or name=="seek_arm"or name=="painting_verybig"or name=="painting_big"or name=="light_fixtures"or name=="fireplace"or name=="wall_clock"or name=="barrelstack"or name=="web"or name=="barrelstack_small"or name=="grandfather_clock"or name=="pipe"or name=="luggagecarts"or name=="blockades"or name=="lamp_tall"or name=="hat_stand"or name=="bookshelfobstruction"or name=="chandelierobstruction"or name=="chandelier"or name=="window"then
-		wait(0.25)
+	if name=="rafter"or name=="glass"or name=="modular_bookshelf"or name=="potted_plant"or name=="wardrobe"or name=="bookcase"or name=="piece"or name=="rug"or name=="carpet"or name=="desk_globe"or name=="pillar"or name=="wall_strip"or name=="painting_small"or name=="painting_tall"or name=="typewriter"or name=="seek_arm"or name=="painting_verybig"or name=="painting_big"or name=="light_fixtures"or name=="fireplace"or name=="wall_clock"or name=="barrelstack"or name=="web"or name=="barrelstack_small"or name=="grandfather_clock"or name=="pipe"or name=="luggagecarts"or name=="blockades"or name=="lamp_tall"or name=="hat_stand"or name=="bookshelfobstruction"or name=="chandelierobstruction"or name=="chandelier"or name=="window"then
+		wait(0.1)
 		v:Destroy()
 	end
 	if v:IsA("Decal")then
