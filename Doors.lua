@@ -52,7 +52,7 @@ game:GetService("LogService").MessageOut:Connect(function(message)
 	wait(2.2)
 	while message =="SENT SIGNAL" and wait(.1) do
 		chr:TranslateBy((game:GetService("Workspace").CurrentRooms[100].ElevatorCar.IndustrialLight.Top.ElevatorLight.Position-chr.HumanoidRootPart.Position)*speed)
-		if hrp.Position.y<game:GetService("Workspace").CurrentRooms[100].ElevatorCar.IndustrialLight.Top.ElevatorLight.RoomEnd.Position.y then
+		if hrp.Position.y<game:GetService("Workspace").CurrentRooms[100].ElevatorCar.IndustrialLight.Top.ElevatorLight.Position.y then
 			hum:ChangeState(Enum.HumanoidStateType.Jumping)
 		end 
 	end
