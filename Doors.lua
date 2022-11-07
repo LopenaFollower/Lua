@@ -1,4 +1,4 @@
---ver 7.1
+--ver 7.2
 --Doors Gui
 local chr = game.Players.LocalPlayer.Character
 local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
@@ -6,6 +6,7 @@ local hrp = chr and chr.HumanoidRootPart
 local skipping=false
 local no_lag=false
 local KeyObtain
+local speed=0.8
 function haskey(i)
 	for _,v in pairs(i:GetDescendants())do
 		if v.Name=="KeyObtain" then
@@ -21,7 +22,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 			return
 		end
 		if last.Name=="50" then
-			chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild("49").RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*0.25)
+			chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild("49").RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*speed)
 		end
 		for _,v in pairs(last:GetDescendants())do
 			if v.Name:lower()=="keyobtain"then
@@ -30,15 +31,15 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		end
 		if haskey(last) and not workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Key" then
 			if not haskey(workspace.CurrentRooms:FindFirstChild(tostring(tonumber(last.Name)-1))) and not workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Key" then
-				chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild(tostring(tonumber(last.Name)-1)).RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*0.25)
+				chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild(tostring(tonumber(last.Name)-1)).RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*speed)
 			else
-				chr:TranslateBy(((KeyObtain.Hitbox.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,0,0))*0.25)
+				chr:TranslateBy(((KeyObtain.Hitbox.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,0,0))*speed)
 			end
 			if hrp.Position.y<KeyObtain.Hitbox.Position.y-3 then
 				hum:ChangeState(Enum.HumanoidStateType.Jumping)
 			end
 		else
-			chr:TranslateBy(((last.RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*0.25)
+			chr:TranslateBy(((last.RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*speed)
 			if hrp.Position.y<last.RoomEnd.Position.y-3 then
 				hum:ChangeState(Enum.HumanoidStateType.Jumping)
 			end
@@ -48,7 +49,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	game:GetService("LogService").MessageOut:Connect(function(message)
 		wait(2.5)
 		while message =="SENT SIGNAL" and wait(.1) do
-			chr:TranslateBy((game:GetService("Workspace").CurrentRooms[100].ElevatorCar.IndustrialLight.Top.ElevatorLight.Position-chr.HumanoidRootPart.Position)*0.25)
+			chr:TranslateBy((game:GetService("Workspace").CurrentRooms[100].ElevatorCar.IndustrialLight.Top.ElevatorLight.Position-chr.HumanoidRootPart.Position)*speed)
 			if hrp.Position.y<game:GetService("Workspace").CurrentRooms[100].ElevatorCar.IndustrialLight.Top.ElevatorLight.RoomEnd.Position.y then
 				hum:ChangeState(Enum.HumanoidStateType.Jumping)
 			end 
