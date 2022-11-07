@@ -20,13 +20,15 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		if last.Name=="100" then
 			return
 		end
+		if last.Name=="50" then
+			chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild("49").RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*0.25)
+		end
 		for _,v in pairs(last:GetDescendants())do
 			if v.Name:lower()=="keyobtain"then
 				KeyObtain=v
 			end
 		end
 		if haskey(last) and not workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Key" then
-			--chr:TranslateBy(((KeyObtain.Hitbox.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,0,0))*0.25)
 			if not haskey(workspace.CurrentRooms:FindFirstChild(tostring(tonumber(last.Name)-1))) and not workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Key" then
 				chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild(tostring(tonumber(last.Name)-1)).RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*0.25)
 			else
