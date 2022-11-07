@@ -1,4 +1,4 @@
---ver 7
+--ver 7.1
 --Doors Gui
 local chr = game.Players.LocalPlayer.Character
 local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
