@@ -1,12 +1,15 @@
---ver 7.3
+--ver 7.5k
 --Doors Gui
+if game.placeId~=6839171747 then return end
 local chr = game.Players.LocalPlayer.Character
 local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
 local hrp = chr and chr.HumanoidRootPart
 local skipping=false
 local no_lag=false
 local KeyObtain
-local speed=0.8
+local speed=0.9
+local esp=false
+local door_y_offset=-2
 function haskey(i)
 	for _,v in pairs(i:GetDescendants())do
 		if v.Name=="KeyObtain" then
@@ -20,10 +23,22 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		local last=room[#room]
 		if last.Name=="100" then
 			skipping=false
+			esp=false
+			for _,e in pairs(workspace:GetDescendants())do
+				if e.Name=="esp__box"then
+					e:Destroy()
+				end
+			end
 			return
 		end
 		if last.Name=="50" then
-			chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild("49").RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*speed)
+			chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild("49").RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,door_y_offset,0))*speed)
+			if hrp.Position.y<workspace.CurrentRooms:FindFirstChild("49").RoomEnd.Position.y+door_y_offset then
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)
+			end
+			
 		end
 		for _,v in pairs(last:GetDescendants())do
 			if v.Name:lower()=="keyobtain"then
@@ -32,16 +47,23 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		end
 		if haskey(last) and not workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Key" then
 			if not haskey(workspace.CurrentRooms:FindFirstChild(tostring(tonumber(last.Name)-1))) and not workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Key" then
-				chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild(tostring(tonumber(last.Name)-1)).RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*speed)
+				chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild(tostring(tonumber(last.Name)-1)).RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,door_y_offset,0))*speed)
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)
 			else
 				chr:TranslateBy(((KeyObtain.Hitbox.Position-chr.HumanoidRootPart.Position))*speed)
 			end
-			if hrp.Position.y<KeyObtain.Hitbox.Position.y-3 then
+			if hrp.Position.y<KeyObtain.Hitbox.Position.y+door_y_offset then
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)
 				hum:ChangeState(Enum.HumanoidStateType.Jumping)
 			end
 		else
-			chr:TranslateBy(((last.RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,-3,0))*speed)
-			if hrp.Position.y<last.RoomEnd.Position.y-3 then
+			chr:TranslateBy(((last.RoomEnd.Position-chr.HumanoidRootPart.Position)-Vector3.new(0,door_y_offset,0))*speed)
+			if hrp.Position.y<last.RoomEnd.Position.y+door_y_offset then
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)
 				hum:ChangeState(Enum.HumanoidStateType.Jumping)
 			end
 		end
@@ -49,10 +71,12 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	end
 end)
 game:GetService("LogService").MessageOut:Connect(function(message)
-	wait(2.2)
-	while message =="SENT SIGNAL" and wait(.1) do
+	wait(1.75)
+	while message =="SENT SIGNAL" and wait(.01) do
 		chr:TranslateBy((game:GetService("Workspace").CurrentRooms[100].ElevatorCar.IndustrialLight.Top.ElevatorLight.Position-chr.HumanoidRootPart.Position)*speed)
 		if hrp.Position.y<game:GetService("Workspace").CurrentRooms[100].ElevatorCar.IndustrialLight.Top.ElevatorLight.Position.y then
+			hum:ChangeState(Enum.HumanoidStateType.Jumping)
+			hum:ChangeState(Enum.HumanoidStateType.Jumping)
 			hum:ChangeState(Enum.HumanoidStateType.Jumping)
 		end 
 	end
@@ -61,7 +85,7 @@ end)
 --Doors esp
 function box(yes)
 	local a = Instance.new("BoxHandleAdornment")
-	a.Name = "ffie"
+	a.Name = "esp__box"
 	a.Parent = yes
 	a.Adornee = yes
 	a.AlwaysOnTop = true
@@ -79,7 +103,7 @@ light.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
 workspace.DescendantAdded:Connect(function(v)
 	if no_lag==true then
 		local name=v.Name:lower()
-		if v:IsA"BasePart" then
+		if v:IsA"BasePart" and esp then
 			if name=="hitbox"or
 			name=="door"or
 			name=="rails"or
@@ -87,7 +111,7 @@ workspace.DescendantAdded:Connect(function(v)
 			name=="hintbook"or
 			name=="actualroot"or
 			name=="livehintbook"then
-				if not v:FindFirstChild"ffie"then
+				if not v:FindFirstChild"esp__box"then
 					box(v)
 				end
 			end
@@ -124,4 +148,7 @@ Home:addToggle("NoClip",function(value)
 			child.CanCollide = not value
 		end
 	end
+end)
+Home:addToggle("ESP",function(value)
+	esp=value
 end)
