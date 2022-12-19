@@ -1,4 +1,4 @@
---ver 8q
+--ver 8z
 --Doors Gui
 if game.placeId~=6839171747 then return end
 local chr=game.Players.LocalPlayer.Character
@@ -7,12 +7,24 @@ local hrp=chr and chr.HumanoidRootPart
 local conf={
 skipping=false,
 no_lag=true,
-esp=true
+esp=true,
+noclip=true
 }
 local KeyObtain
 local speed=.9
-local door_y_offset=-2
+local door_y_offset=0
 local ce="o"
+local light=game:GetService"Lighting"
+local old_brightness=light.Brightness
+local old_clock=light.ClockTime
+local old_fogend=light.FogEnd
+local old_shadow=light.GlobalShadows
+local old_ambient=light.OutdoorAmbient
+light.Brightness=2
+light.ClockTime=14
+light.FogEnd=10000
+light.GlobalShadows=false
+light.OutdoorAmbient=Color3.fromRGB(128,128,128)
 function haskey(i)
 	for _,v in pairs(i:GetDescendants())do
 		if v.Name=="KeyObtain"then
@@ -21,11 +33,12 @@ function haskey(i)
 	end
 end
 function o()
-	workspace.Gravity=10802
+	workspace.Gravity=90
+	wait(.1)
 	if ce=="o"then
 		for _,v in pairs(workspace:GetDescendants())do
 			if v.Name:lower()=="box"and v.Parent.Name:lower()=="elevatorbreaker"then
-				chr:TranslateBy((v.Position-hrp.Position)*speed)
+				chr:TranslateBy(((v.Position-hrp.Position)-Vector3.new(0,door_y_offset,0))*speed)
 				ce="¶"
 			end
 		end
@@ -71,28 +84,39 @@ game:GetService("RunService").RenderStepped:Connect(function()
 				chr:TranslateBy(((workspace.CurrentRooms:FindFirstChild(tostring(tonumber(last.Name)-1)):FindFirstChild"RoomEnd".Position-hrp.Position)-Vector3.new(0,door_y_offset,0))*speed)
 				jump(5)
 			else
-				chr:TranslateBy(((KeyObtain.Hitbox.Position-hrp.Position)-Vector3.new(0,1,-2))*speed)
+				chr:TranslateBy(((KeyObtain.Hitbox.Position-hrp.Position)-Vector3.new(0,-3,-3))*speed)
 			end
 			if hrp.Position.y<KeyObtain.Hitbox.Position.y+door_y_offset then
-				jump(5)
+				jump(3)
 			end
 		else
 			chr:TranslateBy(((last:FindFirstChild"RoomEnd".Position-hrp.Position)-Vector3.new(0,door_y_offset,0))*speed)
 			if hrp.Position.y<last:FindFirstChild"RoomEnd".Position.y+door_y_offset then
-				jump(5)
+				jump(3)
 			end
 		end
 		last:FindFirstChild"Door":FindFirstChild"ClientOpen":FireServer()
+		for _,v in pairs(chr:GetDescendants())do
+			if v:IsA("BasePart")then
+				v.Anchored=false
+			end
+		end
 	end
 end)
 game:GetService"LogService".MessageOut:Connect(function(message)
-	wait(1.64)
+	wait(1.6)
 	while message=="SENT SIGNAL"and wait()do
-		chr:TranslateBy((workspace.CurrentRooms[100].ElevatorCar.ActualCollision.ElevatorPanel.Button.Position-hrp.Position)*speed)
-		chr:TranslateBy((workspace.CurrentRooms[100].ElevatorCar.ActualCollision.ElevatorPanel.Button.Position-hrp.Position)*speed)
+		chr:TranslateBy(((workspace.CurrentRooms[100].ElevatorCar.ActualCollision.ElevatorPanel.Button.Position-hrp.Position)-Vector3.new(0,0,0))*speed)
+		chr:TranslateBy(((workspace.CurrentRooms[100].ElevatorCar.ActualCollision.ElevatorPanel.Button.Position-hrp.Position)-Vector3.new(0,0,0))*speed)
+		chr:TranslateBy(((workspace.CurrentRooms[100].ElevatorCar.ActualCollision.ElevatorPanel.Button.Position-hrp.Position)-Vector3.new(0,0,0))*speed)
 		if hrp.Position.y<workspace.CurrentRooms[100].ElevatorCar.ActualCollision.ElevatorPanel.Button.Position.y+1 then
 			jump(5)
-			wait(54)
+			light.Brightness=old_brightness
+			light.ClockTime=old_clock
+			light.FogEnd=old_fogend
+			light.GlobalShadows=old_shadow
+			light.OutdoorAmbient=old_ambient
+			wait(53.5)
 			game:GetService"TeleportService":Teleport(6516141723)
 		end
 	end
@@ -108,17 +132,11 @@ function box(p)
 	a.Transparency=.35
 	a.Color=p.BrickColor
 end
-local light=game:GetService"Lighting"
-light.Brightness=2
-light.ClockTime=14
-light.FogEnd=10000
-light.GlobalShadows=false
-light.OutdoorAmbient=Color3.fromRGB(128,128,128)
 workspace.DescendantAdded:Connect(function(v)
 	local name=v.Name:lower()
 	if conf.no_lag then
 		if name=="rafter"or name=="glass"or name=="modular_bookshelf"or name=="potted_plant"or name=="wardrobe"or name=="bookcase"or name=="piece"or name=="rug"or name=="carpet"or name=="desk_globe"or name=="pillar"or name=="wall_strip"or name=="painting_small"or name=="painting_tall"or name=="typewriter"or name=="seek_arm"or name=="painting_verybig"or name=="painting_big"or name=="light_fixtures"or name=="fireplace"or name=="wall_clock"or name=="barrelstack"or name=="web"or name=="barrelstack_small"or name=="grandfather_clock"or name=="pipe"or name=="luggagecarts"or name=="blockades"or name=="lamp_tall"or name=="hat_stand"or name=="bookshelfobstruction"or name=="chandelierobstruction"or name=="chandelier"or name=="window"or v:IsA('ForceField')or v:IsA('Sparkles')or v:IsA('Smoke')or v:IsA('Fire')then
-			wait(0.1)
+			wait(.05)
 			v:Destroy()
 		elseif v:IsA("Decal")then
 			v.Transparency = 1
@@ -142,9 +160,10 @@ Main:addToggle("Fps Boost",function(v)
 	conf.no_lag=v
 end)
 Main:addToggle("NoClip",function(v)
-	for _,v in pairs(chr:GetDescendants())do
-		if v:IsA("BasePart")then
-			v.CanCollide=not v
+	conf.noclip=not v
+	for _,i in pairs(chr:GetDescendants())do
+		if i:IsA("BasePart")then
+			i.CanCollide=conf.noclip
 		end
 	end
 end)
