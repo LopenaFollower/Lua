@@ -66,6 +66,7 @@ end)
 --GUI
 --[[
 	Refs.
+	https://textbin.net/raw/yuiz2p0mqy
 	PageElements:addLabel(labelname,labelinfo)
 	PageElements:addButton(buttonname,callback)
 	PageElements:addToggle(togglename,callback)
