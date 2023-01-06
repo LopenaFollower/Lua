@@ -5,6 +5,7 @@ local hum=chr and chr:FindFirstChildWhichIsA("Humanoid")
 local hrp=chr.HumanoidRootPart
 local gui_run=false
 local HoneyMaking=false
+local safe_delay=0.3
 local toggles={
 	farming=false,
 	tpw=false,
@@ -70,15 +71,15 @@ local looping=game:GetService("RunService").RenderStepped:Connect(function()
 				wait(0.1)
 				set_sprinkler(4)
 			end
-			if toggles.farming and cd and toggles.vicious==false and finished then
+			if toggles.farming and cd and toggles.vicious==false and finished and not HoneyMaking then
 				cd=false
 				if (v.Position-hrp.Position).magnitude <= 80 and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638"and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Orientation.z==0 then
 					pcall(function()goto(workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.x, hrp.Position.y, workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.z)end)
-					wait(.1)
+					wait(safe_delay)
 					cd=true
 				elseif (v.Position-hrp.Position).magnitude <= 80 and not toggles.only_token and v.Orientation.z==0 then
 					pcall(function()goto(v.Position.x, hrp.Position.y, v.Position.z)end)
-					wait(.1)
+					wait(safe_delay)
 					cd=true
 				else
 					if (workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude >= 80 or math.abs(workspace.FlowerZones[selected.field].Position.y-hrp.Position.y) >= 20 then
@@ -88,7 +89,7 @@ local looping=game:GetService("RunService").RenderStepped:Connect(function()
 					cd=true
 				end
 				if not v.Orientation.z==0 then
-					wait(0.1)
+					wait(0.15)
 					v:Destroy()
 				end
 				for _,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
@@ -112,20 +113,17 @@ local looping=game:GetService("RunService").RenderStepped:Connect(function()
 				end
 			end
 		end
-		for _,v in pairs(workspace[game.Players.LocalPlayer.Name]:GetChildren()) do
+		for _,v in pairs(workspace[game.Players.LocalPlayer.Name]:GetDescendants()) do
 			if v:FindFirstChild("Display")then
 				if not HoneyMaking and (v.Display.Gui.ProgressBar.Size == v.Display.Gui.RedBar.Size or v.Display.Gui.ProgressLabel == game.Players.LocalPlayer.CoreStats.Pollen.Value.."/"..game.Players.LocalPlayer.CoreStats.Pollen.Value) then
 					HoneyMaking=true
 					wait(1)
 					game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p)
+					wait(0.25)
 					game:GetService("ReplicatedStorage").Events.PlayerHiveCommand:FireServer("ToggleHoneyMaking")
 					repeat wait(.1) until game.Players.LocalPlayer.CoreStats.Pollen.Value <= 1
-					wait(7)                      
+					wait(7)
 					hrp.CFrame = workspace.FlowerZones[selected.field].CFrame * CFrame.new(0,0,0)
-					wait(1)
-					game:GetService"Players".LocalPlayer.Character:FindFirstChildOfClass'Humanoid':ChangeState("Jumping")
-					wait(.15)
-					game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"]="Sprinkler Builder"})
 					wait(1)
 					HoneyMaking=false
 				end
