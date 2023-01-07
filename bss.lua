@@ -26,12 +26,12 @@ local selected={
 local cd=true
 local cd2=true
 local cd3=true
-gui_run=true
 local in_prog=false
 local finished=false
 for _,v in pairs(workspace.Collectibles:GetChildren())do
 	v:Destroy()
 end
+gui_run=true
 game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(6)
 game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(5)
 game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(4)
@@ -123,7 +123,9 @@ function tokens()
 				repeat game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p)wait(.25)until game.Players.LocalPlayer.CoreStats.Pollen.Value <= 1
 				wait(7)
 				Spin:Destroy()
-				hrp.CFrame = workspace.FlowerZones[selected.field].CFrame * CFrame.new(0,2,0)
+				if toggles.farming then
+					hrp.CFrame = workspace.FlowerZones[selected.field].CFrame * CFrame.new(0,2,0)
+				end
 				wait(0.1)
 				HoneyMaking=false
 				cd3=true
@@ -226,8 +228,9 @@ end)
 	PageElements:addTextBox(textboxname,textboxdefault,callback)
 	PageElements:addDropdown(dropdownname,list,scrollsize,callback)
 ]]
+game.Players.LocalPlayer.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
 local GUI=loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/aaaa"))()
-local UI=GUI:CreateWindow("BSS","version 1.8b")
+local UI=GUI:CreateWindow("BSS","version 1.8c")
 local Main=UI:addPage("Main",3,true,6)
 local Waypoint=UI:addPage("Waypoints",2,false,6)
 local Boss=UI:addPage("Boss",3,false,6)
@@ -236,6 +239,8 @@ Main:addToggle("Auto Dig",function(v)
 	toggles.dig=v
 end)
 Main:addDropdown("Select Field",{"Sunflower Field","Mushroom Field","Dandelion Field","Clover Field","Blue Flower Field","Bamboo Field","Spider Field","Strawberry Field","Pineapple Patch","Stump Field","Rose Field","Cactus Field","Pumpkin Patch","Pine Tree Forest","Mountain Top Field","Coconut Field","Pepper Patch"},4,function(v)
+	selected.field=false
+	wait()	
 	selected.field=v
 	finished=false
 end)
@@ -260,7 +265,13 @@ end)
 Main:addToggle("ESP Tokens",function(v)
 	toggles.token_esp=v
 end)
+local cd=true
+local cd2=true
+local cd3=true
+local in_prog=false
+local finished=false
 Main:addButton("Destroy Ui",function()
+	gui_run=false
 	toggles.farming=false
 	toggles.tpw=false
 	toggles.dig=false
@@ -270,7 +281,7 @@ Main:addButton("Destroy Ui",function()
 	selected.jp=hum.JumpPower
 	selected.ws=hum.WalkSpeed
 	selected.tpws=1
-	gui_run=false
+	selected.mode=false
 	HoneyMaking=false
 	toggles.quest=false
 	toggles.vicious=false
@@ -286,7 +297,7 @@ Main:addButton("Destroy Ui",function()
 		end
 	end
 	wait(.1)
-	for x=1,1000 do
+	for x=1,100 do
 		if game.CoreGui:FindFirstChild("fu8rj82n")then
 			game.CoreGui:FindFirstChild("fu8rj82n"):Destroy()
 		end
@@ -398,9 +409,9 @@ Boss:addButton("Coconut Crab",function()
 			p.Transparency = 0.5
 			p.Size = Vector3.new(2,0,2)
 			p.Anchored = true
-			p.CFrame = CFrame.new(-266.5,113.25,500)
+			p.CFrame = CFrame.new(-266.5,113.25,425.83)
 		end
-		hrp.CFrame=CFrame.new(-266.5,116,500)
+		hrp.CFrame=CFrame.new(-266.5,116,425.83)
 	end
 end)
 Boss:addToggle("Vicious Bee",function(v)
@@ -428,4 +439,3 @@ end)
 Sp:addToggle("TP walk",function(v)
 	toggles.tpw=v
 end)
-game.Players.LocalPlayer.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
