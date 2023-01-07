@@ -83,24 +83,18 @@ function killvicious()
 			if string.find(i.Name,"Waiti") then
 				toggles.farming=false
            		hrp.CFrame = i.CFrame
-			else
-				toggles.farming=true
      		end
 		end
 		for _,v in pairs(game.workspace.Monsters:GetChildren()) do
 			if string.find(v.Name,"Vici") then
 				toggles.farming=false
 				hrp.CFrame = v.Head.CFrame * CFrame.new(0,13,0)
-			else
-				toggles.farming=true
 			end
 		end
 		for _,r in pairs(game.workspace.Monsters:GetChildren()) do
 			if string.find(r.Name,"Gifted") then
 				toggles.farming=false
 				hrp.CFrame = r.Head.CFrame * CFrame.new(0,13,0)
-			else
-				toggles.farming=true
 			end
 		end
 	end
@@ -113,12 +107,19 @@ function tokens()
 				cd3=false
 				HoneyMaking=true
 				wait(1)
+				local Spin =Instance.new("BodyAngularVelocity")
+				Spin.Name="Spinning"
+				Spin.Parent = hrp
+				Spin.MaxTorque = Vector3.new(0, math.huge, 0)
+				Spin.AngularVelocity = Vector3.new(0,10,0)
 				game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p)
 				wait(0.25)
+				game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p)
 				game:GetService("ReplicatedStorage").Events.PlayerHiveCommand:FireServer("ToggleHoneyMaking")
-				repeat wait(.1) until game.Players.LocalPlayer.CoreStats.Pollen.Value <= 1
+				repeat wait(.1)game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p) until game.Players.LocalPlayer.CoreStats.Pollen.Value <= 1
 				wait(7)
-				hrp.CFrame = workspace.FlowerZones[selected.field].CFrame * CFrame.new(0,0,0)
+				Spin:Destroy()
+				hrp.CFrame = workspace.FlowerZones[selected.field].CFrame * CFrame.new(0,2,0)
 				wait(1)
 				HoneyMaking=false
 				cd3=true
@@ -143,7 +144,7 @@ function tokens()
 				wait(safe_delay)
 				cd=true
 			else
-				if (workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude >= 80 or math.abs(workspace.FlowerZones[selected.field].Position.y-hrp.Position.y) >= 20 then
+				if (workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude >= 80 or math.abs(workspace.FlowerZones[selected.field].Position.y-hrp.Position.y)>12 then
 					hrp.CFrame = workspace.FlowerZones[selected.field].CFrame * CFrame.new(0,2,0)
 				end
 				wait()
