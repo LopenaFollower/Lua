@@ -14,14 +14,15 @@ local toggles={
 	only_token=false,
 	quest=false,
 	vicious=false,
-	token_esp=false
+	token_esp=false,
+	noclip=nil
 }
 local selected={
 	field=false,
 	jp=hum.JumpPower,
 	ws=hum.WalkSpeed,
 	tpws=1,
-	mode
+	mode=false,
 }
 local cd=true
 local cd2=true
@@ -39,6 +40,15 @@ function goto(x,y,z)
 				hum.WalkToPoint=Vector3.new(x,hrp.Position.y,z)
 			else
 				chr:TranslateBy((Vector3.new(x,hrp.Position.y,z)-hrp.Position)*.5)
+			end
+		end
+	end
+end
+function NoclipLoop()
+	if game.Players.LocalPlayer.Character ~= nil then
+		for _,v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+			if v:IsA("BasePart") and v.CanCollide == true then
+				v.CanCollide = false
 			end
 		end
 	end
@@ -212,7 +222,7 @@ end)
 	PageElements:addDropdown(dropdownname,list,scrollsize,callback)
 ]]
 local GUI=loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/aaaa"))()
-local UI=GUI:CreateWindow("BSS","version 1.7j")
+local UI=GUI:CreateWindow("BSS","version 1.8a")
 local Main=UI:addPage("Main",3,true,6)
 local Waypoint=UI:addPage("Waypoints",2,false,6)
 local Boss=UI:addPage("Boss",3,false,6)
@@ -228,7 +238,7 @@ Main:addToggle("Start Farm",function(v)
 	toggles.farming=v
 	cd=true
 end)
-Main:addToggle("Walk(Increase WalkSpeed)",function(v)
+Main:addToggle("Walk(Set WalkSpeed to 150-200)",function(v)
 	selected.mode=v
 	if v then
 		safe_delay=0
@@ -260,6 +270,7 @@ Main:addButton("Destroy Ui",function()
 	toggles.quest=false
 	toggles.vicious=false
 	toggles.token_esp=false
+	toggles.noclip:Disconnect()
 	looping:Disconnect()
 	wait(.1)
 	for _,v in pairs(workspace:GetDescendants())do
@@ -397,7 +408,13 @@ end)
 Sp:addToggle("Infinite Jump",function(v)
 	toggles.inf_jump=v
 end)
-Sp:addLabel("Better Speed","no inertia")
+Sp:addToggle("Noclip",function(v)
+	if toggles.noclip then
+		toggles.noclip:Disconnect()
+	else
+		toggles.noclip = game:GetService("RunService").Stepped:Connect(NoclipLoop)
+	end
+end)
 Sp:addTextBox("TP walk speed",selected.tpws,function(val)
 	selected.tpws=val
 end)
