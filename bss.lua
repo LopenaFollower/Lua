@@ -1,4 +1,3 @@
-game.Players.LocalPlayer.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
 --VARIABLES & FUNCTIONS
 local chr=game.Players.LocalPlayer.Character
 local hum=chr and chr:FindFirstChildWhichIsA("Humanoid")
@@ -33,6 +32,12 @@ local finished=false
 for _,v in pairs(workspace.Collectibles:GetChildren())do
 	v:Destroy()
 end
+game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(6)
+game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(5)
+game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(4)
+game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(3)
+game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(2)
+game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(1)
 function goto(x,y,z)
 	if math.abs(y-hrp.Position.y) <= 20 then
 		while (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude > 2 and x and y and z and wait()and gui_run and hum and chr and selected.field do
@@ -72,7 +77,7 @@ function auto_quest()
 	if toggles.quest and cd2 then
 		cd2=false
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/LopenaFollower/Lua/main/bss%20quest.lua"))()
-		wait(10)
+		wait(2.5)
 		cd2=true
 	end	
 end
@@ -101,7 +106,7 @@ function killvicious()
 end
 function tokens()
 	if cd3 then
-		local Display=workspace[game.Players.LocalPlayer.Name]["Porcelain Port-O-Hive"].Display
+		local Display=workspace[game.Players.LocalPlayer.Name]:WaitForChild"Porcelain Port-O-Hive".Display
 		if not HoneyMaking then
 			if Display.Gui.ProgressBar.AbsoluteSize == Display.Gui.RedBar.AbsoluteSize or Display.Gui.ProgressLabel == game.Players.LocalPlayer.CoreStats.Pollen.Value.."/"..game.Players.LocalPlayer.CoreStats.Pollen.Value then
 				cd3=false
@@ -114,13 +119,12 @@ function tokens()
 				Spin.AngularVelocity = Vector3.new(0,10,0)
 				game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p)
 				wait(0.25)
-				game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p)
 				game:GetService("ReplicatedStorage").Events.PlayerHiveCommand:FireServer("ToggleHoneyMaking")
-				repeat wait(.1)game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p) until game.Players.LocalPlayer.CoreStats.Pollen.Value <= 1
+				repeat game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p)wait(.25)until game.Players.LocalPlayer.CoreStats.Pollen.Value <= 1
 				wait(7)
 				Spin:Destroy()
 				hrp.CFrame = workspace.FlowerZones[selected.field].CFrame * CFrame.new(0,2,0)
-				wait(1)
+				wait(0.1)
 				HoneyMaking=false
 				cd3=true
 			end
@@ -223,7 +227,7 @@ end)
 	PageElements:addDropdown(dropdownname,list,scrollsize,callback)
 ]]
 local GUI=loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/aaaa"))()
-local UI=GUI:CreateWindow("BSS","version 2.0")
+local UI=GUI:CreateWindow("BSS","version 1.8b")
 local Main=UI:addPage("Main",3,true,6)
 local Waypoint=UI:addPage("Waypoints",2,false,6)
 local Boss=UI:addPage("Boss",3,false,6)
@@ -239,7 +243,7 @@ Main:addToggle("Start Farm",function(v)
 	toggles.farming=v
 	cd=true
 end)
-Main:addToggle("Walk(Set WalkSpeed to 150-200)",function(v)
+Main:addToggle("Walk(Set WalkSpeed ~150)",function(v)
 	selected.mode=v
 	if v then
 		safe_delay=0
@@ -271,7 +275,9 @@ Main:addButton("Destroy Ui",function()
 	toggles.quest=false
 	toggles.vicious=false
 	toggles.token_esp=false
-	toggles.noclip:Disconnect()
+	if  toggles.noclip then
+		toggles.noclip:Disconnect()
+	end
 	looping:Disconnect()
 	wait(.1)
 	for _,v in pairs(workspace:GetDescendants())do
@@ -346,7 +352,7 @@ Waypoint:addDropdown("Dispensers",{"Ant Pass","Blueberry","Coconut","Robo Pass",
 	elseif v=="Robo Pass" then hrp.CFrame=CFrame.new(-91,183,-298)
 	elseif v=="Glue" then hrp.CFrame=CFrame.new(270,25260,-718)
 	elseif v=="Honey" then hrp.CFrame=CFrame.new(45,6,323)
-	elseif v=="Strawberry" then	hrp.CFrame=CFrame.new(-320.5,46,272.5)
+	elseif v=="Strawberry" then hrp.CFrame=CFrame.new(-320.5,46,272.5)
 	elseif v=="Treat" then hrp.CFrame=CFrame.new(194,69,-122)
 	elseif v=="Royal Jelly" then hrp.CFrame=CFrame.new(111,66,332)
 	end
@@ -422,3 +428,4 @@ end)
 Sp:addToggle("TP walk",function(v)
 	toggles.tpw=v
 end)
+game.Players.LocalPlayer.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
