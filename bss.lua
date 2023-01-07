@@ -35,7 +35,7 @@ for _,v in pairs(workspace.Collectibles:GetChildren())do
 end
 function goto(x,y,z)
 	if math.abs(y-hrp.Position.y) <= 20 then
-		while (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude > 2 and x and y and z and wait()and gui_run and hum and chr do
+		while (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude > 2 and x and y and z and wait()and gui_run and hum and chr and selected.field do
 			if selected.mode then
 				hum.WalkToPoint=Vector3.new(x,hrp.Position.y,z)
 			else
@@ -223,7 +223,7 @@ end)
 	PageElements:addDropdown(dropdownname,list,scrollsize,callback)
 ]]
 local GUI=loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/aaaa"))()
-local UI=GUI:CreateWindow("BSS","version 1.8a")
+local UI=GUI:CreateWindow("BSS","version 2.0")
 local Main=UI:addPage("Main",3,true,6)
 local Waypoint=UI:addPage("Waypoints",2,false,6)
 local Boss=UI:addPage("Boss",3,false,6)
