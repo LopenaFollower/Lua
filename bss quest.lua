@@ -24,7 +24,7 @@ game.ReplicatedStorage.Events.ToyEvent:FireServer("Wealth Clock")
 pcall(function()
 	for _,v in pairs(game.Players.LocalPlayer.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:GetChildren())do
 		if v:IsA"Frame" then
-    	game.ReplicatedStorage.Events.GiveQuest:FireServer(v.TitleBar.Text)
+			game.ReplicatedStorage.Events.GiveQuest:FireServer(v.TitleBar.Text)
 			game.ReplicatedStorage.Events.CompleteQuest:FireServer(v.TitleBar.Text)
 		end
 	end
