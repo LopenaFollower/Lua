@@ -29,7 +29,7 @@ pcall(function()
 		end
 	end
 end)
-game.ReplicatedStorage.Events.CompleteQuestFromPool:FireServer("Brown Bear")
+game.ReplicatedStorage.Events.CompleteQuestFromPool:FireServer("Brown Bear 2")
 game.ReplicatedStorage.Events.CompleteQuestFromPool:FireServer("Polar Bear")
 game.ReplicatedStorage.Events.CompleteQuestFromPool:FireServer("Honey Bee")
 game.ReplicatedStorage.Events.CompleteQuestFromPool:FireServer("Black Bear")
