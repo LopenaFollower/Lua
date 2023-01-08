@@ -14,10 +14,12 @@ local toggles={
 	quest=false,
 	vicious=false,
 	token_esp=false,
-	noclip=nil
+	noclip=nil,
+	commando=false,
+	commando_loop=nil
 }
 local selected={
-	field=false,
+	field=nil,
 	jp=hum.JumpPower,
 	ws=hum.WalkSpeed,
 	tpws=1,
@@ -44,7 +46,7 @@ function goto(x,y,z)
 			if selected.mode then
 				hum.WalkToPoint=Vector3.new(x,hrp.Position.y,z)
 			else
-				chr:TranslateBy((Vector3.new(x,hrp.Position.y,z)-hrp.Position)*.5)
+				chr:TranslateBy((Vector3.new(x,hrp.Position.y,z)-hrp.Position))
 			end
 		end
 	end
@@ -65,9 +67,9 @@ function set_sprinkler(t)
 		in_prog=true
 		for i=1,t do
 			game:GetService"Players".LocalPlayer.Character:FindFirstChildOfClass'Humanoid':ChangeState("Jumping")
-			wait(.15)
+			wait(.13)
 			game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"]="Sprinkler Builder"})
-			wait(0.75)
+			wait(0.85)
 		end
 		in_prog=false
 		finished=true
@@ -182,14 +184,17 @@ function esp(part)
 	end
 end
 workspace.Collectibles.ChildAdded:Connect(function(v)
-	pcall(function()
-		if tostring(v) == tostring(game.Players.LocalPlayer.Name) or tostring(v) == "C" then
-			v.Name=v:FindFirstChild"FrontDecal".Texture
-			v.Name=v:FindFirstChild"BackDecal".Texture
+	if gui_run then
+		pcall(function()
+			if tostring(v) == tostring(game.Players.LocalPlayer.Name) or tostring(v) == "C" then
+				v.Name=v:FindFirstChild"FrontDecal".Texture
+				v.Name=v:FindFirstChild"BackDecal".Texture
+			end
+			game.Players.LocalPlayer.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
+		end)
+		if toggles.token_esp and v:IsA("BasePart") then
+			esp(v)
 		end
-	end)
-	if toggles.token_esp and v:IsA("BasePart") then
-		esp(v)
 	end
 end)
 local looping=game:GetService("RunService").Heartbeat:Connect(function()
@@ -228,18 +233,17 @@ end)
 	PageElements:addTextBox(textboxname,textboxdefault,callback)
 	PageElements:addDropdown(dropdownname,list,scrollsize,callback)
 ]]
-game.Players.LocalPlayer.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
 local GUI=loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/aaaa"))()
-local UI=GUI:CreateWindow("BSS","version 1.8c")
+local UI=GUI:CreateWindow("BSS","version 1.8d")
 local Main=UI:addPage("Main",3,true,6)
 local Waypoint=UI:addPage("Waypoints",2,false,6)
-local Boss=UI:addPage("Boss",3,false,6)
+local Enemy=UI:addPage("Enemy",3,false,6)
 local Sp=UI:addPage("Local",3,false,6)
 Main:addToggle("Auto Dig",function(v)
 	toggles.dig=v
 end)
-Main:addDropdown("Select Field",{"Sunflower Field","Mushroom Field","Dandelion Field","Clover Field","Blue Flower Field","Bamboo Field","Spider Field","Strawberry Field","Pineapple Patch","Stump Field","Rose Field","Cactus Field","Pumpkin Patch","Pine Tree Forest","Mountain Top Field","Coconut Field","Pepper Patch"},4,function(v)
-	selected.field=false
+Main:addDropdown("Select Field",{"Sunflower Field","Mushroom Field","Dandelion Field","Clover Field","Blue Flower Field","Bamboo Field","Spider Field","Strawberry Field","Pineapple Patch","Stump Field","Rose Field","Cactus Field","Pumpkin Patch","Pine Tree Forest","Mountain Top Field","Coconut Field","Pepper Patch","Ant Field"},4.25,function(v)
+	selected.field=nil
 	wait()	
 	selected.field=v
 	finished=false
@@ -248,7 +252,7 @@ Main:addToggle("Start Farm",function(v)
 	toggles.farming=v
 	cd=true
 end)
-Main:addToggle("Walk(Set WalkSpeed ~150)",function(v)
+Main:addToggle("Walk (Set WalkSpeed ~150)",function(v)
 	selected.mode=v
 	if v then
 		safe_delay=0
@@ -277,7 +281,7 @@ Main:addButton("Destroy Ui",function()
 	toggles.dig=false
 	toggles.inf_jump=false
 	toggles.only_token=false
-	selected.field=false
+	selected.field=nil
 	selected.jp=hum.JumpPower
 	selected.ws=hum.WalkSpeed
 	selected.tpws=1
@@ -285,9 +289,13 @@ Main:addButton("Destroy Ui",function()
 	HoneyMaking=false
 	toggles.quest=false
 	toggles.vicious=false
+	toggles.commando=false
 	toggles.token_esp=false
-	if  toggles.noclip then
+	if toggles.noclip then
 		toggles.noclip:Disconnect()
+	end
+	if toggles.commando_loop then
+		toggles.commando_loop:Disconnect()
 	end
 	looping:Disconnect()
 	wait(.1)
@@ -310,7 +318,7 @@ Waypoint:addDropdown("Fields",{"Sunflower Field","Mushroom Field","Dandelion Fie
 	if tostring(v)=="Ant Field" then
 		hrp.CFrame=CFrame.new(91.2,34,503)
 	else
-		hrp.CFrame=workspace.FlowerZones[v].CFrame*CFrame.new(0,0,0)
+		hrp.CFrame=workspace.FlowerZones[v].CFrame*CFrame.new(0,3,0)
 	end
 end)
 Waypoint:addDropdown("NPCs",{"Black Bear","Brown Bear","Bubble Bee Man","Dapper Bear","Gifted Bucko Bee","Gifted Riley Bee","Gummy Bear","Honey Bee","Mother Bear","Panda Bear","Polar Bear","Robo Bear","Science Bear","Spirit Bear","Stick Bug","Onett"},3.75,function(v)
@@ -400,13 +408,12 @@ Waypoint:addDropdown("Boss",{"King Beetles Lair","Tunnel Bear","Coconut Crab","C
 	elseif v=="Commando Chick" then hrp.CFrame=CFrame.new(519,47,166)
 	end
 end)
-Boss:addButton("Coconut Crab",function()
+Enemy:addButton("Coconut Crab",function()
 	if hrp then
 		if not workspace:FindFirstChild"FLOOOASD" then
 			local p = Instance.new('Part')
 			p.Name = "FLOOOASD"
 			p.Parent = workspace
-			p.Transparency = 0.5
 			p.Size = Vector3.new(2,0,2)
 			p.Anchored = true
 			p.CFrame = CFrame.new(-266.5,113.25,425.83)
@@ -414,13 +421,45 @@ Boss:addButton("Coconut Crab",function()
 		hrp.CFrame=CFrame.new(-266.5,116,425.83)
 	end
 end)
-Boss:addToggle("Vicious Bee",function(v)
+Enemy:addToggle("Vicious Bee",function(v)
 	toggles.vicious=v
+end)
+Enemy:addToggle("Commando (bug w/o noclip)",function(v)
+	toggles.commando=v
+	if v and hrp then
+		if not workspace:FindFirstChild"FLOOOASD2" then
+			local p = Instance.new('Part')
+			p.Name = "FLOOOASD2"
+			p.Parent = workspace
+			p.Size = Vector3.new(15,0,15)
+			p.Anchored = true
+			p.CFrame = CFrame.new(69420,69420,69420)
+		end
+		hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+Vector3.new(0,3.1,0)
+		while toggles.commando and wait()and hum and chr and hrp and hum.Health>0 do
+			if workspace.Collectibles:FindFirstChild"rbxassetid://2319083910"and workspace.Collectibles:FindFirstChild"rbxassetid://2319083910".Orientation.z==0 then
+				hrp.CFrame=workspace.Collectibles:FindFirstChild"rbxassetid://2319083910".CFrame+Vector3.new(0,.1,0)
+				wait(0.5)
+				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+Vector3.new(0,3.1,0)
+			else
+				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+Vector3.new(0,3.1,0)
+			end
+		end
+	end
+end)
+toggles.commando_loop=game:GetService("RunService").Stepped:Connect(function()
+	if toggles.commando and workspace:FindFirstChild"FLOOOASD2" then
+		for _,v in pairs(game.workspace.Monsters:GetChildren())do
+			if v.Name:lower():find("commando chick") then
+				workspace:FindFirstChild"FLOOOASD2".CFrame=CFrame.new(v.Torso.CFrame.x,52,v.Torso.CFrame.z)
+			end
+		end
+	end
 end)
 Sp:addSlider("Walk Speed",32,400,function(val)
 	selected.ws=val
 end)
-Sp:addSlider("Jump Height",hum.JumpPower,1000,function(val)
+Sp:addSlider("Jump Height",75,1000,function(val)
 	selected.jp=val
 end)
 Sp:addToggle("Infinite Jump",function(v)
