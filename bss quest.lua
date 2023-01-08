@@ -21,6 +21,14 @@ game.ReplicatedStorage.Events.BadgeEvent:FireServer("Collect", "Rose")
 game.ReplicatedStorage.Events.BadgeEvent:FireServer("Collect", "Pine Tree")
 game.ReplicatedStorage.Events.BadgeEvent:FireServer("Collect", "Stump")
 game.ReplicatedStorage.Events.ToyEvent:FireServer("Wealth Clock")
+pcall(function()
+	for _,v in pairs(game.Players.LocalPlayer.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:GetChildren())do
+		if v:IsA"Frame" then
+    	game.ReplicatedStorage.Events.GiveQuest:FireServer(v.TitleBar.Text)
+			game.ReplicatedStorage.Events.CompleteQuest:FireServer(v.TitleBar.Text)
+		end
+	end
+end)
 game.ReplicatedStorage.Events.CompleteQuestFromPool:FireServer("Brown Bear")
 game.ReplicatedStorage.Events.CompleteQuestFromPool:FireServer("Polar Bear")
 game.ReplicatedStorage.Events.CompleteQuestFromPool:FireServer("Honey Bee")
