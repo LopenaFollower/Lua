@@ -1,5 +1,5 @@
 --VARIABLES & FUNCTIONS
-local ver="1.8h"
+local ver="1.8j"
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -19,14 +19,14 @@ local toggles={
 	token_esp=false,
 	noclip=nil,
 	commando=false,
-	commando_loop=nil
+	commando_loop=nil,
+	walk=false
 }
 local selected={
 	field=nil,
 	jp=hum.JumpPower,
 	ws=hum.WalkSpeed,
 	tpws=1,
-	mode=false,
 }
 local cd=true
 local cd2=true
@@ -50,7 +50,7 @@ function goto(x,y,z)
 			if (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude<4 then
 				hrp.Velocity=Vector3.new(0,0,0)
 			end
-			if selected.mode then
+			if toggles.walk then
 				hum.WalkToPoint=Vector3.new(x,hrp.Position.y,z)
 			else
 				chr:TranslateBy((Vector3.new(x,hrp.Position.y,z)-hrp.Position))
@@ -273,7 +273,7 @@ Main:addToggle("Start Farm",function(v)
 	cd=true
 end)
 Main:addToggle("Walk (Set WalkSpeed ~150)",function(v)
-	selected.mode=v
+	toggles.walk=v
 	if v then
 		safe_delay=0
 	else
@@ -300,7 +300,7 @@ Main:addButton("Destroy Ui",function()
 	selected.jp=hum.JumpPower
 	selected.ws=hum.WalkSpeed
 	selected.tpws=1
-	selected.mode=false
+	toggles.walk=false
 	HoneyMaking=false
 	toggles.quest=false
 	toggles.vicious=false
@@ -446,9 +446,9 @@ Enemy:addToggle("Commando (bug w/o noclip)",function(v)
 			local p = Instance.new('Part')
 			p.Name = "FLOOOASD2"
 			p.Parent = workspace
-			p.Size = Vector3.new(15,0,15)
+			p.Size = Vector3.new(5,0,5)
 			p.Anchored = true
-			p.CFrame = CFrame.new(69420,69420,69420)
+			p.CFrame = CFrame.new(513,47,163)
 		end
 		hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+Vector3.new(0,3.1,0)
 		while toggles.commando and wait()and hum and chr and hrp and hum.Health>0 do
