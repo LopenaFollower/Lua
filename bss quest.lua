@@ -22,6 +22,13 @@ game.ReplicatedStorage.Events.BadgeEvent:FireServer("Collect", "Pine Tree")
 game.ReplicatedStorage.Events.BadgeEvent:FireServer("Collect", "Stump")
 game.ReplicatedStorage.Events.ToyEvent:FireServer("Wealth Clock")
 game.ReplicatedStorage.Events.ToyEvent:FireServer("Beesmas Feast")
+game.ReplicatedStorage.Events.ToyEvent:FireServer("Free Royal Jelly Dispenser")
+game.ReplicatedStorage.Events.ToyEvent:FireServer("Honey Dispenser")
+game.ReplicatedStorage.Events.ToyEvent:FireServer("Treat Dispenser")
+game.ReplicatedStorage.Events.ToyEvent:FireServer("Blueberry Dispenser")
+game.ReplicatedStorage.Events.ToyEvent:FireServer("Strawberry Dispenser")
+game.ReplicatedStorage.Events.ToyEvent:FireServer("Free Ant Pass Dispenser")
+game.ReplicatedStorage.Events.ToyEvent:FireServer("Free Robo Pass Dispenser")
 pcall(function()
 	for _,v in pairs(game.Players.LocalPlayer.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:GetChildren())do
 		if v:IsA"Frame" then
