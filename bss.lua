@@ -1,5 +1,8 @@
 --VARIABLES & FUNCTIONS
-local chr=game.Players.LocalPlayer.Character
+local ver="1.8h"
+
+local plr=game.Players.LocalPlayer
+local chr=plr.Character
 local hum=chr and chr:FindFirstChildWhichIsA("Humanoid")
 local hrp=chr.HumanoidRootPart
 local gui_run=false
@@ -43,6 +46,10 @@ game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(1)
 function goto(x,y,z)
 	if math.abs(y-hrp.Position.y) <= 20 then
 		while (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude > 2 and x and y and z and wait()and gui_run and hum and chr and selected.field do
+			nearest(workspace.Bees)
+			if (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude<4 then
+				hrp.Velocity=Vector3.new(0,0,0)
+			end
 			if selected.mode then
 				hum.WalkToPoint=Vector3.new(x,hrp.Position.y,z)
 			else
@@ -52,8 +59,8 @@ function goto(x,y,z)
 	end
 end
 function NoclipLoop()
-	if game.Players.LocalPlayer.Character ~= nil then
-		for _,v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+	if plr.Character ~= nil then
+		for _,v in pairs(plr.Character:GetDescendants()) do
 			if v:IsA("BasePart") and v.CanCollide == true then
 				v.CanCollide = false
 			end
@@ -83,6 +90,19 @@ function auto_quest()
 		cd2=true
 	end	
 end
+function nearest(tbl)
+	local r
+	for _,v in pairs(tbl:GetChildren())do
+		if r==nil then
+			r=v
+		else
+			if(hrp.Position-v.Position).magnitude<(r.Position-hrp.Position).magnitude then
+				r=v
+			end
+		end
+	end
+	hrp.CFrame=CFrame.lookAt(hrp.Position,Vector3.new(r.Position.x,hrp.Position.y,r.Position.z))
+end
 function killvicious()
 	if toggles.vicious then
 		repeat wait() until not HoneyMaking
@@ -93,24 +113,18 @@ function killvicious()
      		end
 		end
 		for _,v in pairs(game.workspace.Monsters:GetChildren()) do
-			if string.find(v.Name,"Vici") then
+			if string.find(v.Name,"Vici")or string.find(v.Name,"Gifted")then
 				toggles.farming=false
 				hrp.CFrame = v.Head.CFrame * CFrame.new(0,13,0)
-			end
-		end
-		for _,r in pairs(game.workspace.Monsters:GetChildren()) do
-			if string.find(r.Name,"Gifted") then
-				toggles.farming=false
-				hrp.CFrame = r.Head.CFrame * CFrame.new(0,13,0)
 			end
 		end
 	end
 end
 function tokens()
 	if cd3 then
-		local Display=workspace[game.Players.LocalPlayer.Name]:WaitForChild"Porcelain Port-O-Hive".Display
+		local Display=workspace[plr.Name]:WaitForChild"Porcelain Port-O-Hive".Display
 		if not HoneyMaking then
-			if Display.Gui.ProgressBar.AbsoluteSize == Display.Gui.RedBar.AbsoluteSize or Display.Gui.ProgressLabel == game.Players.LocalPlayer.CoreStats.Pollen.Value.."/"..game.Players.LocalPlayer.CoreStats.Pollen.Value then
+			if Display.Gui.ProgressBar.AbsoluteSize == Display.Gui.RedBar.AbsoluteSize or Display.Gui.ProgressLabel == plr.CoreStats.Pollen.Value.."/"..plr.CoreStats.Pollen.Value then
 				cd3=false
 				HoneyMaking=true
 				wait(1)
@@ -122,7 +136,7 @@ function tokens()
 				game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p)
 				wait(0.25)
 				game:GetService("ReplicatedStorage").Events.PlayerHiveCommand:FireServer("ToggleHoneyMaking")
-				repeat game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p)wait(.25)until game.Players.LocalPlayer.CoreStats.Pollen.Value <= 1
+				repeat game:GetService("Players").LocalPlayer.Character:MoveTo(game:GetService("Players").LocalPlayer.SpawnPos.Value.p)wait(.25)until plr.CoreStats.Pollen.Value <= 1
 				wait(7)
 				Spin:Destroy()
 				if toggles.farming then
@@ -162,7 +176,7 @@ function tokens()
 	end
 	if toggles.dig and hrp and not HoneyMaking then
 		pcall(function()
-			for _,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+			for _,v in pairs(plr.Character:GetChildren()) do
 				if v:IsA("Tool") then
 					v.ClickEvent:FireServer()
 				end
@@ -183,14 +197,19 @@ function esp(part)
 		a.Color = part.BrickColor
 	end
 end
+workspace.ChildAdded:Connect(function(v)
+	if v:IsA"Model"and v.Name==plr.Name then
+		finished=false
+	end
+end)
 workspace.Collectibles.ChildAdded:Connect(function(v)
 	if gui_run then
 		pcall(function()
-			if tostring(v) == tostring(game.Players.LocalPlayer.Name) or tostring(v) == "C" then
+			if tostring(v) == tostring(plr.Name) or tostring(v) == "C" then
 				v.Name=v:FindFirstChild"FrontDecal".Texture
 				v.Name=v:FindFirstChild"BackDecal".Texture
 			end
-			game.Players.LocalPlayer.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
+			plr.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
 		end)
 		if toggles.token_esp and v:IsA("BasePart") then
 			esp(v)
@@ -199,7 +218,8 @@ workspace.Collectibles.ChildAdded:Connect(function(v)
 end)
 local looping=game:GetService("RunService").Heartbeat:Connect(function()
 	pcall(function()
-		chr=game.Players.LocalPlayer.Character
+		plr=game.Players.LocalPlayer
+		chr=plr.Character
 		hum=chr and chr:FindFirstChildWhichIsA("Humanoid")
 		hrp=chr.HumanoidRootPart
 		hum.JumpPower=selected.jp
@@ -234,7 +254,7 @@ end)
 	PageElements:addDropdown(dropdownname,list,scrollsize,callback)
 ]]
 local GUI=loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/aaaa"))()
-local UI=GUI:CreateWindow("BSS","version 1.8d")
+local UI=GUI:CreateWindow("BSS","version "..ver)
 local Main=UI:addPage("Main",3,true,6)
 local Waypoint=UI:addPage("Waypoints",2,false,6)
 local Enemy=UI:addPage("Enemy",3,false,6)
@@ -269,11 +289,6 @@ end)
 Main:addToggle("ESP Tokens",function(v)
 	toggles.token_esp=v
 end)
-local cd=true
-local cd2=true
-local cd3=true
-local in_prog=false
-local finished=false
 Main:addButton("Destroy Ui",function()
 	gui_run=false
 	toggles.farming=false
