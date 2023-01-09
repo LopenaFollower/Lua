@@ -1,5 +1,5 @@
 --VARIABLES & FUNCTIONS
-local ver="1.8j"
+local ver="1.8k"
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -45,7 +45,7 @@ game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(2)
 game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(1)
 function goto(x,y,z)
 	if math.abs(y-hrp.Position.y) <= 20 then
-		while (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude > 2 and x and y and z and wait()and gui_run and hum and chr and selected.field do
+		while (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude > 2 and x and y and z and wait()and gui_run and hum and chr and selected.field and finished and not in_prog do
 			nearest(workspace.Bees)
 			if (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude<4 then
 				hrp.Velocity=Vector3.new(0,0,0)
@@ -157,11 +157,11 @@ function tokens()
 		end
 		if toggles.farming and cd and finished and not HoneyMaking and selected.field then
 			cd=false
-			if (v.Position-hrp.Position).magnitude <= 80 and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638"and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Orientation.z==0 then
+			if (workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude <= 80 and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638"and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Orientation.z==0 then
 				pcall(function()goto(workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.x, hrp.Position.y, workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.z)end)
 				wait(safe_delay)
 				cd=true
-			elseif (v.Position-hrp.Position).magnitude <= 80 and not toggles.only_token and v.Orientation.z==0 then
+			elseif (workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude <= 80 and not toggles.only_token and v.Orientation.z==0 then
 				pcall(function()goto(v.Position.x, hrp.Position.y, v.Position.z)end)
 				wait(safe_delay)
 				cd=true
