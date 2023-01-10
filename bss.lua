@@ -1,5 +1,5 @@
 --VARIABLES & FUNCTIONS
-local ver="1.8k"
+local ver="1.8m"
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -157,16 +157,16 @@ function tokens()
 		end
 		if toggles.farming and cd and finished and not HoneyMaking and selected.field then
 			cd=false
-			if (workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude <= 80 and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638"and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Orientation.z==0 then
+			if (workspace.FlowerZones[selected.field].Position-v.Position).magnitude <= 80 and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638"and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Orientation.z==0 then
 				pcall(function()goto(workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.x, hrp.Position.y, workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.z)end)
 				wait(safe_delay)
 				cd=true
-			elseif (workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude <= 80 and not toggles.only_token and v.Orientation.z==0 then
+			elseif (workspace.FlowerZones[selected.field].Position-v.Position).magnitude <= 80 and not toggles.only_token and v.Orientation.z==0 then
 				pcall(function()goto(v.Position.x, hrp.Position.y, v.Position.z)end)
 				wait(safe_delay)
 				cd=true
 			else
-				if (workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude >= 80 or math.abs(workspace.FlowerZones[selected.field].Position.y-hrp.Position.y)>12 then
+				if (workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude >= 80 or math.abs(workspace.FlowerZones[selected.field].Position.y-hrp.Position.y)>12 or hrp.Position.y-workspace.FlowerZones[selected.field].Position.y<-1 then
 					hrp.CFrame = workspace.FlowerZones[selected.field].CFrame * CFrame.new(0,2,0)
 				end
 				wait()
@@ -481,7 +481,7 @@ Sp:addToggle("Infinite Jump",function(v)
 	toggles.inf_jump=v
 end)
 Sp:addToggle("Noclip",function(v)
-	if toggles.noclip then
+	if type(toggles.noclip)=="function" then
 		toggles.noclip:Disconnect()
 	else
 		toggles.noclip = game:GetService("RunService").Stepped:Connect(NoclipLoop)
