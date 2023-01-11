@@ -1,5 +1,8 @@
+repeat wait(1)until workspace[game.Players.LocalPlayer.Name]:WaitForChild"Porcelain Port-O-Hive"
+wait(2)
+if false then return end
 --VARIABLES & FUNCTIONS
-local ver="1.8m"
+local ver="1.8r"
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -8,6 +11,9 @@ local hrp=chr.HumanoidRootPart
 local gui_run=false
 local HoneyMaking=false
 local safe_delay=0.25
+
+local afk_mode=true
+
 local toggles={
 	farming=false,
 	tpw=false,
@@ -33,24 +39,29 @@ local cd2=true
 local cd3=true
 local in_prog=false
 local finished=false
+local min_y=-1
 for _,v in pairs(workspace.Collectibles:GetChildren())do
 	v:Destroy()
 end
 gui_run=true
-game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(6)
-game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(5)
-game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(4)
-game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(3)
-game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(2)
-game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(1)
-function goto(x,y,z)
+if not workspace:FindFirstChild"FLOOOASD3" then
+	local p = Instance.new('Part')
+	p.Name = "FLOOOASD3"
+	p.Parent = workspace
+	p.Size = Vector3.new(150,0,150)
+	p.Anchored = true
+	p.Transparency=1
+	p.CFrame = CFrame.new(workspace.FlowerZones["Stump Field"].Position.x,82,workspace.FlowerZones["Stump Field"].Position.z)
+	workspace.Decorations.Stump.Stump:Destroy()
+end
+function goto(x,y,z,m)
 	if math.abs(y-hrp.Position.y) <= 20 then
-		while (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude > 2 and x and y and z and wait()and gui_run and hum and chr and selected.field and finished and not in_prog do
+		while (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude > 2 and x and y and z and m~=nil and wait()and gui_run and hum and chr and selected.field and finished and not in_prog do
 			nearest(workspace.Bees)
 			if (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude<4 then
 				hrp.Velocity=Vector3.new(0,0,0)
 			end
-			if toggles.walk then
+			if m then
 				hum.WalkToPoint=Vector3.new(x,hrp.Position.y,z)
 			else
 				chr:TranslateBy((Vector3.new(x,hrp.Position.y,z)-hrp.Position))
@@ -72,9 +83,10 @@ function set_sprinkler(t)
 		wait()
 	elseif not finished and not HoneyMaking then
 		in_prog=true
+		wait(0.1)
 		for i=1,t do
 			game:GetService"Players".LocalPlayer.Character:FindFirstChildOfClass'Humanoid':ChangeState("Jumping")
-			wait(.13)
+			wait(.14)
 			game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"]="Sprinkler Builder"})
 			wait(0.85)
 		end
@@ -150,7 +162,7 @@ function tokens()
 		end
 	end
 	for _,v in pairs(workspace.Collectibles:GetChildren())do
-		if toggles.farming and not finished and not in_prog and selected.field then
+		if toggles.farming and not finished and not in_prog and selected.field and not HoneyMaking then
 			hrp.CFrame = workspace.FlowerZones[selected.field].CFrame * CFrame.new(0,2,0)
 			wait(0.1)
 			set_sprinkler(4)
@@ -158,15 +170,15 @@ function tokens()
 		if toggles.farming and cd and finished and not HoneyMaking and selected.field then
 			cd=false
 			if (workspace.FlowerZones[selected.field].Position-v.Position).magnitude <= 80 and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638"and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Orientation.z==0 then
-				pcall(function()goto(workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.x, hrp.Position.y, workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.z)end)
+				pcall(function()goto(workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.x, hrp.Position.y, workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.z,toggles.walk)end)
 				wait(safe_delay)
 				cd=true
 			elseif (workspace.FlowerZones[selected.field].Position-v.Position).magnitude <= 80 and not toggles.only_token and v.Orientation.z==0 then
-				pcall(function()goto(v.Position.x, hrp.Position.y, v.Position.z)end)
+				pcall(function()goto(v.Position.x, hrp.Position.y, v.Position.z,toggles.walk)end)
 				wait(safe_delay)
 				cd=true
 			else
-				if (workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude >= 80 or math.abs(workspace.FlowerZones[selected.field].Position.y-hrp.Position.y)>12 or hrp.Position.y-workspace.FlowerZones[selected.field].Position.y<-1 then
+				if (workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude >= 80 or hrp.Position.y-workspace.FlowerZones[selected.field].Position.y<min_y then
 					hrp.CFrame = workspace.FlowerZones[selected.field].CFrame * CFrame.new(0,2,0)
 				end
 				wait()
@@ -197,6 +209,17 @@ function esp(part)
 		a.Color = part.BrickColor
 	end
 end
+if afk_mode then
+	toggles.farming=true
+	toggles.dig=true
+	toggles.inf_jump=true
+	toggles.quest=true
+	toggles.token_esp=true
+	toggles.noclip=game:GetService("RunService").Stepped:Connect(NoclipLoop)
+	toggles.walk=true
+	selected.field="Pepper Patch"
+	selected.ws=175
+end
 workspace.ChildAdded:Connect(function(v)
 	if v:IsA"Model"and v.Name==plr.Name then
 		finished=false
@@ -216,6 +239,13 @@ workspace.Collectibles.ChildAdded:Connect(function(v)
 		end
 	end
 end)
+workspace.Particles.ChildAdded:Connect(function(v)
+	if v.Name=="Crosshair"and gui_run then
+		goto(v.Position.x,hrp.Position.y,v.Position.z,false)
+		wait()
+		goto(v.Position.x,hrp.Position.y,v.Position.z,false)
+	end
+end)
 local looping=game:GetService("RunService").Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
@@ -224,6 +254,7 @@ local looping=game:GetService("RunService").Heartbeat:Connect(function()
 		hrp=chr.HumanoidRootPart
 		hum.JumpPower=selected.jp
 		hum.WalkSpeed=selected.ws
+		plr.CameraMaxZoomDistance=125
 	end)
 	if gui_run and hum and chr and hrp and hum.Health>0 then
 		if toggles.tpw then
@@ -267,6 +298,11 @@ Main:addDropdown("Select Field",{"Sunflower Field","Mushroom Field","Dandelion F
 	wait()	
 	selected.field=v
 	finished=false
+	if v=="Stump Field"then
+		min_y=-30
+	else
+		min_y=-1
+	end
 end)
 Main:addToggle("Start Farm",function(v)
 	toggles.farming=v
@@ -471,7 +507,7 @@ toggles.commando_loop=game:GetService("RunService").Stepped:Connect(function()
 		end
 	end
 end)
-Sp:addSlider("Walk Speed",32,400,function(val)
+Sp:addSlider("Walk Speed",0,300,function(val)
 	selected.ws=val
 end)
 Sp:addSlider("Jump Height",75,1000,function(val)
