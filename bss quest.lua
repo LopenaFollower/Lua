@@ -30,6 +30,12 @@ game.ReplicatedStorage.Events.ToyEvent:FireServer("Blueberry Dispenser")
 game.ReplicatedStorage.Events.ToyEvent:FireServer("Strawberry Dispenser")
 game.ReplicatedStorage.Events.ToyEvent:FireServer("Free Ant Pass Dispenser")
 game.ReplicatedStorage.Events.ToyEvent:FireServer("Free Robo Pass Dispenser")
+game.ReplicatedStorage.Events.ClaimHive:FireServer(6)
+game.ReplicatedStorage.Events.ClaimHive:FireServer(5)
+game.ReplicatedStorage.Events.ClaimHive:FireServer(4)
+game.ReplicatedStorage.Events.ClaimHive:FireServer(3)
+game.ReplicatedStorage.Events.ClaimHive:FireServer(2)
+game.ReplicatedStorage.Events.ClaimHive:FireServer(1)
 pcall(function()
 	for _,v in pairs(game.Players.LocalPlayer.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:GetChildren())do
 		if v:IsA"Frame" then
