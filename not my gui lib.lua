@@ -507,7 +507,7 @@ function Library:CreateWindow(windowname,windowinfo)
             SliderButton.BorderColor3 = Color3.fromRGB(15, 15, 15)
             SliderButton.BorderSizePixel = 0
             SliderButton.Position = UDim2.new(0, 8, 0, 17)
-            SliderButton.Size = UDim2.new(0, 273, 0, 7)
+            SliderButton.Size = UDim2.new(0, 273, 0, 10)
             SliderButton.AutoButtonColor = false
             SliderButton.Font = Enum.Font.SourceSans
             SliderButton.Text = ""
@@ -521,7 +521,7 @@ function Library:CreateWindow(windowname,windowinfo)
             SliderTrail.Parent = SliderButton
             SliderTrail.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
             SliderTrail.BorderColor3 = Color3.fromRGB(40, 40, 40)
-            SliderTrail.Size = UDim2.new(0, 10, 0, 7)
+            SliderTrail.Size = UDim2.new(0, 10, 0, 10)
             
             SliderTrailCorner.Name = "SliderTrailCorner"
             SliderTrailCorner.Parent = SliderTrail
