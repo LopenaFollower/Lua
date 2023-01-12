@@ -1,5 +1,8 @@
+getgenv().sdasdasdasdadaasdas=true
+wait(1)
 for x = 1,100 do 
 	if game.CoreGui:FindFirstChild("fu8rj82n") then game.CoreGui:FindFirstChild("fu8rj82n"):Destroy() end
+	getgenv().sdasdasdasdadaasdas=false
 end
 
 wait()
