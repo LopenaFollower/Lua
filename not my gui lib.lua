@@ -1,33 +1,28 @@
-function DestroyYep()
-    for x = 1,100 do 
-        if game.CoreGui:FindFirstChild("fu8rj82n") then game.CoreGui:FindFirstChild("fu8rj82n"):Destroy() end
-    end
+for x = 1,100 do 
+	if game.CoreGui:FindFirstChild("fu8rj82n") then game.CoreGui:FindFirstChild("fu8rj82n"):Destroy() end
 end
-
-DestroyYep()
 
 wait()
 
 local Library = {}
 
 function Library:CreateWindow(windowname,windowinfo)
-    local fu8rj82n = Instance.new("ScreenGui")
-    local Frame = Instance.new("Frame")
-    local FrameCorner = Instance.new("UICorner")
-    local DashBoard = Instance.new("Frame")
-    local DashBoardCorner = Instance.new("UICorner")
-    local TabContainer = Instance.new("Frame")
-    local TabContainer_2 = Instance.new("UIListLayout")
-    local PageContainer = Instance.new("Frame")
-    local PageContainerCorner = Instance.new("UICorner")
-    local PageFolder = Instance.new("Folder")
-    local Title = Instance.new("TextLabel")
-    local Yep = Instance.new("TextButton")
-    local Cre = Instance.new("ImageLabel")
-    local YepTitle = Instance.new("TextLabel")
-    local YepCorner = Instance.new("UICorner")
-
-    fu8rj82n.Name = "fu8rj82n"
+	local fu8rj82n = Instance.new("ScreenGui")
+	local Frame = Instance.new("Frame")
+	local FrameCorner = Instance.new("UICorner")
+	local DashBoard = Instance.new("Frame")
+	local DashBoardCorner = Instance.new("UICorner")
+	local TabContainer = Instance.new("Frame")
+	local TabContainer_2 = Instance.new("UIListLayout")
+	local PageContainer = Instance.new("Frame")
+	local PageContainerCorner = Instance.new("UICorner")
+	local PageFolder = Instance.new("Folder")
+	local Title = Instance.new("TextLabel")
+	local Yep = Instance.new("TextButton")
+	local Cre = Instance.new("ImageLabel")
+	local YepTitle = Instance.new("TextLabel")
+	local YepCorner = Instance.new("UICorner")
+	fu8rj82n.Name = "fu8rj82n"
     fu8rj82n.Parent = game.CoreGui
     fu8rj82n.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     fu8rj82n.ResetOnSpawn = false
