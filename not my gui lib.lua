@@ -711,7 +711,7 @@ function Library:CreateWindow(windowname,windowinfo)
             DropdownOptionContainer.Position = UDim2.new(0, 0, 0.0782608688, 0)
             DropdownOptionContainer.Size = UDim2.new(0, 288, 0, 8)
             DropdownOptionContainer.Visible = false
-            DropdownOptionContainer.CanvasSize = UDim2.new(0, 0,#list, 0) or UDim2.new(0,0,5,0)
+            DropdownOptionContainer.CanvasSize = UDim2.new(0, 0,#list*0.25, 0) or UDim2.new(0,0,5,0)
             DropdownOptionContainer.ScrollBarThickness = 3
             
             DropdownOptionContainerLayout.Name = "DropdownOptionContainerLayout"
