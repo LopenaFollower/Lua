@@ -6,7 +6,7 @@ if game.PlaceId~=1537690962 then
 	return
 end
 --VARIABLES & FUNCTIONS
-local ver="2.0c"
+local ver="2.0d"
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -126,63 +126,64 @@ function getbbq()
 		if plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content:FindFirstChild"Frame"then wait()
 			sum=0
 			total=0
-			for _,quests in pairs(plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:GetChildren())do wait()
-				if quests:IsA"Frame"then wait()
-					if quests.TitleBar.Text:lower():find("brown bear:")then wait()
+			for _,quests in pairs(plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:GetChildren())do
+				if quests:IsA"Frame"then
+					if quests.TitleBar.Text:lower():find("brown bear:")then
 						quests.Name="TheBBQ"
-						for _,tasks in pairs(quests:GetChildren())do wait()
-							if quests:FindFirstChild"PRs"then
-								quests:FindFirstChild"PRs":Destroy()
-							end
-							PRs=quests.TitleBar:Clone()
-							PRs.Parent=quests
-							PRs.Name="PRs"
-							PRs.Transparency=0
-							if tasks:IsA"Frame"then
-								sum=sum+tasks.FillBar.AbsoluteSize.x
-								total=total+tasks.AbsoluteSize.x
-							end
-							wait()
-							quests.PRs.Text="Progress: "..tostring(math.round((sum/total)*10000)/100).."%"
-							if tasks:IsA"Frame"and tasks.FillBar.AbsoluteSize.x<=287.995 then wait()
-								for n=1,#goals do wait()
-									if tasks.Description.Text:find(goals[n])then
-										if(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")and(goals[n]:find"Field"or goals[n]:find"Patch")then
-											res=goals[n]
-										elseif goals[n]=="White"and not(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
-											if workspace.MonsterSpawners.CoconutCrab.TimerAttachment.TimerGui.TimerLabel.Text:find("Crab")then
-												res="Coconut Field"
-											else
-												res="Spider Field"
-											end
-										elseif goals[n]=="Red"and not(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
-											res="Pepper Patch"
-										elseif goals[n]=="Blue"and not(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
-											res="Pine Tree Forest"
-										end
-										if old_field~=nil and old_field~=false and res~=nil then
-											if old_field~=res then
-												hrp.CFrame=workspace.FlowerZones[res].CFrame*CFrame.new(0,2,0)
-												finished=false
-											end
-										end
-										if res~=nil then
-											old_field=res
-											return res
-										end
-									end
+					end
+				end
+			end
+			local bbq=plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:FindFirstChild"TheBBQ"
+			for _,tasks in pairs(bbq:GetChildren())do
+				if bbq:FindFirstChild"PRs"then
+					bbq:FindFirstChild"PRs":Destroy()
+				end
+				PRs=bbq.TitleBar:Clone()
+				PRs.Parent=bbq
+				PRs.Name="PRs"
+				PRs.Transparency=0
+				if tasks:IsA"Frame"then
+					sum=sum+tasks.FillBar.AbsoluteSize.x
+					total=tasks.AbsoluteSize.x*(#bbq:GetChildren()-2)
+					bbq.PRs.Text="Progress: "..tostring(math.round((sum/total)*10000)/100).."%"
+				end
+				if tasks:IsA"Frame"and tasks.FillBar.AbsoluteSize.x<=287.9975 then
+					for n=1,#goals do wait()
+						if tasks.Description.Text:find(goals[n])then
+							if(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")and(goals[n]:find"Field"or goals[n]:find"Patch")then
+								res=goals[n]
+							elseif goals[n]=="White"and not(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
+								if workspace.MonsterSpawners.CoconutCrab.TimerAttachment.TimerGui.TimerLabel.Text:find("Crab")then
+									res="Coconut Field"
+								else
+									res="Spider Field"
 								end
+							elseif goals[n]=="Red"and not(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
+								res="Pepper Patch"
+							elseif goals[n]=="Blue"and not(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
+								res="Pine Tree Forest"
+							end
+							if old_field~=nil and old_field~=false and res~=nil and  old_field~=res then
+								hrp.CFrame=workspace.FlowerZones[res].CFrame*CFrame.new(0,2,0)
+								finished=false
+							end
+							if res~=nil then
+								old_field=res
+								return res
 							end
 						end
 					end
 				end
 			end
 		else
-			mousemoveabs(90+math.random(5),110+math.random(5))
-			wait(1.5)
-			mouse1down()
-			wait()
-			mouse1up()
+			local mmm = game.UserInputService:GetMouseLocation()
+			if math.abs(mmm.x-90)>10 or math.abs(mmm.y-110)>10 then
+				mousemoveabs(90,110)
+			else
+				mouse1down()
+				wait()
+				mouse1up()
+			end
 		end
 	end
 end
@@ -233,7 +234,7 @@ function tokens()
 				hum.WalkToPoint=plr.SpawnPos.Value.p
 				Spin.AngularVelocity=Spin.AngularVelocity*-1
 				wait(2.5)
-				if not workspace.Particles:FindFirstChild"HoneyBeam" or not tostring(workspace.Particles:FindFirstChild"HoneyBeam".Attachment1)==tostring(plr.DisplayName) then
+				if not workspace.Particles:FindFirstChild"HoneyBeam"or not tostring(workspace.Particles:FindFirstChild"HoneyBeam".Attachment1)==tostring(plr.DisplayName) then
 					game.ReplicatedStorage.Events.PlayerHiveCommand:FireServer"ToggleHoneyMaking"
 				end
 			until plr.CoreStats.Pollen.Value<=1
@@ -392,7 +393,7 @@ local looping=game.RunService.Heartbeat:Connect(function()
 			if cd3 then
 				cd3=false
 				selected.field=getbbq()
-				wait(2.5)
+				wait(1)
 				cd3=true
 			end
 		end
