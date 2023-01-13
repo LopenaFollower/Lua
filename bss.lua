@@ -6,7 +6,7 @@ if game.PlaceId~=1537690962 then
 	return
 end
 --VARIABLES & FUNCTIONS
-local ver="2.0d"
+local ver="2.0e"
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -15,7 +15,7 @@ local hrp=chr.HumanoidRootPart
 local gui_run=false
 local HoneyMaking=false
 local safe_delay=.25
-
+-- 1 for honey, 2 for brown bear quests
 local afk_mode=false
 
 local toggles={
@@ -311,7 +311,7 @@ function esp(part)
 		a.Color=part.BrickColor
 	end
 end
-if afk_mode then
+if afk_mode==1 then
 	toggles.farming=true
 	toggles.dig=true
 	toggles.inf_jump=true
@@ -321,6 +321,8 @@ if afk_mode then
 	toggles.walk=true
 	selected.field="Pepper Patch"
 	selected.ws=175
+elseif afk_mode==2 then
+	toggles.bb=true
 end
 game.ReplicatedStorage.Events.ClaimHive:FireServer(6)
 game.ReplicatedStorage.Events.ClaimHive:FireServer(5)
