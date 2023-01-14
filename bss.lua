@@ -1,12 +1,12 @@
 repeat
 	wait(1)
 until workspace[game.Players.LocalPlayer.Name]:WaitForChild"Porcelain Port-O-Hive"and game:IsLoaded()
-wait()
+wait(5)
 if game.PlaceId~=1537690962 then
 	return
 end
 --VARIABLES & FUNCTIONS
-local ver="2.0e"
+local ver="2.0g"
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -15,8 +15,12 @@ local hrp=chr.HumanoidRootPart
 local gui_run=false
 local HoneyMaking=false
 local safe_delay=.25
--- 1 for honey, 2 for brown bear quests
-local afk_mode=false
+-- 1 for honey, 2 for leaves
+local afk_mode=false --math.round(math.abs(math.random()-0.2))+1
+print("afk mode: "..tostring(afk_mode))
+if afk_mode==false then
+	--return
+end
 
 local toggles={
 	farming=false,
@@ -47,8 +51,8 @@ local in_prog=false
 local finished=false
 local min_y=-1
 local old_field
-local sum
-local total
+local sum=0
+local total=0
 local PRs
 for _,v in pairs(workspace.Collectibles:GetChildren())do
 	v:Destroy()
@@ -64,11 +68,33 @@ if not workspace:FindFirstChild"FLOOOASD3"then
 	p.CFrame=CFrame.new(workspace.FlowerZones["Stump Field"].Position.x,82,workspace.FlowerZones["Stump Field"].Position.z)
 	workspace.Decorations.Stump.Stump:Destroy()
 end
+function vector(x,y,z)
+	local x1,y1,z1
+	if 'number'==type(x)then
+		x1=x
+	else
+		x1=x.Position.x
+	end
+	if 'number'==type(y)then
+		y1=y
+	else
+		y1=y.Position.y
+	end
+	if 'number'==type(z)then
+		z1=z
+	else
+		z1=z.Position.z
+	end
+	if x1 and y1 and z1 then
+		return Vector3.new(x1,y1,z1)
+	end
+end
 function goto(x,y,z,m)
 	if math.abs(y-hrp.Position.y)<=10 then
-		while (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude > 2 and x and y and z and m~=nil and wait()and gui_run and hum and chr and selected.field and finished and not in_prog do
-			nearest(workspace.Bees)
-			if (Vector3.new(x,hrp.Position.y,z)-hrp.Position).Magnitude<=4 then
+		while (vector(x,hrp,z)-hrp.Position).Magnitude > 2 and x and y and z and m~=nil and wait()and gui_run and hum and chr and selected.field and finished and not in_prog do
+			local bee=nearest(workspace.Bees)
+			hrp.CFrame=CFrame.lookAt(hrp.Position,Vector3.new(bee.Position.x,hrp.Position.y,bee.Position.z))
+			if (vector(x,hrp,z)-hrp.Position).Magnitude<=4 then
 				hrp.Velocity=Vector3.new(0,0,0)
 			end
 			if m then
@@ -123,9 +149,7 @@ function getbbq()
 	if gui_run and hum and chr and hrp and hum.Health>0 then
 		local goals={"White","Red","Blue","Sunflower Field","Mushroom Field","Dandelion Field","Clover Field","Blue Flower Field","Bamboo Field","Spider Field","Strawberry Field","Pineapple Patch","Stump Field","Rose Field","Cactus Field","Pumpkin Patch","Pine Tree Forest","Mountain Top Field","Coconut Field","Pepper Patch"}
 		local res
-		if plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content:FindFirstChild"Frame"then wait()
-			sum=0
-			total=0
+		if plr and plr.PlayerGui and plr.PlayerGui.ScreenGui and plr.PlayerGui.ScreenGui.Menus and plr.PlayerGui.ScreenGui.Menus.Children and plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content:FindFirstChild"Frame"then wait()
 			for _,quests in pairs(plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:GetChildren())do
 				if quests:IsA"Frame"then
 					if quests.TitleBar.Text:lower():find("brown bear:")then
@@ -134,33 +158,41 @@ function getbbq()
 				end
 			end
 			local bbq=plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:FindFirstChild"TheBBQ"
+			local tsks=bbq:GetChildren()
+			total=288*(#bbq:GetChildren()-2)
+			if bbq:FindFirstChild"PRs"then
+				bbq:FindFirstChild"PRs":Destroy()
+			end
+			local m1=1000--each 0 represents a decimal place. in this case its 1.000
+			local m2=tonumber(tostring(m1).."00")
+			PRs=bbq.TitleBar:Clone()
+			PRs.Parent=bbq
+			PRs.Name="PRs"
+			PRs.Transparency=0
+			for i=1,#tsks do
+				if bbq[tostring(tsks[i])]:IsA"Frame"then
+					sum=sum+tsks[i].FillBar.AbsoluteSize.x
+				end
+				bbq.PRs.Text="Progress: "..tostring(math.round((sum/total)*m2)/m1).."%"
+			end
+			wait()
+			sum=0
+			total=0
 			for _,tasks in pairs(bbq:GetChildren())do
-				if bbq:FindFirstChild"PRs"then
-					bbq:FindFirstChild"PRs":Destroy()
-				end
-				PRs=bbq.TitleBar:Clone()
-				PRs.Parent=bbq
-				PRs.Name="PRs"
-				PRs.Transparency=0
-				if tasks:IsA"Frame"then
-					sum=sum+tasks.FillBar.AbsoluteSize.x
-					total=tasks.AbsoluteSize.x*(#bbq:GetChildren()-2)
-					bbq.PRs.Text="Progress: "..tostring(math.round((sum/total)*10000)/100).."%"
-				end
 				if tasks:IsA"Frame"and tasks.FillBar.AbsoluteSize.x<=287.9975 then
 					for n=1,#goals do wait()
 						if tasks.Description.Text:find(goals[n])then
-							if(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")and(goals[n]:find"Field"or goals[n]:find"Patch")then
+							if(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")and(goals[n]:find"Forest"or goals[n]:find"Field"or goals[n]:find"Patch")then
 								res=goals[n]
-							elseif goals[n]=="White"and not(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
+							elseif goals[n]=="White"and not(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
 								if workspace.MonsterSpawners.CoconutCrab.TimerAttachment.TimerGui.TimerLabel.Text:find("Crab")then
 									res="Coconut Field"
 								else
 									res="Spider Field"
 								end
-							elseif goals[n]=="Red"and not(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
+							elseif goals[n]=="Red"and not(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
 								res="Pepper Patch"
-							elseif goals[n]=="Blue"and not(tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
+							elseif goals[n]=="Blue"and not(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
 								res="Pine Tree Forest"
 							end
 							if old_field~=nil and old_field~=false and res~=nil and  old_field~=res then
@@ -198,7 +230,7 @@ function nearest(tbl)
 			end
 		end
 	end
-	hrp.CFrame=CFrame.lookAt(hrp.Position,Vector3.new(r.Position.x,hrp.Position.y,r.Position.z))
+	return r
 end
 function killvicious()
 	if toggles.vicious then
@@ -228,17 +260,23 @@ function tokens()
 			local Spin=BAV(Vector3.new(0,10,0),hrp,"Spinning")
 			chr:MoveTo(plr.SpawnPos.Value.p)
 			wait(.25)
-			game.ReplicatedStorage.Events.PlayerHiveCommand:FireServer"ToggleHoneyMaking"
 			repeat
 				chr:MoveTo(plr.SpawnPos.Value.p)
 				hum.WalkToPoint=plr.SpawnPos.Value.p
 				Spin.AngularVelocity=Spin.AngularVelocity*-1
-				wait(2.5)
-				if not workspace.Particles:FindFirstChild"HoneyBeam"or not tostring(workspace.Particles:FindFirstChild"HoneyBeam".Attachment1)==tostring(plr.DisplayName) then
-					game.ReplicatedStorage.Events.PlayerHiveCommand:FireServer"ToggleHoneyMaking"
-				end
+				wait(3)
+				pcall(function()
+					if not workspace.Particles:FindFirstChild"MyBeam"then
+						game.ReplicatedStorage.Events.PlayerHiveCommand:FireServer"ToggleHoneyMaking"
+					end
+				end)
 			until plr.CoreStats.Pollen.Value<=1
 			wait(7)
+			if isfile"bss.txt"then
+				appendfile("bss.txt","\n"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%c"))
+			else
+				writefile("bss.txt","\n"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%c"))
+			end
 			Spin:Destroy()
 			if toggles.farming then
 				hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
@@ -287,17 +325,6 @@ function tokens()
 		end)
 	end
 end
-workspace.Flowers.DescendantAdded:Connect(function(v)
-	if v.Name:find"LeafBurst"and toggles.leaves then
-		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame=v.Parent.CFrame*CFrame.new(0,0,0)
-		print(v.Parent.Parent.Name)
-		for _,i in pairs(workspace.Collectibles:GetChildren())do
-			if(i.Position-hrp.Position).magnitude<10 then
-				chr:TranslateBy((Vector3.new(i.Position.x+math.random(),hrp.Position.y,i.Position.z)-hrp.Position))
-			end
-		end
-	end
-end)
 function esp(part)
 	if part:IsA"BasePart" and not part:FindFirstChild"content.com/Lopen"then
 		local a=Instance.new"BoxHandleAdornment"
@@ -321,8 +348,10 @@ if afk_mode==1 then
 	toggles.walk=true
 	selected.field="Pepper Patch"
 	selected.ws=175
-elseif afk_mode==2 then
-	toggles.bb=true
+end
+if afk_mode==2 then
+	toggles.leaves=true
+	toggles.dig=true
 end
 game.ReplicatedStorage.Events.ClaimHive:FireServer(6)
 game.ReplicatedStorage.Events.ClaimHive:FireServer(5)
@@ -330,12 +359,25 @@ game.ReplicatedStorage.Events.ClaimHive:FireServer(4)
 game.ReplicatedStorage.Events.ClaimHive:FireServer(3)
 game.ReplicatedStorage.Events.ClaimHive:FireServer(2)
 game.ReplicatedStorage.Events.ClaimHive:FireServer(1)
+for _,v in pairs(workspace[plr.Name]:GetDescendants())do
+	if v.Name=="BodyBackAttachment"then
+		v.Name=plr.DisplayName
+	end
+end
 workspace.ChildAdded:Connect(function(v)
 	wait(0.25)
 	if v:IsA"Model"and v.Name==plr.Name and workspace[plr.Name].UpperTorso:FindFirstChild"BodyBackAttachment" then
 		finished=false
-		workspace[plr.Name].UpperTorso.BodyBackAttachment.Name=plr.DisplayName
-		workspace[plr.Name]["Porcelain Port-O-Hive"].Handle.BodyBackAttachment.Name=plr.DisplayName
+		for _,v in pairs(workspace[plr.Name]:GetDescendants())do
+			if v.Name=="BodyBackAttachment"then
+				v.Name=plr.DisplayName
+			end
+		end
+	end
+end)
+workspace.Flowers.DescendantAdded:Connect(function(v)
+	if v.Name:find"LeafBurst"and toggles.leaves then
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame=v.Parent.CFrame*CFrame.new(0,0,0)
 	end
 end)
 workspace.Collectibles.ChildAdded:Connect(function(v)
@@ -354,9 +396,18 @@ workspace.Collectibles.ChildAdded:Connect(function(v)
 end)
 workspace.Particles.ChildAdded:Connect(function(v)
 	if v.Name=="Crosshair"and gui_run then
-		for i=0,5 do
+		for i=0,3 do wait()
 			hrp.Velocity=Vector3.new(0,0,0)
 			goto(v.Position.x,hrp.Position.y,v.Position.z,false)
+		end
+	end
+	if v:IsA"Beam"and tostring(v.Attachment1)==tostring(game.Players.LocalPlayer.DisplayName)then
+		v.Name="MyBeam"
+	end
+	game.Lighting.FogEnd=100000
+	for i,v in pairs(game.Lighting:GetDescendants()) do
+		if v:IsA("Atmosphere") then
+			v:Destroy()
 		end
 	end
 end)
