@@ -338,10 +338,10 @@ function tokens()
 				end)
 			until plr.CoreStats.Pollen.Value<=1 and not workspace.Particles:FindFirstChild"MyBeam"
 			wait(1)
-			if isfile"bss.txt"then
-				appendfile("bss.txt","<br>"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%c"))
+			if isfile"bss.html"then
+				appendfile("bss.html","<br>"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%x, %X"))
 			else
-				writefile("bss.txt","<br>"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%c"))
+				writefile("bss.html","<br>"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%x, %X"))
 			end
 			if toggles.farming then
 				hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
@@ -465,7 +465,7 @@ workspace.Collectibles.ChildAdded:Connect(function(v)
 end)
 workspace.Particles.ChildAdded:Connect(function(v)
 	if v.Name=="Crosshair"and gui_run and toggles.farming then
-		for i=0,3 do wait()
+		for i=0,4 do wait()
 			hrp.Velocity=Vector3.new(0,0,0)
 			goto(v.Position.x,hrp.Position.y,v.Position.z,false)
 		end
