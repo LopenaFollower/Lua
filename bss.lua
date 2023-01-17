@@ -1,12 +1,13 @@
 repeat
 	wait(1)
 until workspace[game.Players.LocalPlayer.Name]:WaitForChild"Porcelain Port-O-Hive"and game:IsLoaded()
-wait(5)
+wait()
+
 if game.PlaceId~=1537690962 then
 	return
 end
 --VARIABLES & FUNCTIONS
-local ver="2.0g"
+local ver="2.1a"
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -15,12 +16,11 @@ local hrp=chr.HumanoidRootPart
 local gui_run=false
 local HoneyMaking=false
 local safe_delay=.25
--- 1 for honey, 2 for leaves
-local afk_mode=false --math.round(math.abs(math.random()-0.2))+1
-print("afk mode: "..tostring(afk_mode))
-if afk_mode==false then
-	--return
-end
+--[[
+1 for honey,
+2 for leaves
+]]
+local afk_mode=false
 
 local toggles={
 	farming=false,
@@ -36,7 +36,9 @@ local toggles={
 	commando_loop=nil,
 	walk=false,
 	bb=false,
-	leaves=false
+	leaves=false,
+	ccnc=false,
+	ccnl=nil
 }
 local selected={
 	field=nil,
@@ -50,10 +52,18 @@ local cd3=true
 local in_prog=false
 local finished=false
 local min_y=-1
+local goals={"White","Red","Blue","Sunflower Field","Mushroom Field","Dandelion Field","Clover Field","Blue Flower Field","Bamboo Field","Spider Field","Strawberry Field","Pineapple Patch","Stump Field","Rose Field","Cactus Field","Pumpkin Patch","Pine Tree Forest","Mountain Top Field","Coconut Field","Pepper Patch"}
 local old_field
 local sum=0
 local total=0
 local PRs
+local m1=1000--each 0 represents a decimal place. in this case its 1.000
+local m2=tonumber(tostring(m1).."00")
+local mmm
+local apnt
+local pr
+local offset
+local fl=false
 for _,v in pairs(workspace.Collectibles:GetChildren())do
 	v:Destroy()
 end
@@ -114,6 +124,66 @@ function NoclipLoop()
 		end
 	end
 end
+function ccnc_func()
+	if toggles.ccnc then
+		repeat
+			wait()
+		until workspace:FindFirstChild"CrabModel"
+		pcall(function()
+			if workspace:FindFirstChild"CrabModel" then
+				if math.random()<0.15 and workspace.Collectibles:FindFirstChild"rbxassetid://2319083910"and workspace.Collectibles:FindFirstChild"rbxassetid://2319083910".Orientation.z==0 and workspace.Collectibles:FindFirstChild"rbxassetid://2319083910".Position.z<=468 and workspace.Collectibles:FindFirstChild"rbxassetid://2319083910".Position.z>=424 then
+					hrp.CFrame=workspace.Collectibles:FindFirstChild"rbxassetid://2319083910".CFrame+Vector3.new(0,.1,0)
+					wait()
+				end
+				if math.random()<0.05 and not fl and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638"and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Orientation.z==0 and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.z<=468 and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.z>=424 then
+					hrp.CFrame=workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".CFrame+Vector3.new(0,.1,0)
+					wait()
+				end
+				apnt=workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker"
+				pr=workspace.Particles
+				offset=25
+				if hrp.Position.y<=71 then
+					hrp.CFrame=CFrame.new(hrp.Position.x,72,hrp.Position.z)
+				end
+				if math.random()<0.025 and hrp.Position.z>=430 then
+					hum.WalkToPoint=Vector3.new(apnt.Position.x-offset,hrp.Position.y,hrp.Position.z-5)
+				end
+				if(hrp.Position.x+255)>=0 and not fl then
+					if hrp.Position.z<=475 and hrp.Position.z>=424 then
+						hrp.CFrame=CFrame.new(apnt.Position.x-offset,hrp.Position.y,hrp.Position.z)
+					else
+						hrp.CFrame=CFrame.new(apnt.Position.x-offset,hrp.Position.y,436)
+					end
+				end
+				if(hrp.Position.x+255)<=0 and not fl then
+					if hrp.Position.z<=475 and hrp.Position.z>=424 then
+						hrp.CFrame=CFrame.new(apnt.Position.x+offset,hrp.Position.y,hrp.Position.z)
+					else
+						hrp.CFrame=CFrame.new(apnt.Position.x+offset,hrp.Position.y,436)
+					end
+				end
+				for _,v in pairs(pr:GetChildren())do
+					if v:IsA"BasePart"and v.Size.x>35 then
+						if v.Name=="WarningDisk" then
+							if(Vector3.new(v.Position.x,hrp.Position.y,v.Position.z)-hrp.Position).magnitude<23 then
+								fl=true
+								if(hrp.Position.x+255)<=0 then
+									hrp.CFrame=CFrame.new(v.Position.x+23,hrp.Position.y,hrp.Position.z)
+								end
+								if(hrp.Position.x+255)>=0 then
+									hrp.CFrame=CFrame.new(v.Position.x-23,hrp.Position.y,hrp.Position.z)
+								end
+							else
+								wait(0.25)
+								fl=false
+							end
+						end
+					end	
+				end
+			end
+		end)
+	end
+end
 function set_sprinkler(t)
 	if in_prog then 
 		wait()
@@ -147,7 +217,6 @@ function BAV(AngularVelocity,Parent,Name)
 end
 function getbbq()
 	if gui_run and hum and chr and hrp and hum.Health>0 then
-		local goals={"White","Red","Blue","Sunflower Field","Mushroom Field","Dandelion Field","Clover Field","Blue Flower Field","Bamboo Field","Spider Field","Strawberry Field","Pineapple Patch","Stump Field","Rose Field","Cactus Field","Pumpkin Patch","Pine Tree Forest","Mountain Top Field","Coconut Field","Pepper Patch"}
 		local res
 		if plr and plr.PlayerGui and plr.PlayerGui.ScreenGui and plr.PlayerGui.ScreenGui.Menus and plr.PlayerGui.ScreenGui.Menus.Children and plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content:FindFirstChild"Frame"then wait()
 			for _,quests in pairs(plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:GetChildren())do
@@ -163,8 +232,6 @@ function getbbq()
 			if bbq:FindFirstChild"PRs"then
 				bbq:FindFirstChild"PRs":Destroy()
 			end
-			local m1=1000--each 0 represents a decimal place. in this case its 1.000
-			local m2=tonumber(tostring(m1).."00")
 			PRs=bbq.TitleBar:Clone()
 			PRs.Parent=bbq
 			PRs.Name="PRs"
@@ -208,7 +275,7 @@ function getbbq()
 				end
 			end
 		else
-			local mmm = game.UserInputService:GetMouseLocation()
+			mmm=game.UserInputService:GetMouseLocation()
 			if math.abs(mmm.x-90)>10 or math.abs(mmm.y-110)>10 then
 				mousemoveabs(90,110)
 			else
@@ -257,27 +324,25 @@ function tokens()
 		if hum and chr and Display.Gui.ProgressBar.AbsoluteSize==Display.Gui.RedBar.AbsoluteSize or Display.Gui.ProgressLabel==plr.CoreStats.Pollen.Value.."/"..plr.CoreStats.Pollen.Value then
 			HoneyMaking=true
 			wait(1)
-			local Spin=BAV(Vector3.new(0,10,0),hrp,"Spinning")
 			chr:MoveTo(plr.SpawnPos.Value.p)
-			wait(.25)
+			wait(.05)
 			repeat
-				chr:MoveTo(plr.SpawnPos.Value.p)
-				hum.WalkToPoint=plr.SpawnPos.Value.p
-				Spin.AngularVelocity=Spin.AngularVelocity*-1
+				chr:MoveTo(plr.SpawnPos.Value.p+Vector3.new(0,0,10))
+				hum.WalkToPoint=Vector3.new(plr.SpawnPos.Value.x,hrp.Position.y,plr.SpawnPos.Value.z)+Vector3.new(0,0,10)
+				hrp.CFrame=CFrame.new(hrp.CFrame.p,hrp.CFrame.p+Vector3.new(0,0,0.001))
 				wait(3)
 				pcall(function()
 					if not workspace.Particles:FindFirstChild"MyBeam"then
 						game.ReplicatedStorage.Events.PlayerHiveCommand:FireServer"ToggleHoneyMaking"
 					end
 				end)
-			until plr.CoreStats.Pollen.Value<=1
-			wait(7)
+			until plr.CoreStats.Pollen.Value<=1 and not workspace.Particles:FindFirstChild"MyBeam"
+			wait(1)
 			if isfile"bss.txt"then
-				appendfile("bss.txt","\n"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%c"))
+				appendfile("bss.txt","<br>"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%c"))
 			else
-				writefile("bss.txt","\n"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%c"))
+				writefile("bss.txt","<br>"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%c"))
 			end
-			Spin:Destroy()
 			if toggles.farming then
 				hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
 			end
@@ -292,7 +357,7 @@ function tokens()
 			wait(.25)
 			set_sprinkler(5)
 		end
-		if toggles.farming and cd and finished and not HoneyMaking and selected.field then
+		if toggles.farming and cd and finished and not HoneyMaking and selected.field and not toggles.ccnc then
 			cd=false
 			if (workspace.FlowerZones[selected.field].Position-v.Position).magnitude<=80 and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638"and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Orientation.z==0 then
 				pcall(function()
@@ -309,13 +374,14 @@ function tokens()
 			else
 				if(workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude>=80 or hrp.Position.y-workspace.FlowerZones[selected.field].Position.y<min_y then
 					hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
+					hum.WalkToPoint=workspace.FlowerZones[selected.field].CFrame.p
 				end
 				wait()
 				cd=true
 			end
 		end
 	end
-	if toggles.dig and hrp and not HoneyMaking then
+	if toggles.dig and hrp then
 		pcall(function()
 			for _,v in pairs(chr:GetChildren()) do
 				if v:IsA"Tool"then
@@ -368,6 +434,9 @@ workspace.ChildAdded:Connect(function(v)
 	wait(0.25)
 	if v:IsA"Model"and v.Name==plr.Name and workspace[plr.Name].UpperTorso:FindFirstChild"BodyBackAttachment" then
 		finished=false
+		if toggles.ccnl then
+			toggles.ccnl:Disconnect()
+		end
 		for _,v in pairs(workspace[plr.Name]:GetDescendants())do
 			if v.Name=="BodyBackAttachment"then
 				v.Name=plr.DisplayName
@@ -395,7 +464,7 @@ workspace.Collectibles.ChildAdded:Connect(function(v)
 	end
 end)
 workspace.Particles.ChildAdded:Connect(function(v)
-	if v.Name=="Crosshair"and gui_run then
+	if v.Name=="Crosshair"and gui_run and toggles.farming then
 		for i=0,3 do wait()
 			hrp.Velocity=Vector3.new(0,0,0)
 			goto(v.Position.x,hrp.Position.y,v.Position.z,false)
@@ -514,26 +583,45 @@ Main:addToggle("ESP Tokens",function(v)
 	toggles.token_esp=v
 end)
 Main:addButton("Destroy Ui",function()
+	looping:Disconnect()
 	gui_run=false
 	toggles.farming=false
 	toggles.tpw=false
 	toggles.dig=false
 	toggles.inf_jump=false
 	toggles.only_token=false
+	toggles.quest=false
+	toggles.vicious=false
+	toggles.token_esp=false
 	selected.field=nil
 	selected.jp=hum.JumpPower
 	selected.ws=hum.WalkSpeed
-	selected.tpws=1
+	selected.tpws=0
 	toggles.walk=false
 	HoneyMaking=false
-	toggles.quest=false
-	toggles.vicious=false
 	toggles.commando=false
 	toggles.leaves=false
-	toggles.token_esp=false
 	toggles.bb=false
+	toggles.ccnc=false
+	cd=true
+	cd2=true
+	cd3=true
+	in_prog=false
+	finished=false
+	min_y=-1
+	old_field=nil
+	sum=0
+	total=0
+	PRs=nil
+	mmm=nil
+	apnt=nil
+	pr=nil
+	fl=false
 	if toggles.noclip then
 		toggles.noclip:Disconnect()
+	end
+	if toggles.ccnl then
+		toggles.ccnl:Disconnect()
 	end
 	if toggles.commando_loop then
 		toggles.commando_loop:Disconnect()
@@ -715,17 +803,16 @@ Waypoint:addDropdown("Boss",{"King Beetles Lair","Tunnel Bear","Coconut Crab","C
 		hrp.CFrame=CFrame.new(519,47,166)
 	end
 end)
-Enemy:addButton("Coconut Crab",function()
-	if hrp then
-		if not workspace:FindFirstChild"FLOOOASD"then
-			local p=Instance.new"Part"
-			p.Name="FLOOOASD"
-			p.Parent=workspace
-			p.Size=Vector3.new(2,0,2)
-			p.Anchored=true
-			p.CFrame=CFrame.new(-266.5,113.25,425.83)
+Enemy:addToggle("Coconut Crab",function(v)
+	toggles.ccnc=v
+	if toggles.ccnc then
+		if type(toggles.ccnl)=="function"then
+			toggles.ccnl:Disconnect()
+		else
+			toggles.ccnl=game.RunService.Stepped:Connect(ccnc_func)
 		end
-		hrp.CFrame=CFrame.new(-266.5,116,425.83)
+	else
+		toggles.ccnl:Disconnect()
 	end
 end)
 Enemy:addToggle("Vicious Bee",function(v)
@@ -783,9 +870,9 @@ Sp:addToggle("Infinite Jump",function(v)
 	toggles.inf_jump=v
 end)
 Sp:addToggle("Noclip",function(v)
-	if type(toggles.noclip)=="function"then
+	if type(toggles.noclip)=="function"and not v then
 		toggles.noclip:Disconnect()
-	else
+	elseif v then
 		toggles.noclip=game.RunService.Stepped:Connect(NoclipLoop)
 	end
 end)
