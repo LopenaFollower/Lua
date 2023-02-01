@@ -12,6 +12,15 @@ _G.cng={
 	gl=false,
 	bl=false
 }
+_G.rgbresult={
+	result={
+		ac={
+			nested={
+				actualresult=nil
+			}
+		}
+	}
+}
 function rgb()
 	if _G.cng.rg then _G.yc.r=_G.yc.r+_G.yc.incr end
 	if _G.cng.gg then _G.yc.g=_G.yc.g+_G.yc.incr end
@@ -68,7 +77,7 @@ function rgb()
 		_G.cng.bg=false
 	end
 	wait()
+	_G.rgbresult.result.ac.nested.actualresult=(_G.yc.r..",".._G.yc.g..",".._G.yc.b)
 	rgb()
-	return(_G.yc.r..",".._G.yc.g..",".._G.yc.b)
 end
 rgb()
