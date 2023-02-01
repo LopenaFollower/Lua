@@ -2,7 +2,7 @@ _G.yc={
 	r=255,
 	g=0,
 	b=0,
-	incr=2.5
+	incr=1.5
 }
 _G.cng={
 	rg=false,
@@ -16,7 +16,11 @@ _G.rgbresult={
 	result={
 		ac={
 			nested={
-				actualresult=nil
+				actualresult={
+					r,
+					g,
+					b
+				}
 			}
 		}
 	}
@@ -77,7 +81,9 @@ function rgb()
 		_G.cng.bg=false
 	end
 	wait()
-	_G.rgbresult.result.ac.nested.actualresult=(_G.yc.r..",".._G.yc.g..",".._G.yc.b)
+	_G.rgbresult.result.ac.nested.actualresult.r=_G.yc.r
+	_G.rgbresult.result.ac.nested.actualresult.g=_G.yc.g
+	_G.rgbresult.result.ac.nested.actualresult.b=_G.yc.b
 	rgb()
 end
 rgb()
