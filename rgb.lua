@@ -2,7 +2,7 @@ _G.yc={
 	r=255,
 	g=0,
 	b=0,
-	incr=1.5
+	incr=2.5
 }
 _G.cng={
 	rg=false,
