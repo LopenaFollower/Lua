@@ -2,7 +2,7 @@ _G.yc={
 	r=255,
 	g=0,
 	b=0,
-	incr=5
+	incr=2.5
 }
 _G.cng={
 	rg=false,
@@ -68,6 +68,7 @@ function rgb()
 		_G.cng.bg=false
 	end
 	wait()
-	if _G.rgb then rgb()end
+	rgb()
+	return(_G.yc.r..",".._G.yc.g..",".._G.yc.b)
 end
 rgb()
