@@ -25,7 +25,7 @@ _G.rgbresult={
 		}
 	}
 }
-function rgb()
+while wait() do
 	if _G.cng.rg then _G.yc.r=_G.yc.r+_G.yc.incr end
 	if _G.cng.gg then _G.yc.g=_G.yc.g+_G.yc.incr end
 	if _G.cng.bg then _G.yc.b=_G.yc.b+_G.yc.incr end
@@ -80,10 +80,7 @@ function rgb()
 		_G.cng.bl=true
 		_G.cng.bg=false
 	end
-	wait()
 	_G.rgbresult.result.ac.nested.actualresult.r=_G.yc.r
 	_G.rgbresult.result.ac.nested.actualresult.g=_G.yc.g
 	_G.rgbresult.result.ac.nested.actualresult.b=_G.yc.b
-	rgb()
 end
-rgb()
