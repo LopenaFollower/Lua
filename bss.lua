@@ -6,7 +6,7 @@ repeat
 until workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Porcelain Port-O-Hive"and game:IsLoaded()
 wait()
 --VARIABLES & FUNCTIONS
-local ver,branch="2.0.",227
+local ver,branch="2.0.",230
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -1106,6 +1106,9 @@ Main:addButton("Destroy Ui",function()
 	end 
 end)
 Waypoint:addButton("Hive",function()
+	hrp.Anchored=false
+	chr:MoveTo(plr.SpawnPos.Value.p+vector(0,0,10))
+	hum.WalkToPoint=vector(plr.SpawnPos.Value.x,hrp.Position.y,plr.SpawnPos.Value.z)+vector(0,0,10)
 	hrp.CFrame=CFrame.new(hrp.CFrame.p,hrp.CFrame.p+vector(0,0,.001))
 end)
 Waypoint:addDropdown("Fields",{"Sunflower Field","Mushroom Field","Dandelion Field","Clover Field","Blue Flower Field","Bamboo Field","Spider Field","Strawberry Field","Pineapple Patch","Stump Field","Rose Field","Cactus Field","Pumpkin Patch","Pine Tree Forest","Mountain Top Field","Coconut Field","Pepper Patch","Ant Field"},4.25,function(v)
