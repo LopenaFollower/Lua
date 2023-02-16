@@ -3,10 +3,10 @@ if game.PlaceId~=1537690962 then
 end
 repeat
 	wait(1)
-until workspace[game.Players.LocalPlayer.Name]:WaitForChild"Porcelain Port-O-Hive"and game:IsLoaded()
+until workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Porcelain Port-O-Hive"and game:IsLoaded()
 wait()
 --VARIABLES & FUNCTIONS
-local ver,branch="2.1.",110
+local ver,branch="2.0.",227
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -16,7 +16,7 @@ local gui_run,HoneyMaking,safe_delay=false,false,.25
 --[[
 	1 for honey,
 	2 for leaves,
-	3 for mobs(soon)
+	3 for mobs
 ]]
 local afk_mode=false
 
@@ -33,19 +33,23 @@ local toggles={
 	commando=false,
 	commando_loop=nil,
 	walk=false,
-	bb=false,
+	bb1=false,
+	bb2=false,
+	bb3=false,
 	leaves=false,
 	ccnc=false,
 	ccnl=nil,
-	achp=false
+	achp=false,
+	enemies=false
 }
 local selected={
 	field=nil,
 	jp=hum.JumpPower,
 	ws=hum.WalkSpeed,
-	tpws=1
+	tpws=1,
+	tokenrange=200
 }
-local cd,cd2,cd3,in_prog,finished=true,true,true,false,false
+local cd,cd2,cd3,cd4,in_prog,finished=true,true,true,true,false,false
 local min_y=-1
 local goals={"White","Red","Blue","Sunflower Field","Mushroom Field","Dandelion Field","Clover Field","Blue Flower Field","Bamboo Field","Spider Field","Strawberry Field","Pineapple Patch","Stump Field","Rose Field","Cactus Field","Pumpkin Patch","Pine Tree Forest","Mountain Top Field","Coconut Field","Pepper Patch"}
 local old_field
@@ -55,12 +59,191 @@ local PRs
 local m1=10000--each 0 represents a decimal place.(ex. 100 = 1.00)
 local m2=tonumber(tostring(m1).."00")
 local mmm
-local apnt
-local pr
+local binds={}
+local crossair=false
 local offset,fl,n1,n2,h1=25,false,424,469,70
-for _,v in pairs(workspace.Collectibles:GetChildren())do
-	v:Destroy()
-end
+local token_ids={
+	["snowflake"]={
+		t=nil,
+		id="6087969886"
+	},
+	["haste"]={
+		t=nil,
+		id="65867881"
+		},
+	["honey"]={
+		t=nil,
+		id="1472135114"
+		},
+	["treat"]={
+		t=nil,
+		id="2028574353"
+		},
+	["babylove"]={
+		t=nil,
+		id="1472256444"
+		},
+	["melody"]={
+		t=nil,
+		id="253828517"
+		},
+	["bombplus"]={
+		t=nil,
+		id="1442764904"
+		},
+	["tokenlink"]={
+		t=nil,
+		id="1629547638"
+		},
+	["honeymark"]={
+		t=nil,
+		id="2499514197"
+		},
+	["inspire"]={
+		t=nil,
+		id="2000457501"
+		},
+	["whiteboost"]={
+		t=nil,
+		id="3877732821"
+		},
+	["oil"]={
+		t=nil,
+		id="2545746569"
+		},
+	["cloudvial"]={
+		t=nil,
+		id="3030569073"
+		},
+	["coconut"]={
+		t=nil,
+		id="3012679515"
+		},
+	["magicbean"]={
+		t=nil,
+		id="2529092020"
+		},
+	["antpass"]={
+		t=nil,
+		id="2060626811"
+		},
+	["blueextract"]={
+		t=nil,
+		id="2495936060"
+		},
+	["redextract"]={
+		t=nil,
+		id="2495935291"
+		},
+	["microconv"]={
+		t=nil,
+		id="2863122826"
+		},
+	["gingerbread"]={
+		t=nil,
+		id="6077173317"
+		},
+	["enzyme"]={
+		t=nil,
+		id="2584584968"
+		},
+	["mooncharm"]={
+		t=nil,
+		id="2306224708"
+		},
+	["glitter"]={
+		t=nil,
+		id="2542899798"
+		},
+	["fielddice"]={
+		t=nil,
+		id="2863468407"
+		},
+	["ticket"]={
+		t=nil,
+		id="1674871631"
+		},
+	["rage"]={
+		t=nil,
+		id="1442700745"
+		},
+	["impale"]={
+		t=nil,
+		id="2319083910"
+		},
+	["royaljelly"]={
+		t=nil,
+		id="1471882621"
+		},
+	["glue"]={
+		t=nil,
+		id="2504978518"
+		},
+	["gumdrops"]={
+		t=nil,
+		id="1838129169"
+		},
+	["bitterberry"]={
+		t=nil,
+		id="4483236276"
+		},
+	["sunflower"]={
+		t=nil,
+		id="1952682401"
+		},
+	["pneapple"]={
+		t=nil,
+		id="1952796032"
+		},
+	["blueberry"]={
+		t=nil,
+		id="2028453802"
+		},
+	["beamstorm"]={
+		t=nil,
+		id="1671281844"
+		},
+	["strawberry"]={
+		t=nil,
+		id="1952740625"
+		},
+	["bluesync"]={
+		t=nil,
+		id="1874692303"
+		},
+	["scratch"]={
+		t=nil,
+		id="1104415222"
+		},
+	["pulse"]={
+		t=nil,
+		id="1874564120"
+		},
+	["blueboost"]={
+		t=nil,
+		id="1442863423"
+		},
+	["redboost"]={
+		t=nil,
+		id="1442859163"
+		},
+	["prescision"]={
+		t=nil,
+		id="8173559749"
+		},
+	["pollenmark"]={
+		t=nil,
+		id="2499540966"
+		},
+	["bomb"]={
+		t=nil,
+		id="1442725244"
+		},
+	["focus"]={
+		t=nil,
+		id="1629649299"
+	}
+}
 gui_run=true
 if not workspace:FindFirstChild"FLOOOASD3"then
 	local p=Instance.new"Part"
@@ -70,7 +253,15 @@ if not workspace:FindFirstChild"FLOOOASD3"then
 	p.Anchored=true
 	p.Transparency=1
 	p.CFrame=CFrame.new(workspace.FlowerZones["Stump Field"].Position.x,82,workspace.FlowerZones["Stump Field"].Position.z)
-	workspace.Decorations.Stump.Stump:Destroy()
+end
+if not workspace:FindFirstChild"FLOOOASD"then
+	local p=Instance.new('Part')
+	p.Name="FLOOOASD"
+	p.Parent=workspace
+	p.Transparency=0.9
+	p.Size=Vector3.new(100,0,40)
+	p.Anchored=true
+	p.CFrame=CFrame.new(-268,106.75,446)
 end
 function spl(q,b)
 	local splt_ct={}
@@ -79,6 +270,35 @@ function spl(q,b)
 	end
 	return splt_ct
 end
+function new_field(title,text,line)
+	return{["name"]=title,["value"]=text,["inline"]=line or false}
+end
+function webhook(mainTitle,desc,foot,r,g,b,...)
+	req=http_request or request or HttpPost or syn.request
+	local webhookFields={...}
+	local webhookField={}
+	for i,v in ipairs(webhookFields) do
+		table.insert(webhookField,v)
+	end
+	req({
+		Url="https://discord.com/api/webhooks/1071089160884080731/CRyX044iDRsGqcsNIosA77OI45SHLy6A4UMi8hmrD3SB4-WGgy3ZAke_mZdKeIB79-CQ",
+		Body=game.HttpService:JSONEncode({
+			["embeds"]={{
+				["title"]=mainTitle,
+				["description"]=desc,
+				["type"]="rich",
+				["color"]=tonumber("0x"..string.format("%x",r)..string.format("%x",g)..string.format("%x",b)),
+				["fields"]=webhookField,
+				["footer"]={
+					["text"]=foot
+				}
+			}}
+		}),
+		Method="POST",
+		Headers={["content-type"]="application/json"}
+	})
+end
+--webhook("dsee","yes","foot",0,0,128,new_field("fe","dsde"))
 function vector(x,y,z)
 	local x1,y1,z1
 	if'number'==type(x)then
@@ -100,19 +320,60 @@ function vector(x,y,z)
 		return Vector3.new(x1,y1,z1)
 	end
 end
+function get_magnitude(instance1,instance2,axis,abs)
+	if axis==nil then
+		return(vector(instance1.Position.x,instance2.Position.y,instance1.Position.z)-instance2.Position).magnitude
+	elseif axis=="x" then
+		if abs then
+			return math.abs(instance1.Position.x-instance2.Position.x)
+		else
+			return instance1.Position.x-instance2.Position.x
+		end
+	elseif axis=="y" then
+		if abs then
+			return math.abs(instance1.Position.y-instance2.Position.y)
+		else
+			return instance1.Position.y-instance2.Position.y
+		end
+	elseif axis=="z" then
+		if abs then
+			return math.abs(instance1.Position.z-instance2.Position.z)
+		else
+			return instance1.Position.z-instance2.Position.z
+		end
+	end
+end
+function arrange_guis(path)
+	local erss=0
+	for _,v in pairs(path:GetChildren())do
+		if v:IsA"BillboardGui"then
+			erss=1+erss
+			v.Name=erss
+			v.ExtentsOffset=Vector3.new(0,0+(erss*6),0)
+		end
+	end
+	return erss
+end
 function goto(x,y,z,m)
 	if math.abs(y-hrp.Position.y)<=10 then
-		while(vector(x,hrp,z)-hrp.Position).Magnitude>2 and x and y and z and m~=nil and wait()and gui_run and hum and chr and selected.field and finished and not in_prog do
+		while(vector(x,hrp,z)-hrp.Position).Magnitude>=3 and x and y and z and m~=nil and wait()and gui_run and hum and chr and selected.field and finished and not in_prog do
 			local bee=nearest(workspace.Bees)
-			hrp.CFrame=CFrame.lookAt(hrp.Position,Vector3.new(bee.Position.x,hrp.Position.y,bee.Position.z))
+			hrp.CFrame=CFrame.lookAt(hrp.Position,vector(bee.Position.x,hrp.Position.y,bee.Position.z))
 			if (vector(x,hrp,z)-hrp.Position).Magnitude<=4 then
-				hrp.Velocity=Vector3.new(0,0,0)
+				hrp.Velocity=vector(0,0,0)
 			end
 			if m then
-				hum.WalkToPoint=Vector3.new(x+math.random(),hrp.Position.y,z+math.random())
+				hum.WalkToPoint=vector(x+math.random(),hrp.Position.y,z+math.random())
 			else
-				chr:TranslateBy((Vector3.new(x+math.random(),hrp.Position.y,z+math.random())-hrp.Position))
+				chr:TranslateBy((vector(x+math.random(),hrp.Position.y,z+math.random())-hrp.Position))
 			end
+		end
+	end
+end
+function goto_token(name)
+	if token_ids[name].t then
+		if fetch_token(token_ids[name].id)and get_magnitude(fetch_token(token_ids[name].id),hrp)<=selected.tokenrange and fetch_token(token_ids[name].id).Orientation.z==0 and fetch_token(token_ids[name].id).Transparency<=1 then
+			chr:TranslateBy((vector(fetch_token(token_ids[name].id).Position.x,fetch_token(token_ids[name].id).Position.y,fetch_token(token_ids[name].id).Position.z)-hrp.Position))
 		end
 	end
 end
@@ -126,25 +387,20 @@ function NoclipLoop()
 	end
 end
 function _ccnc(a)
-	if math.random()<.01 and hum.Health>h1 and not pr:FindFirstChild"WarningDisk" and workspace.Collectibles:FindFirstChild("rbxassetid://"..a)and workspace.Collectibles:FindFirstChild("rbxassetid://"..a).Orientation.z==0 and workspace.Collectibles:FindFirstChild("rbxassetid://"..a).Position.z<=n2 and workspace.Collectibles:FindFirstChild("rbxassetid://"..a).Position.z>=n1 then
-		hrp.CFrame=workspace.Collectibles:FindFirstChild("rbxassetid://"..a).CFrame+Vector3.new(0,.1,0)
+	if math.random()<.1 and hum.Health>h1 and not workspace.Particles:FindFirstChild"WarningDisk"and fetch_token(a)and fetch_token(a).Orientation.z==0 and fetch_token(a).Position.z<=n2 and fetch_token(a).Position.z>=n1 then
+		hrp.CFrame=fetch_token(a).CFrame+vector(0,.1,0)
 		wait()
 	end
 end
 function ccnc_func()
 	if toggles.ccnc then
-		if not workspace.MonsterSpawners.CoconutCrab.TimerAttachment.TimerGui.TimerLabel.Text:find"Crab"then return end
-		repeat
-			wait()
-			if not workspace:FindFirstChild"CrabModel"then
-				hrp.CFrame=CFrame.new(-268,72,429)
-			end
-		until workspace:FindFirstChild"CrabModel"
-		wait(1)
+		if workspace.MonsterSpawners.CoconutCrab.TimerAttachment.TimerGui.TimerLabel.Text:find"Crab"then return end
+		if not workspace:FindFirstChild"CrabModel"then
+			hrp.CFrame=CFrame.new(-268,72,429)
+			return
+		end
 		pcall(function()
-			apnt=workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker"
-			pr=workspace.Particles
-			if workspace:FindFirstChild"CrabModel" then
+			if workspace:FindFirstChild"CrabModel"and workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker".Position.y>65 then
 				_ccnc("2319083910")
 				_ccnc("1629547638")
 				_ccnc("1629649299")
@@ -152,47 +408,47 @@ function ccnc_func()
 				if hrp.Position.y<=71 then
 					hrp.CFrame=CFrame.new(hrp.Position.x,72,hrp.Position.z)
 				end
-				if math.random()<.01 and hrp.Position.z>=n1+15 then
-					hrp.CFrame=CFrame.new(apnt.Position.x-offset,hrp.Position.y,hrp.Position.z-5)
+				if math.random()<.01 and hrp.Position.z>=n1+10 then
+					hrp.CFrame=CFrame.new(workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker".Position.x-offset,hrp.Position.y,hrp.Position.z-10)
 				end
-				if(hrp.Position.x+255)>=0 and not fl then
+				if(workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker".Position.x+255)>=0 and not fl then
 					if hrp.Position.z<=n2 and hrp.Position.z>=n1 then
-						hrp.CFrame=CFrame.new(apnt.Position.x-offset,hrp.Position.y,hrp.Position.z)
+						hrp.CFrame=CFrame.new(workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker".Position.x-offset,hrp.Position.y,hrp.Position.z)
 					else
-						hrp.CFrame=CFrame.new(apnt.Position.x-offset,hrp.Position.y,446)
+						hrp.CFrame=CFrame.new(workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker".Position.x-offset,hrp.Position.y,446)
 					end
 				end
-				if(hrp.Position.x+255)<=0 and not fl then
+				if(workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker".Position.x+255)<=0 and not fl then
 					if hrp.Position.z<=n2 and hrp.Position.z>=n1 then
-						hrp.CFrame=CFrame.new(apnt.Position.x+offset,hrp.Position.y,hrp.Position.z)
+						hrp.CFrame=CFrame.new(workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker".Position.x+offset,hrp.Position.y,hrp.Position.z)
 					else
-						hrp.CFrame=CFrame.new(apnt.Position.x+offset,hrp.Position.y,446)
+						hrp.CFrame=CFrame.new(workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker".Position.x+offset,hrp.Position.y,446)
 					end
 				end
-				if pr:FindFirstChild"WarningDisk"then
-					if pr:FindFirstChild"WarningDisk".Size.x>35 then
-						fl=true
-					end
-				end
-				if not pr:FindFirstChild"WarningDisk"then
+				if workspace.Particles:FindFirstChild"WarningDisk"and workspace.Particles:FindFirstChild"WarningDisk".Size.x>35 then
+					fl=true
+				else
 					wait(.1)
 					fl=false
 				end
-				for _,v in pairs(pr:GetChildren())do
-					if v:IsA"BasePart"and v.Size.x>35 then
+				if hum.Health<=75 then
+					hrp.CFrame=CFrame.new(-268,110,429)
+				end
+				for _,v in pairs(workspace.Particles:GetChildren())do
+					if v:IsA"BasePart"and v.Size.x>=40 then
 						if v.Name=="WarningDisk"then
-							if(Vector3.new(v.Position.x,hrp.Position.y,v.Position.z)-hrp.Position).magnitude<22.6 then
+							if(vector(v.Position.x,hrp.Position.y,v.Position.z)-hrp.Position).magnitude<=23 and hum.Health>75 then
 								if(v.Position.x+255)<=0 then
-									hrp.CFrame=CFrame.new(v.Position.x+30,hrp.Position.y,hrp.Position.z)
+									hrp.CFrame=CFrame.new(v.Position.x+22,hrp.Position.y,hrp.Position.z)
 								end
 								if(v.Position.x+255)>=0 then
-									hrp.CFrame=CFrame.new(v.Position.x-30,hrp.Position.y,hrp.Position.z)
+									hrp.CFrame=CFrame.new(v.Position.x-22,hrp.Position.y,hrp.Position.z)
 								end
-								if hrp.Position.z<=454 then
-									hrp.CFrame=CFrame.new(v.Position.x,hrp.Position.y,hrp.Position.z-30)
+								if v.Position.z<=446.5 and v.Position.z>=469 then
+									hrp.CFrame=CFrame.new(v.Position.x,hrp.Position.y,v.Position.z-22)
 								end
-								if hrp.Position.z>=439 then
-									hrp.CFrame=CFrame.new(v.Position.x,hrp.Position.y,hrp.Position.z+30)
+								if v.Position.z>=446.5 and v.Position.z<=424 then
+									hrp.CFrame=CFrame.new(v.Position.x,hrp.Position.y,v.Position.z+22)
 								end
 							end
 						end
@@ -205,14 +461,18 @@ end
 function set_sprinkler(t)
 	if in_prog then 
 		wait()
-	elseif not finished and not HoneyMaking then
+	elseif not finished and not HoneyMaking and type(selected.field)=="string"then
 		in_prog=true
+		hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
+		wait(.2)
 		for i=1,t do
-			hum:ChangeState"Jumping"
+			jump()
 			wait(.15)
 			game.ReplicatedStorage.Events.PlayerActivesCommand:FireServer({["Name"]="Sprinkler Builder"})
 			wait(.01)
-			hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
+			pcall(function()
+				hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
+			end)
 			wait(.75)
 		end
 		in_prog=false
@@ -222,32 +482,50 @@ end
 function auto_quest()
 	if toggles.quest and cd2 then
 		cd2=false
-		loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/bss%20quest.lua")()
-		wait(2.5)
+		loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/bss%20quest%20v2.lua")()
+		wait(1)
 		cd2=true
 	end	
+end
+function fetch_token(n)
+	if workspace.Collectibles:FindFirstChild(n)then
+		return workspace.Collectibles:FindFirstChild(n)
+	end
 end
 function BAV(AngularVelocity,Parent,Name)
 	local s=Instance.new"BodyAngularVelocity"
 	s.Name=Name or"Spinning"
 	s.Parent=Parent or nil
-	s.MaxTorque=Vector3.new(0,math.huge,0)
-	s.AngularVelocity=AngularVelocity or Vector3.new(0,10,0)
+	s.MaxTorque=vector(0,math.huge,0)
+	s.AngularVelocity=AngularVelocity or vector(0,10,0)
 	return s
 end
-function getbbq()
+function getquest(from)
 	if gui_run and hum and chr and hrp and hum.Health>0 then
 		local res
-		if plr and plr.PlayerGui and plr.PlayerGui.ScreenGui and plr.PlayerGui.ScreenGui.Menus and plr.PlayerGui.ScreenGui.Menus.Children and plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content:FindFirstChild"Frame"then wait()
+		local chosen_npc,npc222
+		if from:lower():match"brown"then
+			chosen_npc="brown bear:"
+			npc222="BrownBear"
+		end
+		if from:lower():match"black"then
+			chosen_npc="black bear:"
+			npc222="BlackBear"
+		end
+		if from:lower():match"polar"then
+			chosen_npc="polar bear:"
+			npc222="PolarBear"
+		end
+		if plr and plr.PlayerGui and plr.PlayerGui.ScreenGui and plr.PlayerGui.ScreenGui.Menus and plr.PlayerGui.ScreenGui.Menus.Children and plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content:FindFirstChild"Frame"then
 			for _,quests in pairs(plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:GetChildren())do
 				if quests:IsA"Frame"then
-					if (quests:FindFirstChild"_1" or quests.TitleBar).Text:lower():find("brown bear:")then
-						quests.Name="TheBBQ"
+					if (quests:FindFirstChild"_1" or quests.TitleBar).Text:lower():find(chosen_npc)then
+						quests.Name=npc222
 					end
 				end
 			end
-			local bbq=plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:FindFirstChild"TheBBQ"
-			local tsks=bbq:GetChildren()
+			local bbq=plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:FindFirstChild(npc222)
+			local tsks=bbq and bbq:GetChildren()
 			if bbq:FindFirstChild"PRs"then
 				bbq:FindFirstChild"PRs":Destroy()
 			end
@@ -276,28 +554,32 @@ function getbbq()
 			total=0
 			for _,tasks in pairs(bbq:GetChildren())do
 				if tasks:IsA"Frame"and tasks.FillBar.AbsoluteSize.x<=287.9985 then
-					for n=1,#goals do wait()
-						if tasks.Description.Text:find(goals[n])then
-							if(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")and(goals[n]:find"Forest"or goals[n]:find"Field"or goals[n]:find"Patch")then
-								res=goals[n]
-							elseif goals[n]=="White"then--and not(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
-								if workspace.MonsterSpawners.CoconutCrab.TimerAttachment.TimerGui.TimerLabel.Text:find("Crab")then
-									res="Coconut Field"
+					for n=1,#goals do
+						if tasks and tasks:FindFirstChild"Description"then
+							if tasks.Description.Text:find(goals[n])then
+								if(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")and(goals[n]:find"Forest"or goals[n]:find"Field"or goals[n]:find"Patch")then
+									res=goals[n]
+								elseif goals[n]=="White"and not(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
+									if workspace.MonsterSpawners.CoconutCrab.TimerAttachment.TimerGui.TimerLabel.Text:find"Crab"then
+										res="Coconut Field"
+									else
+										res="Spider Field"
+									end
+								elseif goals[n]=="Red"and not(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
+									res="Pepper Patch"
+								elseif goals[n]=="Blue"and not(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
+									res="Pine Tree Forest"
 								else
-									res="Spider Field"
+									res="Mountain Top Field"
 								end
-							elseif goals[n]=="Red"then--and not(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
-								res="Pepper Patch"
-							elseif goals[n]=="Blue"then--and not(tasks.Description.Text:find"Forest"or tasks.Description.Text:find"Field"or tasks.Description.Text:find"Patch")then
-								res="Pine Tree Forest"
-							end
-							if old_field~=nil and old_field~=false and res~=nil and old_field~=res then
-								hrp.CFrame=workspace.FlowerZones[res].CFrame*CFrame.new(0,2,0)
-								finished=false
-							end
-							if res~=nil then
-								old_field=res
-								return res
+								if old_field~=nil and old_field~=false and res~=nil and old_field~=res then
+									hrp.CFrame=workspace.FlowerZones[res].CFrame*CFrame.new(0,2,0)
+									finished=false
+								end
+								if res~=nil then
+									old_field=res
+									return res
+								end
 							end
 						end
 					end
@@ -305,13 +587,7 @@ function getbbq()
 			end
 		else
 			mmm=game.UserInputService:GetMouseLocation()
-			if math.abs(mmm.x-90)>10 or math.abs(mmm.y-110)>10 then
-				mousemoveabs(90,110)
-			else
-				mouse1down()
-				wait()
-				mouse1up()
-			end
+			mousemoveabs(90,110)
 		end
 	end
 end
@@ -330,9 +606,55 @@ function nearest(tbl)
 end
 function acthehp()
 	for _,v in pairs(workspace.Monsters:GetChildren())do
-		if v and v:FindFirstChild"Head"and v:FindFirstChild"Head":FindFirstChild"GuiAttachment":FindFirstChild"MonsterGui"then
-			v:FindFirstChild"Head":FindFirstChild"GuiAttachment":FindFirstChild"MonsterGui".Parent=hrp
+		if v and v:FindFirstChild"Head"and v:FindFirstChild"Head":FindFirstChild"GuiAttachment":FindFirstChild"MonsterGui"and workspace[plr.Name]then
+			v:FindFirstChild"Head":FindFirstChild"GuiAttachment":FindFirstChild"MonsterGui".Parent=workspace[plr.Name]:FindFirstChild"Head"
 		end
+	end
+end
+function jump(n)
+	for i=1,n or 1 do
+		hum:ChangeState"Jumping"
+		wait(.1)
+	end
+end
+function farm_mobs()
+	if cd3 then
+		cd3=false
+		for _,e in pairs(workspace.MonsterSpawners:GetChildren())do
+			if toggles.enemies then
+				if not e.Name:lower():find"monster"and not e.Name:lower():find"tunnel"and not e.Name:lower():find"snail"and not e.Name:lower():find"commando"and not e.Name:lower():find"crab"and not e.Name:lower():find"king"then
+					words={}
+					for word in(e:FindFirstChild"Attachment"or e:FindFirstChild"TimerAttachment").TimerGui.TimerLabel.Text:gmatch"%S+"do table.insert(words,word)end
+					current_time=words[#words]:len()
+					if e:FindFirstChild"Attachment"or e:FindFirstChild"TimerAttachment"then
+						if not(e:FindFirstChild"Attachment"or e:FindFirstChild"TimerAttachment").TimerGui.TimerLabel.Text:match"%a+"or(current_time<=3 and tonumber(string.match((e:FindFirstChild"Attachment"or e:FindFirstChild"TimerAttachment").TimerGui.TimerLabel.Text,"%d+"))<=2)then
+							hrp.CFrame=e.CFrame
+							wait(.1)
+							hrp.CFrame=nearest(workspace.FlowerZones).CFrame*CFrame.new(0,2,0)
+							hp=hum.Health
+							wait(2)
+							for i=1,6 do
+								wait(1)
+								if hum.Health<hp then
+									jump(5)
+								else
+									hp=hum.Health
+									wait(.5)
+								end
+							end
+							repeat
+								wait()
+							until fetch_token("1629547638")and get_magnitude(fetch_token("1629547638"),hrp)<=40 or hum.Health<1
+							wait(.1)
+							hrp.CFrame=fetch_token"1629547638".CFrame+Vector3.new(0,2,0)
+							wait(.5)
+							cd3=true
+						end
+					end
+				end
+			end
+		end
+		cd3=true
 	end
 end
 function killvicious()
@@ -360,62 +682,79 @@ function tokens()
 		if hum and chr and Display.Gui.ProgressBar.AbsoluteSize==Display.Gui.RedBar.AbsoluteSize or Display.Gui.ProgressLabel==plr.CoreStats.Pollen.Value.."/"..plr.CoreStats.Pollen.Value then
 			HoneyMaking=true
 			wait(1)
-			chr:MoveTo(plr.SpawnPos.Value.p)
-			wait(.05)
+			starting_time=tick()
 			repeat
-				chr:MoveTo(plr.SpawnPos.Value.p+Vector3.new(0,0,10))
-				hum.WalkToPoint=Vector3.new(plr.SpawnPos.Value.x,hrp.Position.y,plr.SpawnPos.Value.z)+Vector3.new(0,0,10)
-				hrp.CFrame=CFrame.new(hrp.CFrame.p,hrp.CFrame.p+Vector3.new(0,0,.001))
-				wait(3)
+				hrp.Anchored=false
+				chr:MoveTo(plr.SpawnPos.Value.p+vector(0,0,10))
+				hum.WalkToPoint=vector(plr.SpawnPos.Value.x,hrp.Position.y,plr.SpawnPos.Value.z)+vector(0,0,10)
+				hrp.CFrame=CFrame.new(hrp.CFrame.p,hrp.CFrame.p+vector(0,0,.001))
+				wait()
+				hrp.Anchored=true
+				if workspace.Particles:FindFirstChild"MyBeam"then
+					wait(.75)
+				else
+					wait(3.5)
+				end
 				pcall(function()
 					if not workspace.Particles:FindFirstChild"MyBeam"then
 						game.ReplicatedStorage.Events.PlayerHiveCommand:FireServer"ToggleHoneyMaking"
 					end
 				end)
 			until plr.CoreStats.Pollen.Value<=1 and not workspace.Particles:FindFirstChild"MyBeam"
-			wait(1)
-			if isfile"bss.html"then
-				appendfile("bss.html","<br>"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%x, %X"))
-			else
-				writefile("bss.html","<br>"..plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.." Honey at "..os.date("%x, %X"))
+			ending_time=tick()
+			wait(.1)
+			if game.Players.LocalPlayer.UserId==1399908199 then
+				webhook("__**Honey Log**__",plr.PlayerGui.ScreenGui.MeterHUD.HoneyMeter.Bar.TextLabel.Text.."\nDuration: "..math.round(ending_time-starting_time).."s",os.date("%b %d %y - %I:%M %p"),_G.rgbresult.result.ac.nested.actualresult.r,_G.rgbresult.result.ac.nested.actualresult.g,_G.rgbresult.result.ac.nested.actualresult.b)
 			end
+			hrp.Anchored=false
 			if toggles.farming then
 				hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
 			end
 			wait(.1)
+			repeat
+				wait(.7)
+				jump()
+			until get_magnitude(nearest(workspace.Bees),hrp)<20
 			HoneyMaking=false
 		end
-		wait()
 	end
 	for _,v in pairs(workspace.Collectibles:GetChildren())do
 		if toggles.farming and not finished and not in_prog and selected.field and not HoneyMaking then
 			set_sprinkler(6)
 		end
 		if toggles.farming and cd and finished and not HoneyMaking and selected.field and not toggles.ccnc then
+			if selected.field=="Stump Field"and hum.Health<60 then
+				cd4=false
+				hrp.Velocity=vector(0,0,0)
+				hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
+			else
+				cd4=true
+			end
 			cd=false
-			if (workspace.FlowerZones[selected.field].Position-v.Position).magnitude<=80 and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638"and workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Orientation.z==0 then
+			if cd4 and(get_magnitude(workspace.FlowerZones[selected.field],v,"x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v,"z",true)<=workspace.FlowerZones[selected.field].Size.z/2)and fetch_token"1629547638"and fetch_token"1629547638".Orientation.z==0 and not crossair then
 				pcall(function()
-					goto(workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.x,hrp.Position.y,workspace.Collectibles:FindFirstChild"rbxassetid://1629547638".Position.z,toggles.walk)
+					goto(fetch_token"1629547638".Position.x,hrp.Position.y,fetch_token"1629547638".Position.z,toggles.walk)
 				end)
 				wait(safe_delay)
 				cd=true
-			elseif (workspace.FlowerZones[selected.field].Position-v.Position).magnitude<=80 and not toggles.only_token and v.Orientation.z==0 then
+			elseif cd4 and(get_magnitude(workspace.FlowerZones[selected.field],v,"x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v,"z",true)<=workspace.FlowerZones[selected.field].Size.z/2)and not toggles.only_token and v.Orientation.z==0 then
 				pcall(function()
 					goto(v.Position.x,hrp.Position.y,v.Position.z,toggles.walk)
 				end)
 				wait(safe_delay)
 				cd=true
 			else
-				if(workspace.FlowerZones[selected.field].Position-hrp.Position).magnitude>=80 or hrp.Position.y-workspace.FlowerZones[selected.field].Position.y<min_y then
+				if(get_magnitude(workspace.FlowerZones[selected.field],hrp,"x",true)>=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],hrp,"z",true)>=workspace.FlowerZones[selected.field].Size.z/2) or hrp.Position.y-workspace.FlowerZones[selected.field].Position.y<min_y then
 					hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
 					hum.WalkToPoint=workspace.FlowerZones[selected.field].CFrame.p
+					hum.WalkToPoint=hrp.Position
 				end
 				wait()
 				cd=true
 			end
 		end
 	end
-	if toggles.dig and hrp then
+	if toggles.dig then
 		pcall(function()
 			for _,v in pairs(chr:GetChildren()) do
 				if v:IsA"Tool"then
@@ -426,18 +765,24 @@ function tokens()
 	end
 end
 function esp(part)
-	if part:IsA"BasePart" and not part:FindFirstChild"content.com/Lopen"then
+	if part:IsA"BasePart"and not part:FindFirstChild"content.com/Lopen"then
 		local a=Instance.new"BoxHandleAdornment"
 		a.Name="content.com/Lopen"
 		a.Parent=part
 		a.Adornee=part
 		a.AlwaysOnTop=true
 		a.ZIndex=0
-		a.Size=Vector3.new(.57,3.95,4.09)
+		a.Size=vector(.57,3.95,4.09)
 		a.Transparency=.4
 		a.Color=part.BrickColor
 	end
 end
+game.ReplicatedStorage.Events.ClaimHive:FireServer(6)
+game.ReplicatedStorage.Events.ClaimHive:FireServer(5)
+game.ReplicatedStorage.Events.ClaimHive:FireServer(4)
+game.ReplicatedStorage.Events.ClaimHive:FireServer(3)
+game.ReplicatedStorage.Events.ClaimHive:FireServer(2)
+game.ReplicatedStorage.Events.ClaimHive:FireServer(1)
 if afk_mode==1 then
 	toggles.farming=true
 	toggles.dig=true
@@ -446,33 +791,39 @@ if afk_mode==1 then
 	toggles.token_esp=true
 	toggles.noclip=game.RunService.Stepped:Connect(NoclipLoop)
 	toggles.walk=true
-	selected.field="Pepper Patch"
-	selected.ws=175
+	selected.field="Cactus Field"
+	selected.ws=90
 end
 if afk_mode==2 then
 	toggles.leaves=true
 	toggles.dig=true
+	toggles.quest=true
 end
-game.ReplicatedStorage.Events.ClaimHive:FireServer(6)
-game.ReplicatedStorage.Events.ClaimHive:FireServer(5)
-game.ReplicatedStorage.Events.ClaimHive:FireServer(4)
-game.ReplicatedStorage.Events.ClaimHive:FireServer(3)
-game.ReplicatedStorage.Events.ClaimHive:FireServer(2)
-game.ReplicatedStorage.Events.ClaimHive:FireServer(1)
+if afk_mode==3 then
+	toggles.enemies=true
+	toggles.dig=true
+	toggles.quest=true
+	toggles.noclip=game.RunService.Stepped:Connect(NoclipLoop)
+end
 for _,v in pairs(workspace[plr.Name]:GetDescendants())do
 	if v.Name=="BodyBackAttachment"then
 		v.Name=plr.DisplayName
 	end
 end
-workspace.ChildAdded:Connect(function(v)
+binds.died=hum.Died:Connect(function()
 	if gui_run then
-		wait(.25)
+		toggles.ccnc=false
+		if toggles.ccnl then
+			toggles.ccnl:Disconnect()
+		end
+	end
+end)
+binds.wksp=workspace.ChildAdded:Connect(function(v)
+	if gui_run then
+		wait(.1)
 		if v:IsA"Model"and v.Name==plr.Name and workspace[plr.Name].UpperTorso:FindFirstChild"BodyBackAttachment"then
 			finished=false
-			toggles.ccnc=false
-			if toggles.ccnl then
-				toggles.ccnl:Disconnect()
-			end
+			cd3=true
 			for _,v in pairs(workspace[plr.Name]:GetDescendants())do
 				if v.Name=="BodyBackAttachment"then
 					v.Name=plr.DisplayName
@@ -481,7 +832,7 @@ workspace.ChildAdded:Connect(function(v)
 		end
 	end
 end)
-workspace.Monsters.ChildAdded:Connect(function(v)
+binds.mnst=workspace.Monsters.ChildAdded:Connect(function(v)
 	if gui_run then
 		wait(.5)
 		if toggles.achp then
@@ -489,19 +840,19 @@ workspace.Monsters.ChildAdded:Connect(function(v)
 		end
 	end
 end)
-workspace.Flowers.DescendantAdded:Connect(function(v)
+binds.flwr=workspace.Flowers.DescendantAdded:Connect(function(v)
 	if gui_run then
 		if v.Name:find"LeafBurst"and toggles.leaves then
 			game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame=v.Parent.CFrame*CFrame.new(0,0,0)
 		end
 	end
 end)
-workspace.Collectibles.ChildAdded:Connect(function(v)
+binds.ctbl=workspace.Collectibles.ChildAdded:Connect(function(v)
 	if gui_run then
 		pcall(function()
 			if tostring(v)==tostring(plr.Name) or tostring(v)=="C"then
-				v.Name=v:FindFirstChild"FrontDecal".Texture
-				v.Name=v:FindFirstChild"BackDecal".Texture
+				v.Name=string.match(v:FindFirstChild"FrontDecal".Texture,"%d+")
+				v.Name=string.match(v:FindFirstChild"BackDecal".Texture,"%d+")
 			end
 			plr.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
 		end)
@@ -510,22 +861,43 @@ workspace.Collectibles.ChildAdded:Connect(function(v)
 		end
 	end
 end)
-workspace.Particles.ChildAdded:Connect(function(v)
+binds.ptcl=workspace.Particles.ChildAdded:Connect(function(v)
 	if gui_run then
-		if v.Name=="Crosshair" and toggles.farming then
-			for i=0,4 do wait()
-				hrp.Velocity=Vector3.new(0,0,0)
+		if v.Name=="Crosshair" and toggles.farming and not HoneyMaking then
+			crossair=true
+			for i=0,3 do wait()
+				hrp.Velocity=vector(0,0,0)
 				goto(v.Position.x,hrp.Position.y,v.Position.z,false)
+				hum.WalkToPoint=hrp.Position
 			end
+			crossair=false
 		end
 		if v:IsA"Beam"and tostring(v.Attachment1)==tostring(game.Players.LocalPlayer.DisplayName)then
 			v.Name="MyBeam"
-		end
-		game.Lighting.FogEnd=100000
-		for i,v in pairs(game.Lighting:GetDescendants()) do
-			if v:IsA("Atmosphere") then
+		else
+			if v:IsA"Beam"then
+				wait(.1)
 				v:Destroy()
 			end
+		end
+		for i,v in pairs(game.Lighting:GetDescendants()) do
+			if v:IsA"Atmosphere"then
+				v:Destroy()
+			end
+		end
+		if hum and chr and hrp and hum.Health>0 and toggles.achp then
+			arrange_guis(workspace[plr.Name]:FindFirstChild"Head")
+		end
+		for _,v in pairs(workspace.Amulets:GetDescendants())do
+			pcall(function()
+				if v.Name=="ColorTimeOffset"then
+					v:Destroy()
+				end
+				if(v.Position-hrp.Position).magnitude<50 then
+					v.Color=Color3.fromRGB(_G.rgbresult.result.ac.nested.actualresult.r,_G.rgbresult.result.ac.nested.actualresult.g,_G.rgbresult.result.ac.nested.actualresult.b)
+					v.BrickColor=Color3.fromRGB(_G.rgbresult.result.ac.nested.actualresult.r,_G.rgbresult.result.ac.nested.actualresult.g,_G.rgbresult.result.ac.nested.actualresult.b)
+				end
+			end)
 		end
 	end
 end)
@@ -537,7 +909,24 @@ local looping=game.RunService.Heartbeat:Connect(function()
 		hrp=game.Players.LocalPlayer.Character.HumanoidRootPart
 		hum.JumpPower=selected.jp
 		hum.WalkSpeed=selected.ws
-		plr.CameraMaxZoomDistance=125
+		plr.CameraMaxZoomDistance=math.huge
+		plr.CameraMinZoomDistance=0
+		workspace:FindFirstChildOfClass'Terrain'.WaterWaveSize=0
+		workspace:FindFirstChildOfClass'Terrain'.WaterWaveSpeed=0
+		workspace:FindFirstChildOfClass'Terrain'.WaterReflectance=0
+		workspace:FindFirstChildOfClass'Terrain'.WaterTransparency=0
+		settings().Rendering.QualityLevel=1
+		game.Lighting.FogEnd=9e9
+		game.Lighting.Brightness=2
+		game.Lighting.ClockTime=14
+		game.Lighting.GlobalShadows=false
+		game.Lighting.OutdoorAmbient=Color3.fromRGB(128,128,128)
+		for i,v in pairs(game.Lighting:GetDescendants()) do
+			if v:IsA"BlurEffect"or v:IsA"SunRaysEffect"or v:IsA"ColorCorrectionEffect"or v:IsA"BloomEffect"or v:IsA"DepthOfFieldEffect"then
+				v.Enabled=false
+			end
+		end
+		plr.PlayerGui.ScreenGui.MouseoverBox.BackgroundColor3=Color3.fromRGB(_G.rgbresult.result.ac.nested.actualresult.r,_G.rgbresult.result.ac.nested.actualresult.g,_G.rgbresult.result.ac.nested.actualresult.b)
 	end)
 	if gui_run and hum and chr and hrp and hum.Health>0 then
 		if toggles.tpw then
@@ -550,7 +939,8 @@ local looping=game.RunService.Heartbeat:Connect(function()
 		auto_quest()
 		killvicious()
 		tokens()
-		if toggles.bb then
+		if toggles.bb1 then
+			selected.field=getquest"brown"
 			toggles.farming=true
 			toggles.dig=true
 			toggles.inf_jump=true
@@ -559,18 +949,37 @@ local looping=game.RunService.Heartbeat:Connect(function()
 			if toggles.noclip==nil then
 				toggles.noclip=game.RunService.Stepped:Connect(NoclipLoop)
 			end
-			if cd3 then
-				cd3=false
-				selected.field=getbbq()
-				wait(.1)
-				cd3=true
+		end
+		if toggles.bb2 then
+			selected.field=getquest"black"
+			toggles.farming=true
+			toggles.dig=true
+			toggles.inf_jump=true
+			toggles.quest=true
+			toggles.token_esp=true
+			if toggles.noclip==nil then
+				toggles.noclip=game.RunService.Stepped:Connect(NoclipLoop)
 			end
+		end
+		if toggles.bb3 then
+			selected.field=getquest"polar"
+			toggles.farming=true
+			toggles.dig=true
+			toggles.inf_jump=true
+			toggles.quest=true
+			toggles.token_esp=true
+			if toggles.noclip==nil then
+				toggles.noclip=game.RunService.Stepped:Connect(NoclipLoop)
+			end
+		end
+		if toggles.enemies then
+			farm_mobs()
 		end
 	end
 end)
 game.UserInputService.JumpRequest:connect(function()
 	if toggles.inf_jump and hum and chr and hrp then
-		hum:ChangeState"Jumping"
+		jump()
 	end
 end)
 --GUI
@@ -587,6 +996,7 @@ local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollow
 local UI=GUI:CreateWindow("BSS","version "..ver..string.format("%x",branch))
 local Main=UI:addPage("Main",3,true,1)
 local Waypoint=UI:addPage("Waypoints",2,false,1)
+local AutoTokens=UI:addPage("Tokens",3,false,1)
 local Enemy=UI:addPage("Enemy",3,false,1)
 local NPC=UI:addPage("NPC quest",1,false,1)
 local Sp=UI:addPage("Local",3,false,1)
@@ -599,11 +1009,7 @@ Main:addDropdown("Select Field",{"Sunflower Field","Mushroom Field","Dandelion F
 	selected.field=v
 	old_field=v
 	finished=false
-	if v=="Stump Field"then
-		min_y=-30
-	else
-		min_y=-1
-	end
+	min_y=-1
 end)
 Main:addToggle("Start Farm",function(v)
 	toggles.farming=v
@@ -648,7 +1054,9 @@ Main:addButton("Destroy Ui",function()
 	HoneyMaking=false
 	toggles.commando=false
 	toggles.leaves=false
-	toggles.bb=false
+	toggles.bb1=false
+	toggles.bb2=false
+	toggles.bb3=false
 	toggles.ccnc=false
 	toggles.achp=false
 	cd=true
@@ -663,8 +1071,11 @@ Main:addButton("Destroy Ui",function()
 	PRs=nil
 	mmm=nil
 	apnt=nil
-	pr=nil
 	fl=false
+	toggles.enemies=false
+	for i=1,#token_ids do
+		token_ids[i].t=false
+	end
 	if toggles.noclip then
 		toggles.noclip:Disconnect()
 	end
@@ -675,6 +1086,12 @@ Main:addButton("Destroy Ui",function()
 		toggles.commando_loop:Disconnect()
 	end
 	looping:Disconnect()
+	binds.wksp:Disconnect()
+	binds.mnst:Disconnect()
+	binds.flwr:Disconnect()
+	binds.ctbl:Disconnect()
+	binds.ptcl:Disconnect()
+	binds.died:Disconnect()
 	wait(.1)
 	for _,v in pairs(workspace:GetDescendants())do
 		if v.Name=="content.com/Lopen"then
@@ -689,7 +1106,7 @@ Main:addButton("Destroy Ui",function()
 	end 
 end)
 Waypoint:addButton("Hive",function()
-	chr:MoveTo(plr.SpawnPos.Value.p)
+	hrp.CFrame=CFrame.new(hrp.CFrame.p,hrp.CFrame.p+vector(0,0,.001))
 end)
 Waypoint:addDropdown("Fields",{"Sunflower Field","Mushroom Field","Dandelion Field","Clover Field","Blue Flower Field","Bamboo Field","Spider Field","Strawberry Field","Pineapple Patch","Stump Field","Rose Field","Cactus Field","Pumpkin Patch","Pine Tree Forest","Mountain Top Field","Coconut Field","Pepper Patch","Ant Field"},4.25,function(v)
 	if tostring(v)=="Ant Field"then
@@ -851,6 +1268,27 @@ Waypoint:addDropdown("Boss",{"King Beetles Lair","Tunnel Bear","Coconut Crab","C
 		hrp.CFrame=CFrame.new(519,47,166)
 	end
 end)
+AutoTokens:addSlider("Range",5,2500,function(val)
+	selected.tokenrange=tonumber(val)
+end)
+AutoTokens:addToggle("Ticket",function(v)
+	token_ids["ticket"].t=v
+	if v then
+		repeat
+			wait(.3)
+			goto_token("ticket")
+		until not token_ids["ticket"].t
+	end
+end)
+AutoTokens:addToggle("Snowflake",function(v)
+	token_ids["snowflake"].t=v
+	if v then
+		repeat
+			wait(.3)
+			goto_token("snowflake")
+		until not token_ids["snowflake"].t
+	end
+end)
 Enemy:addToggle("Coconut Crab",function(v)
 	toggles.ccnc=v
 	if toggles.ccnc then
@@ -869,19 +1307,33 @@ end)
 Enemy:addToggle("Commando (bug w/o noclip)",function(v)
 	toggles.commando=v
 	if v and hrp then
-		local adhd=Vector3.new(0,3.1,0)
+		local adhd=vector(0,3.1,0)
 		if not workspace:FindFirstChild"FLOOOASD2"then
 			local p=Instance.new"Part"
 			p.Name="FLOOOASD2"
 			p.Parent=workspace
-			p.Size=Vector3.new(5,0,5)
+			p.Size=vector(5,0,5)
 			p.Anchored=true
 			p.CFrame=CFrame.new(513,47,163)
 		end
 		hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
 		while toggles.commando and wait()and hum and chr and hrp and hum.Health>0 do
-			if workspace.Collectibles:FindFirstChild"rbxassetid://2319083910"and workspace.Collectibles:FindFirstChild"rbxassetid://2319083910".Orientation.z==0 then
-				hrp.CFrame=workspace.Collectibles:FindFirstChild"rbxassetid://2319083910".CFrame+Vector3.new(0,.1,0)
+			if fetch_token"2319083910"and fetch_token"2319083910".Orientation.z==0 then
+				hrp.CFrame=fetch_token"2319083910".CFrame+vector(0,.1,0)
+				wait(.5)
+				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
+			else
+				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
+			end
+			if fetch_token"1442700745"and fetch_token"1442700745".Orientation.z==0 then
+				hrp.CFrame=fetch_token"1442700745".CFrame+vector(0,.1,0)
+				wait(.5)
+				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
+			else
+				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
+			end
+			if fetch_token"1629649299"and fetch_token"1629649299".Orientation.z==0 then
+				hrp.CFrame=fetch_token"1629649299".CFrame+vector(0,.1,0)
 				wait(.5)
 				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
 			else
@@ -899,12 +1351,27 @@ toggles.commando_loop=game.RunService.Stepped:Connect(function()
 		end
 	end
 end)
+Enemy:addToggle("Auto Farm enemies",function(v)
+	toggles.enemies=v
+end)
 Enemy:addToggle("Anchor HP bars",function(v)
 	toggles.achp=v
 end)
 NPC:addLabel("Open Quest Tab","Script can't read unloaded Instances")
 NPC:addToggle("Brown Bear",function(v)
-	toggles.bb=v
+	toggles.bb1=v
+	if v==false then
+		toggles.farming=false
+	end
+end)
+NPC:addToggle("Black Bear",function(v)
+	toggles.bb2=v
+	if v==false then
+		toggles.farming=false
+	end
+end)
+NPC:addToggle("Polar Bear",function(v)
+	toggles.bb3=v
 	if v==false then
 		toggles.farming=false
 	end
@@ -928,8 +1395,15 @@ Sp:addToggle("Noclip",function(v)
 	end
 end)
 Sp:addTextBox("TP walk speed",selected.tpws,function(val)
-	selected.tpws=val
+	if val>=0.01 then
+		selected.tpws=val
+	end	
 end)
 Sp:addToggle("TP walk",function(v)
 	toggles.tpw=v
 end)
+for _,v in pairs(workspace.Collectibles:GetChildren())do
+	v:Destroy()
+end
+print("loaded")
+loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/rgb.lua")()
