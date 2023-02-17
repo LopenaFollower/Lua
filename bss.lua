@@ -6,7 +6,7 @@ repeat
 until workspace[game.Players.LocalPlayer.Name]:FindFirstChild"Porcelain Port-O-Hive"and game:IsLoaded()
 wait()
 --VARIABLES & FUNCTIONS
-local ver,branch="2.0.",230
+local ver,branch="2.0.",238
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -70,178 +70,326 @@ local token_ids={
 	["haste"]={
 		t=nil,
 		id="65867881"
-		},
+	},
 	["honey"]={
 		t=nil,
 		id="1472135114"
-		},
+	},
 	["treat"]={
 		t=nil,
 		id="2028574353"
-		},
+	},
 	["babylove"]={
 		t=nil,
 		id="1472256444"
-		},
+	},
 	["melody"]={
 		t=nil,
 		id="253828517"
-		},
+	},
 	["bombplus"]={
 		t=nil,
 		id="1442764904"
-		},
+	},
 	["tokenlink"]={
 		t=nil,
 		id="1629547638"
-		},
+	},
 	["honeymark"]={
 		t=nil,
 		id="2499514197"
-		},
+	},
 	["inspire"]={
 		t=nil,
 		id="2000457501"
-		},
+	},
 	["whiteboost"]={
 		t=nil,
 		id="3877732821"
-		},
+	},
 	["oil"]={
 		t=nil,
 		id="2545746569"
-		},
+	},
 	["cloudvial"]={
 		t=nil,
 		id="3030569073"
-		},
+	},
 	["coconut"]={
 		t=nil,
 		id="3012679515"
-		},
+	},
 	["magicbean"]={
 		t=nil,
 		id="2529092020"
-		},
+	},
 	["antpass"]={
 		t=nil,
 		id="2060626811"
-		},
+	},
 	["blueextract"]={
 		t=nil,
 		id="2495936060"
-		},
+	},
 	["redextract"]={
 		t=nil,
 		id="2495935291"
-		},
+	},
 	["microconv"]={
 		t=nil,
 		id="2863122826"
-		},
+	},
 	["gingerbread"]={
 		t=nil,
 		id="6077173317"
-		},
+	},
 	["enzyme"]={
 		t=nil,
 		id="2584584968"
-		},
+	},
 	["mooncharm"]={
 		t=nil,
 		id="2306224708"
-		},
+	},
 	["glitter"]={
 		t=nil,
 		id="2542899798"
-		},
+	},
 	["fielddice"]={
 		t=nil,
 		id="2863468407"
-		},
+	},
 	["ticket"]={
 		t=nil,
 		id="1674871631"
-		},
+	},
 	["rage"]={
 		t=nil,
 		id="1442700745"
-		},
+	},
 	["impale"]={
 		t=nil,
 		id="2319083910"
-		},
+	},
 	["royaljelly"]={
 		t=nil,
 		id="1471882621"
-		},
+	},
 	["glue"]={
 		t=nil,
 		id="2504978518"
-		},
+	},
 	["gumdrops"]={
 		t=nil,
 		id="1838129169"
-		},
+	},
 	["bitterberry"]={
 		t=nil,
 		id="4483236276"
-		},
+	},
 	["sunflower"]={
 		t=nil,
 		id="1952682401"
-		},
+	},
 	["pneapple"]={
 		t=nil,
 		id="1952796032"
-		},
+	},
 	["blueberry"]={
 		t=nil,
 		id="2028453802"
-		},
+	},
 	["beamstorm"]={
 		t=nil,
 		id="1671281844"
-		},
+	},
 	["strawberry"]={
 		t=nil,
 		id="1952740625"
-		},
+	},
 	["bluesync"]={
 		t=nil,
 		id="1874692303"
-		},
+	},
 	["scratch"]={
 		t=nil,
 		id="1104415222"
-		},
+	},
 	["pulse"]={
 		t=nil,
 		id="1874564120"
-		},
+	},
 	["blueboost"]={
 		t=nil,
 		id="1442863423"
-		},
+	},
 	["redboost"]={
 		t=nil,
 		id="1442859163"
-		},
+	},
 	["prescision"]={
 		t=nil,
 		id="8173559749"
-		},
+	},
 	["pollenmark"]={
 		t=nil,
 		id="2499540966"
-		},
+	},
 	["bomb"]={
 		t=nil,
 		id="1442725244"
-		},
+	},
 	["focus"]={
 		t=nil,
 		id="1629649299"
+	},
+	["stinger"]={
+		t=nil,
+		id="2314214749"
+	},
+	["inferno"]={
+		t=nil,
+		id="4519549299"
+	},
+	["panda_morph"]={
+		t=nil,
+		id="1472580249"
+	},
+	["turpentine"]={
+		t=nil,
+		id="8310376128"
+	},
+	["polar_morph"]={
+		t=nil,
+		id="1472532912"
+	},
+	["brown_morph"]={
+		t=nil,
+		id="1472425802"
+	},
+	["black_morph"]={
+		t=nil,
+		id="1472491940"
+	},
+	["fuzzbomb"]={
+		t=nil,
+		id="4889322534"
+	},
+	["redsync"]={
+		t=nil,
+		id="1874704640"
+	},
+	["festivegift"]={
+		t=nil,
+		id="2652424740"
+	},
+	["starjelly"]={
+		t=nil,
+		id="2319943273"
+	},
+	["neonberry"]={
+		t=nil,
+		id="4483267595"
+	},
+	["basicegg"]={
+		t=nil,
+		id="1471846464",
+	},
+	["cog"]={
+		t=nil,
+		id="11804999942",
+	},
+	["smoothdice"]={
+		t=nil,
+		id="8054996680",
+	},
+	["loadeddice"]={
+		t=nil,
+		id="8055428094",
+	},
+	["jellybeans"]={
+		t=nil,
+		id="3080740120",
+	},
+	["tropicaldrink"]={
+		t=nil,
+		id="3835877932",
+	},
+	["purplepotion"]={
+		t=nil,
+		id="4935580111",
+	},
+	["supersmoothie"]={
+		t=nil,
+		id="5144657109",
+	},
+	["marhmallowbee"]={
+		t=nil,
+		id="3027672238",
+	},
+	["festivebean"]={
+		t=nil,
+		id="2676715441",
+	},
+	["nightbell"]={
+		t=nil,
+		id="2676671613",
+	},
+	["boxofrogs"]={
+		t=nil,
+		id="4528640710",
+	},
+	["robopass"]={
+		t=nil,
+		id="3036899811",
+	},
+	["startreat"]={
+		t=nil,
+		id="2028603146",
+	},
+	["atomictreat"]={
+		t=nil,
+		id="4520736128",
+	},
+	["turpentine"]={
+		t=nil,
+		id="8310376128",
+	},
+	["silveregg"]={
+		t=nil,
+		id="1471848094",
+	},
+	["goldegg"]={
+		t=nil,
+		id="1471849394",
+	},
+	["diamondegg"]={
+		t=nil,
+		id="1471850677",
+	},
+	["mythicegg"]={
+		t=nil,
+		id="4520739302",
+	},
+	["staregg"]={
+		t=nil,
+		id="2007771339",
+	},
+	["giftedsilver"]={
+		t=nil,
+		id="1987253833",
+	},
+	["giftedgold"]={
+		t=nil,
+		id="1987255318",
+	},
+	["gifteddiamond"]={
+		t=nil,
+		id="1987257040",
+	},
+	["giftedmythic"]={
+		t=nil,
+		id="6134473023",
 	}
 }
 gui_run=true
@@ -464,8 +612,10 @@ function set_sprinkler(t)
 	elseif not finished and not HoneyMaking and type(selected.field)=="string"then
 		in_prog=true
 		hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
+		hrp.Velocity=vector(0,0,0)
 		wait(.2)
 		for i=1,t do
+			hrp.Velocity=vector(0,0,0)
 			jump()
 			wait(.15)
 			game.ReplicatedStorage.Events.PlayerActivesCommand:FireServer({["Name"]="Sprinkler Builder"})
@@ -634,13 +784,14 @@ function farm_mobs()
 							hp=hum.Health
 							wait(2)
 							for i=1,6 do
-								wait(1)
-								if hum.Health<hp then
+								if hum.Health<=hp then
 									jump(5)
+									hp=hum.Health
 								else
 									hp=hum.Health
 									wait(.5)
 								end
+								wait(1)
 							end
 							repeat
 								wait()
@@ -712,20 +863,23 @@ function tokens()
 			end
 			wait(.1)
 			repeat
-				wait(.7)
-				jump()
-			until get_magnitude(nearest(workspace.Bees),hrp)<20
+				if get_magnitude(workspace.FlowerZones[selected.field],hrp,"y",true)<=25 then
+					jump()
+				end
+				wait()
+			until get_magnitude(nearest(workspace.Bees),hrp)<=30
 			HoneyMaking=false
 		end
 	end
 	for _,v in pairs(workspace.Collectibles:GetChildren())do
 		if toggles.farming and not finished and not in_prog and selected.field and not HoneyMaking then
-			set_sprinkler(6)
+			set_sprinkler(5)
 		end
 		if toggles.farming and cd and finished and not HoneyMaking and selected.field and not toggles.ccnc then
 			if selected.field=="Stump Field"and hum.Health<60 then
 				cd4=false
 				hrp.Velocity=vector(0,0,0)
+				wait()
 				hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
 			else
 				cd4=true
@@ -1321,26 +1475,28 @@ Enemy:addToggle("Commando (bug w/o noclip)",function(v)
 		end
 		hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
 		while toggles.commando and wait()and hum and chr and hrp and hum.Health>0 do
-			if fetch_token"2319083910"and fetch_token"2319083910".Orientation.z==0 then
-				hrp.CFrame=fetch_token"2319083910".CFrame+vector(0,.1,0)
-				wait(.5)
-				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
-			else
-				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
-			end
-			if fetch_token"1442700745"and fetch_token"1442700745".Orientation.z==0 then
-				hrp.CFrame=fetch_token"1442700745".CFrame+vector(0,.1,0)
-				wait(.5)
-				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
-			else
-				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
-			end
-			if fetch_token"1629649299"and fetch_token"1629649299".Orientation.z==0 then
-				hrp.CFrame=fetch_token"1629649299".CFrame+vector(0,.1,0)
-				wait(.5)
-				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
-			else
-				hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
+			if hum.Health>40 then
+				if fetch_token"2319083910"and fetch_token"2319083910".Orientation.z==0 then
+					hrp.CFrame=fetch_token"2319083910".CFrame+vector(0,.1,0)
+					wait(.5)
+					hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
+				else
+					hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
+				end
+				if fetch_token"1442700745"and fetch_token"1442700745".Orientation.z==0 then
+					hrp.CFrame=fetch_token"1442700745".CFrame+vector(0,.1,0)
+					wait(.5)
+					hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
+				else
+					hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
+				end
+				if fetch_token"1629649299"and fetch_token"1629649299".Orientation.z==0 then
+					hrp.CFrame=fetch_token"1629649299".CFrame+vector(0,.1,0)
+					wait(.5)
+					hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
+				else
+					hrp.CFrame=workspace:FindFirstChild"FLOOOASD2".CFrame+adhd
+				end
 			end
 		end
 	end
