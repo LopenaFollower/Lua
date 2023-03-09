@@ -77,7 +77,7 @@ local old_field
 local sum=0
 local total=0
 local PRs
-local m1=10000--each 0 represents a decimal place.(ex. 100 = 1.00)
+local m1=10000--100 = 1.00
 local m2=tonumber(tostring(m1).."00")
 local mmm
 local binds={}
