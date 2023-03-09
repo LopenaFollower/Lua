@@ -479,7 +479,7 @@ function webhook(mainTitle,desc,foot,r,g,b,...)
 		table.insert(webhookField,v)
 	end
 	req({
-		Url="https://discord.com/api/webhooks/1076173084425474131/J_z30wmC9ACnSMhKUM6WGodS3MrEklt07SahKCmGOzAGggwykL9e7s1VJMBrXlIFERcX",
+		Url="",
 		Body=game.HttpService:JSONEncode({
 			["embeds"]={{
 				["title"]=mainTitle,
