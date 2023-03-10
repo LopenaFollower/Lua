@@ -14,7 +14,7 @@ function stringify(a)
 	return game.HttpService:JSONEncode(a)
 end
 --VARIABLES & FUNCTIONS
-local ver,branch="2.0.",290
+local ver,branch="2.0.",295
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -77,11 +77,12 @@ local old_field
 local sum=0
 local total=0
 local PRs
-local m1=10000--100 = 1.00
+local m1=10000--each 0 represents a decimal place.(ex. 100 = 1.00)
 local m2=tonumber(tostring(m1).."00")
 local mmm
 local binds={}
 local crossair=false
+local disk_pause=false
 local offset,fl,n1,n2,h1=25,false,424,469,71
 local token_ids={
 	["snowflake"]={
@@ -547,7 +548,9 @@ function goto(x,y,z,m)
 				end)
 			end
 			if m then
-				hum.WalkToPoint=vector(x+math.random(),hrp.Position.y,z+math.random())
+				if not disk_pause and not crossair then
+					hum.WalkToPoint=vector(x+math.random(),hrp.Position.y,z+math.random())
+				end
 			else
 				chr:TranslateBy((vector(x+math.random(),hrp.Position.y,z+math.random())-hrp.Position))
 			end
@@ -595,7 +598,7 @@ function ccnc_func()
 				if math.random()<.01 and hrp.Position.z>=n1+10 then
 					hrp.CFrame=CFrame.new(workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker".Position.x-offset,hrp.Position.y,hrp.Position.z-10)
 				end
-				if hum.Health>h1 then
+				if hum.Health>50 then
 					if(workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker".Position.x+255)>=0 and not fl then
 						if hrp.Position.z<=n2 and hrp.Position.z>=n1 then
 							hrp.CFrame=CFrame.new(workspace:FindFirstChild"CrabModel":FindFirstChild"Whisker".Position.x-offset,hrp.Position.y,hrp.Position.z)
@@ -624,7 +627,7 @@ function ccnc_func()
 					hrp.CFrame=CFrame.new(-268,110,429)
 				end
 				for _,v in pairs(workspace.Particles:GetChildren())do
-					if v:IsA"BasePart"and v.Size.x>=40 then
+					if v:IsA"BasePart"and v.Size.x==40 then
 						if v.Name=="WarningDisk"then
 							if(vector(v.Position.x,hrp.Position.y,v.Position.z)-hrp.Position).magnitude<=23 and hum.Health>75 then
 								if(v.Position.x+255)<=0 then
@@ -716,7 +719,7 @@ function getquest(from)
 			end
 			local bbq=plr.PlayerGui.ScreenGui.Menus.Children.Quests.Content.Frame:FindFirstChild(npc222)
 			local tsks=bbq and bbq:GetChildren()
-			if bbq:FindFirstChild"PRs"then
+			if bbq and bbq:FindFirstChild"PRs"then
 				bbq:FindFirstChild"PRs":Destroy()
 			end
 			PRs=(bbq:FindFirstChild"_1" or bbq.TitleBar):Clone()
@@ -826,15 +829,15 @@ function farm_mobs()
 							repeat
 								wait()
 								hum.HipHeight=12
-							until get_magnitude(nearest(workspace.Bees),hrp)<=10
+							until get_magnitude(nearest(workspace.Bees),hrp)<=40
 							hum.HipHeight=2.1
-							wait(3)
+							wait(7)
 							repeat
 								wait()
 							until fetch_token"1629547638"and get_magnitude(fetch_token("1629547638"),hrp)<=40 or hum.Health<1
 							wait(.1)
 							hrp.CFrame=fetch_token"1629547638".CFrame+vector(0,2,0)
-							wait(.5)
+							wait(1)
 							cd3=true
 						end
 					end
@@ -888,9 +891,8 @@ function killvicious()
 	end
 end
 function tokens()
-	local Display=workspace[plr.Name]:WaitForChild"Porcelain Port-O-Hive".Display
-	if not HoneyMaking and Display and Display.Gui then
-		if hum and chr and Display.Gui.ProgressBar.AbsoluteSize==Display.Gui.RedBar.AbsoluteSize or Display.Gui.ProgressLabel==plr.CoreStats.Pollen.Value.."/"..plr.CoreStats.Pollen.Value then
+	if not HoneyMaking then
+		if hum and chr and plr.CoreStats.Pollen.value/plr.CoreStats.Capacity.value>=1 then
 			HoneyMaking=true
 			wait(1)
 			starting_time=tick()
@@ -945,7 +947,7 @@ function tokens()
 				cd4=true
 			end
 			cd=false
-			if cd4 and(get_magnitude(workspace.FlowerZones[selected.field],v,"x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v,"z",true)<=workspace.FlowerZones[selected.field].Size.z/2)and fetch_token"1629547638"and fetch_token"1629547638".Orientation.z==0 and not crossair then
+			if cd4 and(get_magnitude(workspace.FlowerZones[selected.field],v,"x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v,"z",true)<=workspace.FlowerZones[selected.field].Size.z/2)and fetch_token"1629547638"and fetch_token"1629547638".Orientation.z==0 and not crossair and not disk_pause then
 				pcall(function()
 					goto(fetch_token"1629547638".Position.x,hrp.Position.y,fetch_token"1629547638".Position.z,toggles.walk)
 				end)
@@ -1168,22 +1170,35 @@ end)
 binds.ptcl=workspace.Particles.ChildAdded:Connect(function(v)
 	if gui_run then
 		for _,v2 in pairs(workspace.Particles:GetChildren())do
-			if v2.Name=="DustBunnyInstance"and toggles.farming and not HoneyMaking then
-				pcall(function()
-					if(get_magnitude(workspace.FlowerZones[selected.field],v2:FindFirstChild"Root","x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v2:FindFirstChild"Root","z",true)<=workspace.FlowerZones[selected.field].Size.z/2)then
-						hrp.CFrame=v2:FindFirstChild"Root".CFrame+vector(0,2,0)
+			if toggles.farming and not HoneyMaking then
+				if v2.Name=="DustBunnyInstance"then
+					pcall(function()
+						if(get_magnitude(workspace.FlowerZones[selected.field],v2:FindFirstChild"Root","x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v2:FindFirstChild"Root","z",true)<=workspace.FlowerZones[selected.field].Size.z/2)then
+							hrp.CFrame=v2:FindFirstChild"Root".CFrame+vector(0,2,0)
+						end
+					end)
+				end
+				if v2:IsA"BasePart"and(v2.Size.x==30 or v2.Size.x==8)then
+					if v2.Name=="WarningDisk"then
+						if(get_magnitude(workspace.FlowerZones[selected.field],v2,"x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v2,"z",true)<=workspace.FlowerZones[selected.field].Size.z/2)then
+							disk_pause=true
+							hrp.Velocity=vector(0,0,0)
+							hrp.CFrame=CFrame.new(v2.Position.x,hrp.Position.y,v2.Position.z)
+							wait(3)
+							disk_pause=false
+						end
 					end
-				end)
+				end
+				if v.Name=="Crosshair"then
+					if tostring(v.BrickColor)~="Red flip/flop"then
+						crossair=true
+						hrp.Velocity=vector(0,0,0)
+						wait()
+						goto(v.Position.x,hrp.Position.y,v.Position.z,false)
+						crossair=false
+					end
+				end
 			end
-		end
-		if v.Name=="Crosshair"and toggles.farming and not HoneyMaking then
-			crossair=true
-			repeat
-				hrp.Velocity=vector(0,0,0)
-				wait()
-				goto(v.Position.x,hrp.Position.y,v.Position.z,false)
-			until tostring(v.BrickColor)~="Red flip/flop"or not v or not toggles.farming or HoneyMaking
-			crossair=false
 		end
 		if v:IsA"Beam"and tostring(v.Attachment1)==tostring(game.Players.LocalPlayer.DisplayName)then
 			v.Name="MyBeam"
@@ -1203,7 +1218,7 @@ binds.ptcl=workspace.Particles.ChildAdded:Connect(function(v)
 		end
 	end
 end)
-local looping=game.RunService.Heartbeat:Connect(function()
+binds.loop=game.RunService.Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=game.Players.LocalPlayer.Character
@@ -1279,7 +1294,7 @@ local looping=game.RunService.Heartbeat:Connect(function()
 		end
 	end
 end)
-game.UserInputService.JumpRequest:connect(function()
+binds.jump=game.UserInputService.JumpRequest:connect(function()
 	if toggles.inf_jump and hum and chr and hrp then
 		jump()
 	end
@@ -1338,7 +1353,7 @@ Main:addToggle("ESP Tokens",function(v)
 	toggles.token_esp=v
 end)
 Main:addButton("Destroy Ui",function()
-	looping:Disconnect()
+	binds.loop:Disconnect()
 	gui_run=false
 	toggles.farming=false
 	toggles.tpw=false
@@ -1388,13 +1403,14 @@ Main:addButton("Destroy Ui",function()
 	if toggles.commando_loop then
 		toggles.commando_loop:Disconnect()
 	end
-	looping:Disconnect()
+	binds.loop:Disconnect()
 	binds.wksp:Disconnect()
 	binds.mnst:Disconnect()
 	binds.flwr:Disconnect()
 	binds.ctbl:Disconnect()
 	binds.ptcl:Disconnect()
 	binds.died:Disconnect()
+	binds.jump:Disconnect()
 	wait(.1)
 	for _,v in pairs(workspace:GetDescendants())do
 		if v.Name=="content.com/Lopen"then
