@@ -14,7 +14,7 @@ function stringify(a)
 	return game.HttpService:JSONEncode(a)
 end
 --VARIABLES & FUNCTIONS
-local ver,branch="2.0.",295
+local ver,branch="2.0.",323
 
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
@@ -81,6 +81,7 @@ local m1=10000--each 0 represents a decimal place.(ex. 100 = 1.00)
 local m2=tonumber(tostring(m1).."00")
 local mmm
 local binds={}
+local mf_cue=false
 local crossair=false
 local disk_pause=false
 local offset,fl,n1,n2,h1=25,false,424,469,71
@@ -449,7 +450,7 @@ if not workspace:FindFirstChild"coconut_platform"then
 	local p=Instance.new"Part"
 	p.Name="coconut_platform"
 	p.Parent=workspace
-	p.Transparency=0.9
+	p.Transparency=.9
 	p.Size=vector(100,0,40)
 	p.Anchored=true
 	p.CFrame=CFrame.new(-268,106.75,446)
@@ -480,7 +481,7 @@ function webhook(mainTitle,desc,foot,r,g,b,...)
 		table.insert(webhookField,v)
 	end
 	req({
-		Url="",
+		Url="https://discord.com/api/webhooks/1076173084425474131/J_z30wmC9ACnSMhKUM6WGodS3MrEklt07SahKCmGOzAGggwykL9e7s1VJMBrXlIFERcX",
 		Body=game.HttpService:JSONEncode({
 			["embeds"]={{
 				["title"]=mainTitle,
@@ -817,13 +818,16 @@ function farm_mobs()
 			if toggles.enemies then
 				if not e.Name:lower():find"monster"and not e.Name:lower():find"tunnel"and not e.Name:lower():find"snail"and not e.Name:lower():find"commando"and not e.Name:lower():find"crab"and not e.Name:lower():find"king"then
 					words={}
-					for word in(e:FindFirstChild"Attachment"or e:FindFirstChild"TimerAttachment").TimerGui.TimerLabel.Text:gmatch"%S+"do table.insert(words,word)end
+					for word in(e:FindFirstChild"Attachment"or e:FindFirstChild"TimerAttachment").TimerGui.TimerLabel.Text:gmatch"%S+"do
+						table.insert(words,word)
+					end
 					current_time=words[#words]:len()
 					if e:FindFirstChild"Attachment"or e:FindFirstChild"TimerAttachment"then
 						if not(e:FindFirstChild"Attachment"or e:FindFirstChild"TimerAttachment").TimerGui.TimerLabel.Text:match"%a+"or(current_time<=3 and tonumber(string.match((e:FindFirstChild"Attachment"or e:FindFirstChild"TimerAttachment").TimerGui.TimerLabel.Text,"%d+"))<=2)then
 							hrp.CFrame=e.CFrame
 							wait(.1)
 							hrp.CFrame=nearest(workspace.FlowerZones).CFrame*CFrame.new(0,2,0)
+							hrp.Velocity=vector(0,0,0)
 							wait(1)
 							game.ReplicatedStorage.Events.PlayerActivesCommand:FireServer({["Name"]="Sprinkler Builder"})
 							repeat
@@ -831,12 +835,16 @@ function farm_mobs()
 								hum.HipHeight=12
 							until get_magnitude(nearest(workspace.Bees),hrp)<=40
 							hum.HipHeight=2.1
-							wait(7)
 							repeat
 								wait()
-							until fetch_token"1629547638"and get_magnitude(fetch_token("1629547638"),hrp)<=40 or hum.Health<1
-							wait(.1)
-							hrp.CFrame=fetch_token"1629547638".CFrame+vector(0,2,0)
+							until mf_cue
+							mf_cue=false
+							repeat
+								wait()
+							until fetch_token"1629547638"and get_magnitude(fetch_token"1629547638",hrp)<=40 or hum.Health<1
+							wait(.25)
+							hrp.CFrame=fetch_token"1629547638".CFrame+vector(0,3,0)
+							hrp.Velocity=vector(0,0,0)
 							wait(1)
 							cd3=true
 						end
@@ -1101,6 +1109,11 @@ for _,v in pairs(workspace[plr.Name]:GetDescendants())do
 		v.Name=plr.DisplayName
 	end
 end
+binds.chat=plr.PlayerGui.Chat.Frame.ChatChannelParentFrame.Frame_MessageLogDisplay.Scroller.ChildAdded:Connect(function(v)
+	if string.find(v.TextLabel.Text,"Defeated")then
+		mf_cue=true
+	end
+end)
 binds.died=hum.Died:Connect(function()
 	if gui_run then
 		toggles.ccnc=false
@@ -1111,6 +1124,7 @@ binds.died=hum.Died:Connect(function()
 		if toggles.commando_loop then
 			toggles.commando_loop:Disconnect()
 		end
+		binds.chat:Disconnect()
 	end
 end)
 binds.wksp=workspace.DescendantAdded:Connect(function(v)
@@ -1124,6 +1138,11 @@ binds.wksp=workspace.DescendantAdded:Connect(function(v)
 					v.Name=plr.DisplayName
 				end
 			end
+			binds.chat=plr.PlayerGui.Chat.Frame.ChatChannelParentFrame.Frame_MessageLogDisplay.Scroller.ChildAdded:Connect(function(v)
+				if string.find(v.TextLabel.Text,"Defeated")then
+					mf_cue=true
+				end
+			end)
 		end
 		if v:IsA"BasePart"then
 			v.CastShadow=false
@@ -1180,11 +1199,11 @@ binds.ptcl=workspace.Particles.ChildAdded:Connect(function(v)
 				end
 				if v2:IsA"BasePart"and(v2.Size.x==30 or v2.Size.x==8)then
 					if v2.Name=="WarningDisk"then
-						if(get_magnitude(workspace.FlowerZones[selected.field],v2,"x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v2,"z",true)<=workspace.FlowerZones[selected.field].Size.z/2)then
+						if not disk_pause and(get_magnitude(workspace.FlowerZones[selected.field],v2,"x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v2,"z",true)<=workspace.FlowerZones[selected.field].Size.z/2)then
 							disk_pause=true
+							wait()
 							hrp.Velocity=vector(0,0,0)
 							hrp.CFrame=CFrame.new(v2.Position.x,hrp.Position.y,v2.Position.z)
-							wait(3)
 							disk_pause=false
 						end
 					end
@@ -1389,6 +1408,7 @@ Main:addButton("Destroy Ui",function()
 	mmm=nil
 	apnt=nil
 	fl=false
+	mf_cue=false
 	toggles.enemies=false
 	toggles.vichop=false
 	for i=1,#token_ids do
@@ -1411,6 +1431,7 @@ Main:addButton("Destroy Ui",function()
 	binds.ptcl:Disconnect()
 	binds.died:Disconnect()
 	binds.jump:Disconnect()
+	binds.chat:Disconnect()
 	wait(.1)
 	for _,v in pairs(workspace:GetDescendants())do
 		if v.Name=="content.com/Lopen"then
@@ -1418,7 +1439,6 @@ Main:addButton("Destroy Ui",function()
 		end
 	end
 	wait(.1)
-	hum.WalkSpeed=16
 	for x=1,100 do
 		if game.CoreGui:FindFirstChild"fu8rj82n"then
 			game.CoreGui:FindFirstChild"fu8rj82n":Destroy()
@@ -1603,12 +1623,35 @@ AutoTokens:addToggle("Ticket",function(v)
 		until not token_ids["ticket"].t
 	end
 end)
+local cd5=true
 AutoTokens:addToggle("Snowflake",function(v)
 	token_ids["snowflake"].t=v
-	if v then
-		repeat
-			wait(2)
-			hrp.CFrame=workspace.Particles.Snowflakes:FindFirstChild"SnowflakePart".CFrame
+	if token_ids["snowflake"].t then
+		repeat wait()
+			if cd5 then
+				cd5=false
+				nearest(workspace.Particles.Snowflakes).Name="target"
+				local t=workspace.Particles.Snowflakes:FindFirstChild"target"
+				repeat
+					if not mf_cue then
+						game.TweenService:Create(hrp,TweenInfo.new(.5,Enum.EasingStyle.Linear),{CFrame=CFrame.new(t.Position)}):Play()
+						hrp.Velocity=vector(0,0,0)
+					else
+						repeat
+							wait(1)
+							hrp.CFrame=nearest(workspace.FlowerZones).CFrame*CFrame.new(0,2,0)
+						until fetch_token"1629547638"and get_magnitude(fetch_token"1629547638",hrp)<=90 or hum.Health<1
+						wait(.25)
+						hrp.CFrame=fetch_token"1629547638".CFrame+vector(0,3,0)
+						hrp.Velocity=vector(0,0,0)
+						wait(.1)
+						mf_cue=false
+					end
+					wait()
+				until not workspace.Particles.Snowflakes:FindFirstChild"target"
+				wait(3)
+				cd5=true
+			end
 		until not token_ids["snowflake"].t
 	end
 end)
@@ -1634,7 +1677,7 @@ Enemy:addButton("Toggle Vicious Hop",function()
 	else
 		writefile("vic hop.txt",'{"v10":false}')
 	end
-	if type(afk_mode)~="number" then
+	if type(afk_mode)~="number"then
 		if parse(readfile"vic hop.txt").v10==true then
 			local vic_name=""
 			if workspace.Particles:FindFirstChild"Vicious"then
@@ -1782,12 +1825,15 @@ Sp:addToggle("Noclip",function(v)
 	end
 end)
 Sp:addTextBox("TP walk speed",selected.tpws,function(val)
-	if val>=0.01 then
+	if val>=.01 then
 		selected.tpws=val
 	end	
 end)
 Sp:addToggle("TP walk",function(v)
 	toggles.tpw=v
+end)
+Sp:addToggle("FPS boost",function(v)
+	game:GetService("RunService"):Set3dRenderingEnabled(not v)
 end)
 for _,v in pairs(workspace.Collectibles:GetChildren())do
 	v:Destroy()
