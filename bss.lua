@@ -1,4 +1,4 @@
-if game.PlaceId~=1537690962 then
+	if game.PlaceId~=1537690962 then
 	return
 end
 repeat
@@ -481,7 +481,7 @@ function webhook(mainTitle,desc,foot,r,g,b,...)
 		table.insert(webhookField,v)
 	end
 	req({
-		Url="https://discord.com/api/webhooks/1076173084425474131/J_z30wmC9ACnSMhKUM6WGodS3MrEklt07SahKCmGOzAGggwykL9e7s1VJMBrXlIFERcX",
+		Url="",
 		Body=game.HttpService:JSONEncode({
 			["embeds"]={{
 				["title"]=mainTitle,
@@ -841,7 +841,7 @@ function farm_mobs()
 							mf_cue=false
 							repeat
 								wait()
-							until fetch_token"1629547638"and get_magnitude(fetch_token"1629547638",hrp)<=40 or hum.Health<1
+							until fetch_token"1629547638"and get_magnitude(fetch_token"1629547638",hrp)<=50 or hum.Health<1
 							wait(.25)
 							hrp.CFrame=fetch_token"1629547638".CFrame+vector(0,3,0)
 							hrp.Velocity=vector(0,0,0)
@@ -900,7 +900,7 @@ function killvicious()
 end
 function tokens()
 	if not HoneyMaking then
-		if hum and chr and plr.CoreStats.Pollen.value/plr.CoreStats.Capacity.value>=1 then
+		if toggles.farming and hum and chr and plr.CoreStats.Pollen.value/plr.CoreStats.Capacity.value>=1 then
 			HoneyMaking=true
 			wait(1)
 			starting_time=tick()
@@ -951,6 +951,8 @@ function tokens()
 				hrp.Velocity=vector(0,0,0)
 				wait()
 				hrp.CFrame=workspace.FlowerZones[selected.field].CFrame*CFrame.new(0,2,0)
+				local bee=nearest(workspace.Bees)
+				hrp.CFrame=CFrame.lookAt(hrp.Position,vector(bee.Position.x,hrp.Position.y,bee.Position.z))
 			else
 				cd4=true
 			end
@@ -961,7 +963,7 @@ function tokens()
 				end)
 				wait(safe_delay)
 				cd=true
-			elseif cd4 and(get_magnitude(workspace.FlowerZones[selected.field],v,"x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v,"z",true)<=workspace.FlowerZones[selected.field].Size.z/2)and not toggles.only_token and v.Orientation.z==0 then
+			elseif cd4 and(get_magnitude(workspace.FlowerZones[selected.field],v,"x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v,"z",true)<=workspace.FlowerZones[selected.field].Size.z/2)and not toggles.only_token and v.Orientation.z==0 and not crossair and not disk_pause then
 				pcall(function()
 					goto(v.Position.x,hrp.Position.y,v.Position.z,toggles.walk)
 				end)
@@ -1197,7 +1199,7 @@ binds.ptcl=workspace.Particles.ChildAdded:Connect(function(v)
 						end
 					end)
 				end
-				if v2:IsA"BasePart"and(v2.Size.x==30 or v2.Size.x==8)then
+				if v2:IsA"BasePart"and(v2.Size.x==30)then
 					if v2.Name=="WarningDisk"then
 						if not disk_pause and(get_magnitude(workspace.FlowerZones[selected.field],v2,"x",true)<=workspace.FlowerZones[selected.field].Size.x/2 and get_magnitude(workspace.FlowerZones[selected.field],v2,"z",true)<=workspace.FlowerZones[selected.field].Size.z/2)then
 							disk_pause=true
@@ -1634,17 +1636,20 @@ AutoTokens:addToggle("Snowflake",function(v)
 				local t=workspace.Particles.Snowflakes:FindFirstChild"target"
 				repeat
 					if not mf_cue then
+						hrp.Velocity=vector(0,0,0)
 						game.TweenService:Create(hrp,TweenInfo.new(.5,Enum.EasingStyle.Linear),{CFrame=CFrame.new(t.Position)}):Play()
 						hrp.Velocity=vector(0,0,0)
 					else
-						repeat
-							wait(1)
-							hrp.CFrame=nearest(workspace.FlowerZones).CFrame*CFrame.new(0,2,0)
-						until fetch_token"1629547638"and get_magnitude(fetch_token"1629547638",hrp)<=90 or hum.Health<1
-						wait(.25)
-						hrp.CFrame=fetch_token"1629547638".CFrame+vector(0,3,0)
-						hrp.Velocity=vector(0,0,0)
-						wait(.1)
+						pcall(function()
+							repeat
+								wait(.1)
+								hrp.CFrame=nearest(workspace.FlowerZones).CFrame*CFrame.new(0,2,0)
+							until fetch_token"1629547638"or hum.Health<1
+							wait(.25)
+							hrp.CFrame=fetch_token"1629547638".CFrame+vector(0,3,0)
+							hrp.Velocity=vector(0,0,0)
+							wait(.25)
+						end)
 						mf_cue=false
 					end
 					wait()
@@ -1747,26 +1752,15 @@ Enemy:addToggle("Commando (bug w/o noclip)",function(v)
 		hrp.CFrame=workspace:FindFirstChild"commando_platform".CFrame+adhd
 		while toggles.commando and wait()and hum and chr and hrp and hum.Health>0 do
 			if hum.Health>40 then
+				hrp.CFrame=workspace:FindFirstChild"commando_platform".CFrame+adhd
 				if fetch_token"2319083910"and fetch_token"2319083910".Orientation.z==0 then
 					hrp.CFrame=fetch_token"2319083910".CFrame+vector(0,.1,0)
-					wait(.5)
-					hrp.CFrame=workspace:FindFirstChild"commando_platform".CFrame+adhd
-				else
-					hrp.CFrame=workspace:FindFirstChild"commando_platform".CFrame+vector(0,3.1,0)
 				end
 				if fetch_token"1442700745"and fetch_token"1442700745".Orientation.z==0 then
 					hrp.CFrame=fetch_token"1442700745".CFrame+vector(0,.1,0)
-					wait(.5)
-					hrp.CFrame=workspace:FindFirstChild"commando_platform".CFrame+adhd
-				else
-					hrp.CFrame=workspace:FindFirstChild"commando_platform".CFrame+adhd
 				end
 				if fetch_token"1629649299"and fetch_token"1629649299".Orientation.z==0 then
 					hrp.CFrame=fetch_token"1629649299".CFrame+vector(0,.1,0)
-					wait(.5)
-					hrp.CFrame=workspace:FindFirstChild"commando_platform".CFrame+adhd
-				else
-					hrp.CFrame=workspace:FindFirstChild"commando_platform".CFrame+adhd
 				end
 			end
 		end
