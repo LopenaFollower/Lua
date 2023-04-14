@@ -105,8 +105,8 @@ local delete={
 	["MiniGun"]=true,
 	["CornerWedge"]=true,
 	["StoneRod"]=true,
-	["CornerWedge"]=true,
-	["CornerWedge"]=true,
+	["Flag"]=true,
+	["ParachuteBlock"]=true,
 	["CornerWedge"]=true,
 	["CornerWedge"]=true,
 	["CornerWedge"]=true,
@@ -180,10 +180,11 @@ game.RunService.Heartbeat:Connect(function()
 		end
 		hrp.Velocity=Vector3.new(0,1,0)
 		wait()
-		if(hrp.Position-Vector3.new(-53,hrp.Position.y,goal_x)).magnitude<=5 or not hum then
+		if math.abs(hrp.Position.x-goal_x)<=2 or not hum then
 			hrp.CFrame=CFrame.new(-56,-360,9496)
-			if die then
-				hum.Health=0
+			if die and hum then
+				hum:Destroy()
+				workspace.CurrentCamera.CameraSubject=chr
 			end
 		end
 	end
