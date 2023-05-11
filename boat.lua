@@ -10,8 +10,8 @@ local hum=chr and chr:FindFirstChildWhichIsA"Humanoid"
 local hrp=chr.HumanoidRootPart
 
 local farm_status=false
-local farm_speed=15
-local goal_x=8425
+local farm_speed=23
+local goal=8425
 local die=false
 local binds={}
 local autobuy={
@@ -113,6 +113,57 @@ local delete={
 	["CornerWedge"]=true,
 	["CornerWedge"]=true,
 }
+local items={
+	"Common Chest",
+	"Uncommon Chest",
+	"Rare Chest",
+	"Epic Chest",
+	"Legendary Chest",
+	"Sign",
+	"BoatMotor",
+	"Car Parts",
+	"Balloons",
+	"JetPacks",
+	"",
+	"Parachutes",
+	"Shield Generators",
+	"Harpoon",
+	"Note",
+	"HingeBlocks",
+	"Delay",
+	"Pistons",
+	"Locked Doors",
+	"Magnets",
+	"PVP Pack",
+	"LegacyCarPack",
+	"Switch",
+	"Button",
+	"LightBulb",
+	"Camera",
+	"CameraDome",
+	"SpikeTrap",
+	"Cannon",
+	"MiniGun",
+	"CannonTurret",
+	"WoodBlock",
+	"SmootWoodBlock",
+	"GlassBlock",
+	"StoneBlock",
+	"FabricBlock",
+	"PlasticBlock",
+	"GrassBlock",
+	"SandBlock",
+	"RustedBlock",
+	"BouncyBlock",
+	"MetalBlock",
+	"ConcreteBlock",
+	"IceBlock",
+	"CoalBlock",
+	"BrickBlock",
+	"MarbleBlock",
+	"TitaniumBlock",
+	"ObsidianBlock"
+}
 function permin(inp)
 	permin_gold=permin_gold+inp
 	local sp=60
@@ -130,15 +181,6 @@ binds.chat=plr.PlayerGui.GainedGoldGui.SlideDownFrame.ChildAdded:Connect(functio
 	end
 end)
 workspace.ChildAdded:Connect(function(v)
-	if not workspace:FindFirstChild"standing"then
-		local p=Instance.new"Part"
-		p.Name="standing"
-		p.Parent=workspace
-		p.Transparency=1
-		p.Size=Vector3.new(5,0,5)
-		p.Anchored=true
-		p.CFrame=CFrame.new(-268,106.75,446)
-	end
 	wait(.2)
 	for _,v2 in pairs(workspace:GetChildren())do
 		if delete[v2.Name]and v2:IsA"Model"then
@@ -157,10 +199,12 @@ workspace.ChildAdded:Connect(function(v)
 		if i.Name~="GoldenChest"then
 			i:Destroy()
 		end
-		i:FindFirstChild"Cap":Destroy()
+		if i:FindFirstChild"Cap"then
+			i:FindFirstChild"Cap":Destroy()
+		end
 	end
 end)
-game.RunService.Heartbeat:Connect(function()
+game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=plr.Character
@@ -168,21 +212,26 @@ game.RunService.Heartbeat:Connect(function()
 		hrp=chr.HumanoidRootPart
 		workspace[plr.Name].HumanoidRootPart.GroupLabel.TextLabel.Text=math.round(permin_gold*100)/100
 	end)
-	if hrp.CFrame.z<(goal_x-1000) then
+	if hrp.CFrame.z<(goal-1000) then
 		workspace.ClaimRiverResultsGold:FireServer()
 	end
 	if farm_status then
 		if hrp.CFrame.z<760 then
 			hrp.CFrame=CFrame.new(-56,30,1000)
-			if goal_x<8450 then
-				game.TweenService:Create(hrp,TweenInfo.new(farm_speed,Enum.EasingStyle.Linear),{CFrame=CFrame.new(-56,30,goal_x)}):Play()
-			end
+			game.TweenService:Create(hrp,TweenInfo.new(farm_speed,Enum.EasingStyle.Linear),{CFrame=CFrame.new(-56,30,goal+10)}):Play()
 		end
 		hrp.Velocity=Vector3.new(0,1,0)
 		wait()
-		if math.abs(hrp.Position.x-goal_x)<=2 or not hum then
+		if hrp.Position.z>goal then
 			hrp.CFrame=CFrame.new(-56,-360,9496)
 			if die and hum then
+				hum:Destroy()
+				workspace.CurrentCamera.CameraSubject=chr
+			end
+			wait(1)
+			workspace.ClaimRiverResultsGold:FireServer()
+			wait(10)
+			if hrp.Position.z>goal then
 				hum:Destroy()
 				workspace.CurrentCamera.CameraSubject=chr
 			end
@@ -190,6 +239,15 @@ game.RunService.Heartbeat:Connect(function()
 	end
 	if autobuy.s and autobuy.item~=nil then
 		workspace:WaitForChild("ItemBoughtFromShop"):InvokeServer(autobuy.item,1)
+	end
+	if not workspace:FindFirstChild"standing"then
+		local p=Instance.new"Part"
+		p.Name="standing"
+		p.Parent=workspace
+		p.Transparency=.9
+		p.Size=Vector3.new(10,0,10)
+		p.Anchored=true
+		p.CFrame=CFrame.new(-268,100,446)
 	end
 	hrp.AssemblyAngularVelocity=Vector3.new(0,0,0)
 	hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
@@ -204,21 +262,18 @@ Main:addToggle("Start",function(v)
 end)
 Main:addDropdown("Mode",{"normal","die at last stage"},.5,function(v)
 	if v=="normal"then
-		goal_x=8425
+		die=false
 	end
 	if v=="die at last stage"then
 		die=true
-	else
-		die=false
 	end
 end)
-Main:addTextBox("Speed",20,function(val)
+Main:addTextBox("Speed",23,function(val)
 	farm_speed=tonumber(val)
 end)
-Shop:addDropdown("Chest",{"Common Chest","Uncommon Chest","Rare Chest","Epic Chest","Legendary Chest"},1.25,function(v)
+Shop:addDropdown("Chest",items,#items*.25,function(v)
 	autobuy.item=v
 end)
-
 Shop:addToggle("Auto Buy",function(v)
 	autobuy.s=v
 end)
