@@ -13,6 +13,7 @@ local farm_status=false
 local farm_speed=23
 local goal=8425
 local die=false
+local del_tog=false
 local binds={}
 local autobuy={
 	item=nil,
@@ -124,7 +125,7 @@ local items={
 	"Car Parts",
 	"Balloons",
 	"JetPacks",
-	"",
+	"Plane Parts",
 	"Parachutes",
 	"Shield Generators",
 	"Harpoon",
@@ -183,7 +184,7 @@ end)
 workspace.ChildAdded:Connect(function(v)
 	wait(.2)
 	for _,v2 in pairs(workspace:GetChildren())do
-		if delete[v2.Name]and v2:IsA"Model"then
+		if del_tog and delete[v2.Name]and v2:IsA"Model"then
 			v2:Destroy()
 		end
 	end
@@ -221,7 +222,9 @@ game:GetService"RunService".Heartbeat:Connect(function()
 			game.TweenService:Create(hrp,TweenInfo.new(farm_speed,Enum.EasingStyle.Linear),{CFrame=CFrame.new(-56,30,goal+10)}):Play()
 		end
 		hrp.Velocity=Vector3.new(0,1,0)
-		wait()
+		hrp.AssemblyAngularVelocity=Vector3.new(0,0,0)
+		hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
+		workspace:FindFirstChild"standing".CFrame=hrp.CFrame-Vector3.new(0,3.1,0)
 		if hrp.Position.z>goal then
 			hrp.CFrame=CFrame.new(-56,-360,9496)
 			if die and hum then
@@ -231,7 +234,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 			wait(1)
 			workspace.ClaimRiverResultsGold:FireServer()
 			wait(10)
-			if hrp.Position.z>goal then
+			if hrp.Position.z>goal and hum then
 				hum:Destroy()
 				workspace.CurrentCamera.CameraSubject=chr
 			end
@@ -249,12 +252,9 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		p.Anchored=true
 		p.CFrame=CFrame.new(-268,100,446)
 	end
-	hrp.AssemblyAngularVelocity=Vector3.new(0,0,0)
-	hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
-	workspace:FindFirstChild"standing".CFrame=hrp.CFrame-Vector3.new(0,3.1,0)
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
-local UI=GUI:CreateWindow("BABFB","beta 1")
+local UI=GUI:CreateWindow("BABFB","...")
 local Main=UI:addPage("Main",3,true,1)
 local Shop=UI:addPage("Shop",3,false,1)
 Main:addToggle("Start",function(v)
@@ -271,9 +271,19 @@ end)
 Main:addTextBox("Speed",23,function(val)
 	farm_speed=tonumber(val)
 end)
-Shop:addDropdown("Chest",items,#items*.25,function(v)
+Main:addToggle("Anti Lag",function(v)
+	del_tog=v
+end)
+Shop:addDropdown("Shop Items",items,#items*.25,function(v)
 	autobuy.item=v
 end)
+Shop:addLabel("will spend all ur gold")
 Shop:addToggle("Auto Buy",function(v)
 	autobuy.s=v
 end)
+Shop:addButton("Buy once",function()
+	if autobuy.item~=nil then
+		workspace:WaitForChild("ItemBoughtFromShop"):InvokeServer(autobuy.item,1)
+	end
+end)
+loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
