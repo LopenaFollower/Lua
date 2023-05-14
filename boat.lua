@@ -1,25 +1,20 @@
-if game.PlaceId~=537413528 then
-	return
-end
-repeat
-	wait(1)
-until game:IsLoaded()and game.Players.LocalPlayer
+if game.PlaceId~=537413528 then return end
+repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr and chr:FindFirstChildWhichIsA"Humanoid"
 local hrp=chr.HumanoidRootPart
-
 local farm_status=false
 local farm_speed=23
 local goal=8425
 local die=false
 local del_tog=false
+local permin_gold=0
 local binds={}
 local autobuy={
 	item=nil,
 	s=false
 }
-local permin_gold=0
 local delete={
 	["TitaniumBlock"]=true,
 	["SwitchBig"]=true,
@@ -165,12 +160,12 @@ local items={
 	"TitaniumBlock",
 	"ObsidianBlock"
 }
-function permin(inp)
-	permin_gold=permin_gold+inp
-	local sp=60
-	for i=1,sp do
-		permin_gold=permin_gold-(inp/sp)
-		wait(60/sp)
+function permin(n)
+	permin_gold=permin_gold+n
+	local p=60
+	for i=1,p do
+		permin_gold=permin_gold-(n/p)
+		wait(60/p)
 	end
 end
 binds.died=hum.Died:Connect(function()
@@ -178,10 +173,11 @@ binds.died=hum.Died:Connect(function()
 end)
 binds.chat=plr.PlayerGui.GainedGoldGui.SlideDownFrame.ChildAdded:Connect(function(v)
 	if v.Name=="GainClone"then
+		if not v:FindFirstChildWhichIsA"TextLabel".Text:find"+"then return end
 		permin(tonumber(string.match(v:FindFirstChildWhichIsA"TextLabel".Text,"%d+")))
 	end
 end)
-workspace.ChildAdded:Connect(function(v)
+workspace.ChildAdded:Connect(function()
 	wait(.2)
 	for _,v2 in pairs(workspace:GetChildren())do
 		if del_tog and delete[v2.Name]and v2:IsA"Model"then
@@ -192,11 +188,17 @@ workspace.ChildAdded:Connect(function(v)
 	pcall(function()
 		binds.chat=plr.PlayerGui.GainedGoldGui.SlideDownFrame.ChildAdded:Connect(function(v)
 			if v.Name=="GainClone"then
+				if not v:FindFirstChildWhichIsA"TextLabel".Text:find"+"then return end
 				permin(tonumber(string.match(v:FindFirstChildWhichIsA"TextLabel".Text,"%d+")))
 			end
 		end)
 	end)
-	for _,i in pairs(workspace.BoatStages.NormalStages.TheEnd:GetChildren()) do
+	for _,i in pairs(workspace.BoatStages.NormalStages:GetChildren())do
+		if i.Name~="TheEnd"then
+			i:Destroy()
+		end
+	end
+	for _,i in pairs(workspace.BoatStages.NormalStages.TheEnd:GetChildren())do
 		if i.Name~="GoldenChest"then
 			i:Destroy()
 		end
@@ -213,44 +215,34 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		hrp=chr.HumanoidRootPart
 		workspace[plr.Name].HumanoidRootPart.GroupLabel.TextLabel.Text=math.round(permin_gold*100)/100
 	end)
-	if hrp.CFrame.z<(goal-1000) then
+	if hrp.CFrame.z<(goal-1000)then
 		workspace.ClaimRiverResultsGold:FireServer()
 	end
 	if farm_status then
-		if hrp.CFrame.z<760 then
+		if hrp.CFrame.z<1000 then
 			hrp.CFrame=CFrame.new(-56,30,1000)
 			game.TweenService:Create(hrp,TweenInfo.new(farm_speed,Enum.EasingStyle.Linear),{CFrame=CFrame.new(-56,30,goal+10)}):Play()
 		end
-		hrp.Velocity=Vector3.new(0,1,0)
+		hrp.Velocity=Vector3.new(0,0,0)
 		hrp.AssemblyAngularVelocity=Vector3.new(0,0,0)
 		hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
-		workspace:FindFirstChild"standing".CFrame=hrp.CFrame-Vector3.new(0,3.1,0)
-		if hrp.Position.z>goal then
+		if hrp.Position.z>goal and hrp.Position.z<9490 then
 			hrp.CFrame=CFrame.new(-56,-360,9496)
 			if die and hum then
-				hum:Destroy()
+				hum.Health=0
 				workspace.CurrentCamera.CameraSubject=chr
 			end
 			wait(1)
 			workspace.ClaimRiverResultsGold:FireServer()
-			wait(10)
+			wait(15)
 			if hrp.Position.z>goal and hum then
-				hum:Destroy()
+				hum.Health=0
 				workspace.CurrentCamera.CameraSubject=chr
 			end
 		end
 	end
 	if autobuy.s and autobuy.item~=nil then
 		workspace:WaitForChild("ItemBoughtFromShop"):InvokeServer(autobuy.item,1)
-	end
-	if not workspace:FindFirstChild"standing"then
-		local p=Instance.new"Part"
-		p.Name="standing"
-		p.Parent=workspace
-		p.Transparency=.9
-		p.Size=Vector3.new(10,0,10)
-		p.Anchored=true
-		p.CFrame=CFrame.new(-268,100,446)
 	end
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
