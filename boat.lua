@@ -193,17 +193,33 @@ workspace.ChildAdded:Connect(function()
 			end
 		end)
 	end)
-	for _,i in pairs(workspace.BoatStages.NormalStages:GetChildren())do
-		if i.Name~="TheEnd"then
+	if del_tog then
+		for _,i in pairs(workspace.BoatStages.NormalStages:GetChildren())do
+			if i.Name~="TheEnd"then
+				i:Destroy()
+			end
+		end
+		for _,i in pairs(workspace.BoatStages.OtherStages:GetChildren())do
 			i:Destroy()
 		end
-	end
-	for _,i in pairs(workspace.BoatStages.NormalStages.TheEnd:GetChildren())do
-		if i.Name~="GoldenChest"then
-			i:Destroy()
-		end
-		if i:FindFirstChild"Cap"then
-			i:FindFirstChild"Cap":Destroy()
+		for _,i in pairs(workspace.BoatStages.NormalStages.TheEnd:GetChildren())do
+			if i.Name~="GoldenChest"then
+				i:Destroy()
+			end
+			for _,v in pairs(i:GetChildren())do
+				if v.Name=="DisplayPrizes"or v.Name=="LightPart"then
+					v:Destroy()
+				end
+				if v:FindFirstChild"Gold"then
+					v:FindFirstChild"Gold":Destroy()
+				end
+				if v:FindFirstChild"Lock"then
+					v:FindFirstChild"Lock":Destroy()
+				end
+			end
+			if i:FindFirstChild"Cap"then
+				i:FindFirstChild"Cap":Destroy()
+			end
 		end
 	end
 end)
@@ -249,6 +265,7 @@ local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollow
 local UI=GUI:CreateWindow("BABFB","...")
 local Main=UI:addPage("Main",3,true,1)
 local Shop=UI:addPage("Shop",3,false,1)
+local Local=UI:addPage("Local Player",3,false,1)
 Main:addToggle("Start",function(v)
 	farm_status=v
 end)
@@ -277,5 +294,14 @@ Shop:addButton("Buy once",function()
 	if autobuy.item~=nil then
 		workspace:WaitForChild("ItemBoughtFromShop"):InvokeServer(autobuy.item,1)
 	end
+end)
+Local:addTextBox("WalkSpeed",hum.WalkSpeed,function(v)
+	hum.WalkSpeed=tonumber(v)
+end)
+Local:addTextBox("JumpPower",hum.JumpPower,function(v)
+	hum.JumpPower=tonumber(v)
+end)
+Local:addTextBox("HipHeight",hum.HipHeight,function(v)
+	hum.HipHeight=tonumber(v)
 end)
 loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
