@@ -4,16 +4,22 @@ local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr and chr:FindFirstChildWhichIsA"Humanoid"
 local hrp=chr.HumanoidRootPart
-local farm_status=false
 local farm_speed=23
 local goal=8425
-local die=false
-local del_tog=false
-local permin_gold=0
+local gold=0
 local binds={}
+local toggle={
+	farm=false,
+	die=false,
+	delete=false,
+	infj=false
+}
 local autobuy={
 	item=nil,
-	s=false
+	s=false,
+	check=false,
+	min=nil,
+	cd=true
 }
 local delete={
 	["TitaniumBlock"]=true,
@@ -160,27 +166,21 @@ local items={
 	"TitaniumBlock",
 	"ObsidianBlock"
 }
-function permin(n)
-	permin_gold=permin_gold+n
-	local p=60
-	for i=1,p do
-		permin_gold=permin_gold-(n/p)
-		wait(60/p)
-	end
-end
-binds.died=hum.Died:Connect(function()
-	binds.chat:Disconnect()
-end)
 binds.chat=plr.PlayerGui.GainedGoldGui.SlideDownFrame.ChildAdded:Connect(function(v)
 	if v.Name=="GainClone"then
 		if not v:FindFirstChildWhichIsA"TextLabel".Text:find"+"then return end
-		permin(tonumber(string.match(v:FindFirstChildWhichIsA"TextLabel".Text,"%d+")))
+		gold=gold+tonumber(string.match(v:FindFirstChildWhichIsA"TextLabel".Text,"%d+"))
+	end
+end)
+binds.jump=game.UserInputService.JumpRequest:connect(function()
+	if toggle.infj and hum then
+		hum:ChangeState"Jumping"
 	end
 end)
 workspace.ChildAdded:Connect(function()
 	wait(.2)
 	for _,v2 in pairs(workspace:GetChildren())do
-		if del_tog and delete[v2.Name]and v2:IsA"Model"then
+		if toggle.delete and delete[v2.Name]and v2:IsA"Model"then
 			v2:Destroy()
 		end
 	end
@@ -189,11 +189,19 @@ workspace.ChildAdded:Connect(function()
 		binds.chat=plr.PlayerGui.GainedGoldGui.SlideDownFrame.ChildAdded:Connect(function(v)
 			if v.Name=="GainClone"then
 				if not v:FindFirstChildWhichIsA"TextLabel".Text:find"+"then return end
-				permin(tonumber(string.match(v:FindFirstChildWhichIsA"TextLabel".Text,"%d+")))
+				gold=gold+tonumber(string.match(v:FindFirstChildWhichIsA"TextLabel".Text,"%d+"))
 			end
 		end)
 	end)
-	if del_tog then
+	binds.jump:Disconnect()
+	pcall(function()
+		binds.jump=game.UserInputService.JumpRequest:connect(function()
+			if toggle.infj and hum then
+				hum:ChangeState"Jumping"
+			end
+		end)
+	end)
+	if toggle.delete then
 		for _,i in pairs(workspace.BoatStages.NormalStages:GetChildren())do
 			if i.Name~="TheEnd"then
 				i:Destroy()
@@ -207,7 +215,7 @@ workspace.ChildAdded:Connect(function()
 				i:Destroy()
 			end
 			for _,v in pairs(i:GetChildren())do
-				if v.Name=="DisplayPrizes"or v.Name=="LightPart"then
+				if v.Name:find"DisplayPrizes"or v.Name=="LightPart"then
 					v:Destroy()
 				end
 				if v:FindFirstChild"Gold"then
@@ -215,6 +223,9 @@ workspace.ChildAdded:Connect(function()
 				end
 				if v:FindFirstChild"Lock"then
 					v:FindFirstChild"Lock":Destroy()
+				end
+				if v:FindFirstChild"LockPosition"then
+					v:FindFirstChild"LockPosition":Destroy()
 				end
 			end
 			if i:FindFirstChild"Cap"then
@@ -229,12 +240,12 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		chr=plr.Character
 		hum=chr and chr:FindFirstChildWhichIsA"Humanoid"
 		hrp=chr.HumanoidRootPart
-		workspace[plr.Name].HumanoidRootPart.GroupLabel.TextLabel.Text=math.round(permin_gold*100)/100
+		workspace[plr.Name].HumanoidRootPart.GroupLabel.TextLabel.Text="Session Earnings: "..gold
 	end)
 	if hrp.CFrame.z<(goal-1000)then
 		workspace.ClaimRiverResultsGold:FireServer()
 	end
-	if farm_status then
+	if toggle.farm then
 		if hrp.CFrame.z<1000 then
 			hrp.CFrame=CFrame.new(-56,30,1000)
 			game.TweenService:Create(hrp,TweenInfo.new(farm_speed,Enum.EasingStyle.Linear),{CFrame=CFrame.new(-56,30,goal+10)}):Play()
@@ -244,7 +255,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
 		if hrp.Position.z>goal and hrp.Position.z<9490 then
 			hrp.CFrame=CFrame.new(-56,-360,9496)
-			if die and hum then
+			if toggle.die and hum then
 				hum.Health=0
 				workspace.CurrentCamera.CameraSubject=chr
 			end
@@ -257,31 +268,44 @@ game:GetService"RunService".Heartbeat:Connect(function()
 			end
 		end
 	end
-	if autobuy.s and autobuy.item~=nil then
-		workspace:WaitForChild("ItemBoughtFromShop"):InvokeServer(autobuy.item,1)
+	if autobuy.s and autobuy.item~=nil and autobuy.cd then
+		autobuy.cd=false
+		pcall(function()
+			if plr.PlayerGui:FindFirstChild"ItemGained"then
+				plr.PlayerGui:FindFirstChild"ItemGained":Destroy()
+			end
+			if autobuy.check and type(autobuy.min)=="number"and tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)>autobuy.min then
+				workspace:WaitForChild("ItemBoughtFromShop"):InvokeServer(autobuy.item,1)
+			elseif not autobuy.check then
+				workspace:WaitForChild("ItemBoughtFromShop"):InvokeServer(autobuy.item,1)
+			end
+		end)
+		wait(.25)
+		autobuy.cd=true
 	end
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
 local UI=GUI:CreateWindow("BABFB","...")
 local Main=UI:addPage("Main",3,true,1)
 local Shop=UI:addPage("Shop",3,false,1)
+local Teleport=UI:addPage("Teleport",3,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
 Main:addToggle("Start",function(v)
-	farm_status=v
+	toggle.farm=v
 end)
 Main:addDropdown("Mode",{"normal","die at last stage"},.5,function(v)
 	if v=="normal"then
-		die=false
+		toggle.die=false
 	end
 	if v=="die at last stage"then
-		die=true
+		toggle.die=true
 	end
 end)
 Main:addTextBox("Speed",23,function(val)
 	farm_speed=tonumber(val)
 end)
 Main:addToggle("Anti Lag",function(v)
-	del_tog=v
+	toggle.delete=v
 end)
 Shop:addDropdown("Shop Items",items,#items*.25,function(v)
 	autobuy.item=v
@@ -290,10 +314,42 @@ Shop:addLabel("will spend all ur gold")
 Shop:addToggle("Auto Buy",function(v)
 	autobuy.s=v
 end)
+Shop:addToggle("Check gold",function(v)
+	autobuy.check=v
+	autobuy.cd=true
+end)
+Shop:addTextBox("buy when gold is over",1000,function(v)
+	autobuy.min=tonumber(v)
+	autobuy.cd=true
+end)
 Shop:addButton("Buy once",function()
 	if autobuy.item~=nil then
 		workspace:WaitForChild("ItemBoughtFromShop"):InvokeServer(autobuy.item,1)
 	end
+end)
+Teleport:addButton("Black Team",function()
+	hrp.CFrame=workspace:FindFirstChild"BlackTeam".Baseplate.CFrame+Vector3.new(0,10,0)
+end)
+Teleport:addButton("Red Team",function()
+	hrp.CFrame=workspace:FindFirstChild"Really redTeam".Baseplate.CFrame+Vector3.new(0,10,0)
+end)
+Teleport:addButton("Blue Team",function()
+	hrp.CFrame=workspace:FindFirstChild"Really blueTeam".Baseplate.CFrame+Vector3.new(0,10,0)
+end)
+Teleport:addButton("Green Team",function()
+	hrp.CFrame=workspace:FindFirstChild"CamoTeam".Baseplate.CFrame+Vector3.new(0,10,0)
+end)
+Teleport:addButton("White Team",function()
+	hrp.CFrame=workspace:FindFirstChild"WhiteTeam".Baseplate.CFrame+Vector3.new(0,10,0)
+end)
+Teleport:addButton("Yellow Team",function()
+	hrp.CFrame=workspace:FindFirstChild"New YellerTeam".Baseplate.CFrame+Vector3.new(0,10,0)
+end)
+Teleport:addButton("Magenta Team",function()
+	hrp.CFrame=workspace:FindFirstChild"MagentaTeam".Baseplate.CFrame+Vector3.new(0,10,0)
+end)
+Teleport:addButton("Waterfall",function()
+	hrp.CFrame=CFrame.new(335,-10,1155)
 end)
 Local:addTextBox("WalkSpeed",hum.WalkSpeed,function(v)
 	hum.WalkSpeed=tonumber(v)
@@ -303,5 +359,8 @@ Local:addTextBox("JumpPower",hum.JumpPower,function(v)
 end)
 Local:addTextBox("HipHeight",hum.HipHeight,function(v)
 	hum.HipHeight=tonumber(v)
+end)
+Local:addToggle("Inf Jump",function(v)
+	toggle.infj=v
 end)
 loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
