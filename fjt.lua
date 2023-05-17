@@ -61,7 +61,7 @@ game:GetService"RunService".RenderStepped:Connect(function()
 		my.money=plr.leaderstats.Money.value
 		my.tycoon=workspace.Tycoons[my.team]
 	end)
-	if tog.fruit and cd.fruit and not my.tycoon.Purchased:FindFirstChild"Auto Collector"then
+	if tog.fruit and cd.fruit and not my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector"then
 		cd.fruit=false
 		pcall(function()
 			if #my.tycoon.Drops:GetChildren()>=10 then
@@ -98,7 +98,8 @@ game:GetService"RunService".RenderStepped:Connect(function()
 					local price=v.ButtonLabel.CostLabel.Text:gsub("%$","")
 					price=string.gsub(price,"%,","")
 					if my.money>=tonumber(price)then
-						hrp.CFrame=v.CFrame
+						v.CanCollide=false
+						v.CFrame=hrp.CFrame
 					end
 				end
 			end)
@@ -106,13 +107,15 @@ game:GetService"RunService".RenderStepped:Connect(function()
 		pcall(function()
 			for _,v in pairs(parent_folder:GetChildren())do
 				if v.ButtonLabel.CostLabel.Text:lower():find"free"then
-					hrp.CFrame=v.CFrame
+					v.CanCollide=false
+					v.CFrame=hrp.CFrame
 					return
 				end
 				local price=v.ButtonLabel.CostLabel.Text:gsub("%$","")
 				price=string.gsub(price,"%,","")
 				if my.money>=tonumber(price)then
-					hrp.CFrame=v.CFrame
+					v.CanCollide=false
+					v.CFrame=hrp.CFrame
 				end
 			end
 		end)
@@ -123,7 +126,8 @@ game:GetService"RunService".RenderStepped:Connect(function()
 		cd.obby=false
 		hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
 		wait(.3)
-		hrp.CFrame=workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame+Vector3.new(0,7.5,0)
+		workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=my.tycoon.Essentials.SpawnLocation.CFrame
+		hrp.CFrame=my.tycoon.Essentials.SpawnLocation.CFrame
 		wait(.9)
 		cd.obby=true
 		if workspace[plr.Name]:FindFirstChild"Pick Fruit"then
@@ -134,7 +138,9 @@ game:GetService"RunService".RenderStepped:Connect(function()
 			workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
 		end
 		hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
-		wait(.5)
+		wait(.1)
+		fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
+		wait(.1)
 		fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
 	end
 	if tog.prestige and cd.prestige then
@@ -161,13 +167,12 @@ workspace.ChildAdded:Connect(function()
 		binds.drops=my.tycoon.Drops.ChildAdded:Connect(function(v)
 			if v.Name~="JuiceBottle"then
 				wait(.01)
-				v.CFrame=my.tycoon.Essentials.FruitHolder.HolderBottom.CFrame
-				v.Velocity=Vector3.new(0,-15,0)
+				v.CFrame=my.tycoon:FindFirstChild"Essentials".FruitHolder.HolderBottom.CFrame
 			end
 		end)
 	end)
 	pcall(function()
-		plr.PlayerGui.ObbyBillboards.ObbySignBillBoard.Parent=my.tycoon.Essentials.SpawnLocation
+		workspace.ObbyParts.Stages.Hard.VictoryPart.RewardGui.RewardLabel.Text=plr.PlayerGui.ObbyBillboards.ObbySignBillBoard.BottomText.Text
 	end)
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
