@@ -39,6 +39,7 @@ wait(1)
 for _,v in pairs(t:GetChildren())do
 	if plr.TeamColor==v.TeamColor then
 		my.team=v.Name
+		my.tycoon=workspace.Tycoons[v.Name]
 	end
 end
 notif("Team: "..my.team,"")
@@ -149,7 +150,6 @@ my.tycoon.Drops.ChildAdded:Connect(function(v)
 		v.CFrame=my.tycoon.Essentials.FruitHolder.HolderBottom.CFrame+Vector3.new(0,2,0)
 	end
 end)
-
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
 local UI=GUI:CreateWindow("FJT","...")
 local Main=UI:addPage("Main",30,true,1)
