@@ -42,6 +42,13 @@ for _,v in pairs(t:GetChildren())do
 	end
 end
 notif("Team: "..my.team,"")
+function getFruit()
+	for _,v in pairs(my.tycoon.Drops:GetChildren())do
+		if v.Name~="JuiceBottle"then
+			game:GetService"ReplicatedStorage".CollectFruit:FireServer(v)
+		end
+	end
+end
 game:GetService"RunService".RenderStepped:Connect(function()
 	pcall(function()
 		t=game:GetService"Teams"
@@ -52,28 +59,16 @@ game:GetService"RunService".RenderStepped:Connect(function()
 		my.money=plr.leaderstats.Money.value
 		my.tycoon=workspace.Tycoons[my.team]
 	end)
-	if plr.PlayerGui.FrenzyGui.FrenzyLabel.Text=="FRENZY!!! 2X FRUIT & INSTANT JUICE (2)"then
-		plr.Backpack:FindFirstChild"Pick Fruit".Parent=workspace[plr.Name]
-		for _,v in pairs(my.tycoon.Drops:GetChildren())do
-			if v.Name~="JuiceBottle"then
-				game:GetService"ReplicatedStorage".CollectFruit:FireServer(v)
-			end
-		end
-		wait()
-		workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
-	end
 	if tog.fruit and cd.fruit and not my.tycoon.Purchased:FindFirstChild"Auto Collector"then
 		cd.fruit=false
 		if #my.tycoon.Drops:GetChildren()>=10 then
 			if workspace[plr.Name]:FindFirstChild"Pick Fruit"then
+				getFruit()
+				wait()
 				workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
 			else
 				plr.Backpack:FindFirstChild"Pick Fruit".Parent=workspace[plr.Name]
-				for _,v in pairs(my.tycoon.Drops:GetChildren())do
-					if v.Name~="JuiceBottle"then
-						game:GetService"ReplicatedStorage".CollectFruit:FireServer(v)
-					end
-				end
+				getFruit()
 				wait()
 				workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
 			end
@@ -117,7 +112,7 @@ game:GetService"RunService".RenderStepped:Connect(function()
 				end
 			end)
 		end
-		wait(.3)
+		wait(.4)
 		cd.button=true
 	end
 	if tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"and cd.obby and tog.obby then
@@ -148,6 +143,13 @@ game:GetService"RunService".RenderStepped:Connect(function()
 		hrp.CFrame=workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame+Vector3.new(0,3.7,0)
 	end
 end)
+my.tycoon.Drops.ChildAdded:Connect(function(v)
+	if v.Name~="JuiceBottle"then
+		wait(.1)
+		v.CFrame=my.tycoon.Essentials.FruitHolder.HolderBottom.CFrame+Vector3.new(0,2,0)
+	end
+end)
+
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
 local UI=GUI:CreateWindow("FJT","...")
 local Main=UI:addPage("Main",30,true,1)
