@@ -144,6 +144,7 @@ game:GetService"RunService".RenderStepped:Connect(function()
 		hrp.CFrame=workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame+Vector3.new(0,3.7,0)
 	end
 end)
+wait(1)
 my.tycoon.Drops.ChildAdded:Connect(function(v)
 	if v.Name~="JuiceBottle"then
 		wait(.1)
