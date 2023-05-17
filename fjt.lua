@@ -103,8 +103,8 @@ game:GetService"RunService".RenderStepped:Connect(function()
 				end
 			end)
 		end
-		for _,v in pairs(parent_folder:GetChildren())do
-			pcall(function()
+		pcall(function()
+			for _,v in pairs(parent_folder:GetChildren())do
 				if v.ButtonLabel.CostLabel.Text:lower():find"free"then
 					hrp.CFrame=v.CFrame
 					return
@@ -114,8 +114,8 @@ game:GetService"RunService".RenderStepped:Connect(function()
 				if my.money>=tonumber(price)then
 					hrp.CFrame=v.CFrame
 				end
-			end)
-		end
+			end
+		end)
 		wait(.4)
 		cd.button=true
 	end
