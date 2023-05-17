@@ -166,3 +166,4 @@ end)
 Main:addToggle("1 Dollar",function(v)
 	tog.dollar=v
 end)
+loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
