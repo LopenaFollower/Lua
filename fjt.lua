@@ -166,6 +166,9 @@ workspace.ChildAdded:Connect(function()
 			end
 		end)
 	end)
+	pcall(function()
+		plr.PlayerGui.ObbyBillboards.ObbySignBillBoard.Parent=my.tycoon.Essentials.SpawnLocation
+	end)
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
 local UI=GUI:CreateWindow("FJT","...")
