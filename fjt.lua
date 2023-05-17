@@ -21,6 +21,7 @@ local cd={
 	button=true,
 	prestige=true,
 }
+local binds={}
 function notif(title,text,delay)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=title or"",
@@ -62,18 +63,20 @@ game:GetService"RunService".RenderStepped:Connect(function()
 	end)
 	if tog.fruit and cd.fruit and not my.tycoon.Purchased:FindFirstChild"Auto Collector"then
 		cd.fruit=false
-		if #my.tycoon.Drops:GetChildren()>=10 then
-			if workspace[plr.Name]:FindFirstChild"Pick Fruit"then
-				getFruit()
-				wait()
-				workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
-			else
-				plr.Backpack:FindFirstChild"Pick Fruit".Parent=workspace[plr.Name]
-				getFruit()
-				wait()
-				workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
+		pcall(function()
+			if #my.tycoon.Drops:GetChildren()>=10 then
+				if workspace[plr.Name]:FindFirstChild"Pick Fruit"then
+					getFruit()
+					wait()
+					workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
+				else
+					plr.Backpack:FindFirstChild"Pick Fruit".Parent=workspace[plr.Name]
+					getFruit()
+					wait()
+					workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
+				end
 			end
-		end
+		end)
 		wait(.5)
 		cd.fruit=true
 	end
@@ -89,6 +92,17 @@ game:GetService"RunService".RenderStepped:Connect(function()
 				parent_folder=my.tycoon.Buttons.RoberryButtons
 			end
 		end)
+		for _,v in pairs(my.tycoon.Buttons:GetChildren())do
+			pcall(function()
+				if v:IsA"BasePart"and(v.Name:lower():find"autocollect"or v.Name:lower():find"floor"or v.Name:lower():find"juicespeed"or v.Name:lower():find"prestige")then
+					local price=v.ButtonLabel.CostLabel.Text:gsub("%$","")
+					price=string.gsub(price,"%,","")
+					if my.money>=tonumber(price)then
+						hrp.CFrame=v.CFrame
+					end
+				end
+			end)
+		end
 		for _,v in pairs(parent_folder:GetChildren())do
 			pcall(function()
 				if v.ButtonLabel.CostLabel.Text:lower():find"free"then
@@ -99,17 +113,6 @@ game:GetService"RunService".RenderStepped:Connect(function()
 				price=string.gsub(price,"%,","")
 				if my.money>=tonumber(price)then
 					hrp.CFrame=v.CFrame
-				end
-			end)
-		end
-		for _,v in pairs(my.tycoon.Buttons:GetChildren())do
-			pcall(function()
-				if v:IsA"BasePart"and(v.Name:lower():find"autocollect"or v.Name:lower():find"floor"or v.Name:lower():find"juicespeed"or v.Name:lower():find"prestige")then
-					local price=v.ButtonLabel.CostLabel.Text:gsub("%$","")
-					price=string.gsub(price,"%,","")
-					if my.money>=tonumber(price)then
-						hrp.CFrame=v.CFrame
-					end
 				end
 			end)
 		end
@@ -144,12 +147,25 @@ game:GetService"RunService".RenderStepped:Connect(function()
 		hrp.CFrame=workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame+Vector3.new(0,3.7,0)
 	end
 end)
-wait(1)
-my.tycoon.Drops.ChildAdded:Connect(function(v)
+wait(.1)
+binds.drops=my.tycoon.Drops.ChildAdded:Connect(function(v)
 	if v.Name~="JuiceBottle"then
-		wait(.1)
-		v.CFrame=my.tycoon.Essentials.FruitHolder.HolderBottom.CFrame+Vector3.new(0,2,0)
+		wait(.01)
+		v.CFrame=my.tycoon.Essentials.FruitHolder.HolderBottom.CFrame
+		v.Velocity=Vector3.new(0,0,0)
 	end
+end)
+workspace.ChildAdded:Connect(function()
+	binds.drops:Disconnect()
+	pcall(function()
+		binds.drops=my.tycoon.Drops.ChildAdded:Connect(function(v)
+			if v.Name~="JuiceBottle"then
+				wait(.01)
+				v.CFrame=my.tycoon.Essentials.FruitHolder.HolderBottom.CFrame
+				v.Velocity=Vector3.new(0,-15,0)
+			end
+		end)
+	end)
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
 local UI=GUI:CreateWindow("FJT","...")
