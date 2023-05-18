@@ -97,18 +97,11 @@ game:GetService"RunService".RenderStepped:Connect(function()
 		end)
 		pcall(function()
 			for _,v in pairs(parent_folder:GetChildren())do
-				if v.ButtonLabel.CostLabel.Text:lower():find"free"then
-					v.CanCollide=false
-					v.CFrame=hrp.CFrame
-					v.Size=hrp.Size
-					return
-				end
-				local price=v.ButtonLabel.CostLabel.Text:gsub("%$","")
-				price=string.gsub(price,"%,","")
-				if my.money>=tonumber(price)then
-					v.CanCollide=false
-					v.CFrame=hrp.CFrame
-					v.Size=hrp.Size
+				v.CanCollide=false
+				v.CFrame=hrp.CFrame
+				v.Size=hrp.Size
+				if v:FindFirstChildWhichIsA"BillboardGui"then
+					v:FindFirstChildWhichIsA"BillboardGui":Destroy()
 				end
 			end
 		end)
@@ -129,6 +122,10 @@ game:GetService"RunService".RenderStepped:Connect(function()
 					hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
 					wait()
 					fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
+					hum.WalkToPoint=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
+					v.CanCollide=false
+					v.CFrame=hrp.CFrame
+					v.Size=hrp.Size
 				end
 				if v:IsA"BasePart"and(v.Name:lower():find"floor"or v.Name:lower():find"juicespeed")then
 					local price=v.ButtonLabel.CostLabel.Text:gsub("%$","")
@@ -177,16 +174,13 @@ game:GetService"RunService".RenderStepped:Connect(function()
 	end
 	if tog.walk and cd.walk then
 		cd.walk=false
-		local r=40
+		local r=35
 		hum.WalkToPoint=my.tycoon.Essentials.SpawnLocation.Position+Vector3.new(math.random(-r,r),0,math.random(-r,r))
-		wait(math.random(1.5,5))
+		wait(math.random(1.5,3.5))
 		cd.walk=true
 	end
 	if tog.dollar then
 		hrp.CFrame=workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame+Vector3.new(0,3.7,0)
-	end
-	if math.random()>=0.994 then
-		hum:ChangeState"Jumping"
 	end
 end)
 wait(.1)
