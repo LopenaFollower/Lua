@@ -98,7 +98,7 @@ game:GetService"RunService".RenderStepped:Connect(function()
 		pcall(function()
 			for _,v in pairs(parent_folder:GetChildren())do
 				v.CanCollide=false
-				v.CFrame=hrp.CFrame
+				game.TweenService:Create(v,TweenInfo.new(1,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 				v.Size=hrp.Size
 				if v:FindFirstChildWhichIsA"BillboardGui"then
 					v:FindFirstChildWhichIsA"BillboardGui":Destroy()
@@ -197,7 +197,7 @@ workspace.ChildAdded:Connect(function()
 		binds.drops=my.tycoon.Drops.ChildAdded:Connect(function(v)
 			if v.Name~="JuiceBottle"then
 				wait(.01)
-				v.CFrame=my.tycoon:FindFirstChild"Essentials".FruitHolder.HolderBottom.CFrame
+				game.TweenService:Create(v,TweenInfo.new(1.5,Enum.EasingStyle.Linear),{CFrame=my.tycoon:FindFirstChild"Essentials".FruitHolder.HolderBottom.CFrame}):Play()
 				v.Velocity=Vector3.new(0,-5,0)
 				v.AssemblyAngularVelocity=Vector3.new(0,-5,0)
 				v.AssemblyLinearVelocity=Vector3.new(0,-5,0)
