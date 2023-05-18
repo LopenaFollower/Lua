@@ -5,6 +5,7 @@ local hrp=chr.HumanoidRootPart
 local my={
 	money=0,
 	tycoon=nil,
+	tpws=1,
 }
 local tog={
 	fruit=false,
@@ -13,6 +14,8 @@ local tog={
 	dollar=false,
 	prestige=false,
 	walk=false,
+	infj=false,
+	tpw=false,
 }
 local cd={
 	fruit=true,
@@ -155,7 +158,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		wait(1)
 		cd.prestige=true
 	end
-	if tog.walk and cd.walk then
+	if tog.walk and cd.walk and not(my.tycoon:FindFirstChild"Buttons"and my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige")then
 		cd.walk=false
 		local r=35
 		if my.tycoon:FindFirstChild"Essentials"then
@@ -164,9 +167,13 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		wait(math.random(1.5,3))
 		cd.walk=true
 	end
-	if tog.dollar then
-		hrp.CFrame=workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame+Vector3.new(0,3.7,0)
-	end
+	if tog.tpw then
+		if hum.MoveDirection.Magnitude>0 then
+			chr:TranslateBy(hum.MoveDirection*my.tpws)
+		else
+			chr:TranslateBy(hum.MoveDirection)
+		end
+	end	
 end)
 wait(.1)
 binds.drops=my.tycoon.Drops.ChildAdded:Connect(function(v)end)
@@ -187,9 +194,15 @@ workspace.ChildAdded:Connect(function()
 		end
 	end
 end)
+game.UserInputService.JumpRequest:Connect(function()
+	if tog.infj and hum then
+		hum:ChangeState"Jumping"
+	end
+end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
 local UI=GUI:CreateWindow("FJT","v1.5")
 local Main=UI:addPage("Main",30,true,1)
+local Local:UI:addPage("Local",30,false,1)
 Main:addToggle("Fruits",function(v)
 	tog.fruit=v
 end)
@@ -205,7 +218,22 @@ end)
 Main:addToggle("Randomly Walk",function(v)
 	tog.walk=v
 end)
-Main:addToggle("1 Dollar",function(v)
-	tog.dollar=v
+Local:addTextBox("WalkSpeed",hum.WalkSpeed,function(v)
+	hum.WalkSpeed=tonumber(v)
+end)
+Local:addTextBox("JumpPower",hum.JumpPower,function(v)
+	hum.JumpPower=tonumber(v)
+end)
+Local:addTextBox("HipHeight",hum.HipHeight,function(v)
+	hum.HipHeight=tonumber(v)
+end)
+Local:addToggle("Inf Jump",function(v)
+	tog.infj=v
+end)
+Local:addToggle("TpWalk",function(v)
+	tog.tpw=v
+end)
+Local:addTextBox("TpWalk Speed",my.tpws,function(v)
+	my.tpws=tonumber(v)
 end)
 loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
