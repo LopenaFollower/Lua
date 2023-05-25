@@ -56,7 +56,7 @@ function getFruit()
 		end
 	end)
 end
-binds.drops=workspace.ChildAdded:Connect(function(v)end)
+binds.drops=workspace.ChildAdded:Connect(function()end)
 game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
@@ -134,7 +134,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 				end
 			end
 		end
-		wait(.025)
+		wait(.05)
 		cd.button=true
 	end
 	if cd.obby and tog.obby and tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
@@ -146,12 +146,12 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		cd.obby=true
 		getFruit()
 		hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
-		wait()
-		hrp.Anchored=true
+		wait(.05)
+		hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
 		fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
 		wait(.1)
+		hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
 		fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
-		hrp.Anchored=false
 	end
 	if tog.prestige and cd.prestige then
 		cd.prestige=false
@@ -164,10 +164,10 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		if my.tycoon:FindFirstChild"Purchased"and my.tycoon.Purchased:FindFirstChild"Golden Tree Statue"then
 			game:GetService"ReplicatedStorage".RequestPrestige:FireServer()
 		end
-		wait(.5)
+		wait(.25)
 		cd.prestige=true
 	end
-	if tog.walk and cd.walk and not(my.tycoon:FindFirstChild"Buttons"and my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige")then
+	if tog.walk and cd.walk and not((not plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible or my.money>=tonumber(plr.leaderstats.Prestige.Value.."5000000"))and my.tycoon:FindFirstChild"Buttons"and my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige")then
 		cd.walk=false
 		local r=35
 		if my.tycoon:FindFirstChild"Essentials"then
@@ -188,7 +188,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		binds.drops=my.tycoon.Drops.ChildAdded:Connect(function(v)
 			if v.Name~="JuiceBottle"then
 				wait(.01)
-				v.CFrame=my.tycoon:FindFirstChild"Essentials".FruitHolder.HolderBottom.CFrame-Vector3.new(0,.2,0)
+				v.CFrame=my.tycoon:FindFirstChild"Essentials".FruitHolder.HolderBottom.CFrame-Vector3.new(math.random(-8,8),.1,math.random(-5,5))
 			end
 		end)
 	end
