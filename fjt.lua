@@ -1,13 +1,12 @@
-if game.PlaceId~=6755746130 then return end
-repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer
+if game.PlaceId~=6755746130 then return else repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer end
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr and chr:FindFirstChildWhichIsA"Humanoid"
-local hrp=chr.HumanoidRootPart
+local hrp=chr and chr.HumanoidRootPart
 local my={
 	money=0,
 	tycoon=nil,
-	tpws=1,
+	tpws=1
 }
 local tog={
 	fruit=false,
@@ -25,7 +24,7 @@ local cd={
 	button=true,
 	prestige=true,
 	walk=true,
-	drops=true,
+	drops=true
 }
 for _,v in pairs(workspace.Tycoons:GetChildren())do
 	if(v.Owner.value==nil and v.Essentials and tostring(plr.TeamColor)=="White")or(v.Owner.value==plr.Name and tostring(plr.TeamColor)=="White")then
@@ -79,7 +78,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		rlab.Text=plr.PlayerGui.ObbyBillboards.ObbySignBillBoard.BottomText.Text
 		rlab.TextSize=20
 		rlab.TextScaled=false
-		rgui.MaxDistance=1e4
+		rgui.MaxDistance=1e5
 		if plr.PlayerGui:FindFirstChild"NotificationsGui"then
 			plr.PlayerGui.NotificationsGui:Destroy()
 		end
@@ -147,31 +146,36 @@ game:GetService"RunService".Heartbeat:Connect(function()
 				end
 			end
 		end
+		if countFruits()>=5 and my.money<=25 and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
+			hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
+			wait()
+			fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
+		end
 		wait(.05)
 		cd.button=true
 	end
 	if cd.obby and tog.obby and tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
 		cd.obby=false
 		hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
-		wait(.25)
+		wait(.1)
 		hrp.CFrame=my.tycoon.Essentials.SpawnLocation.CFrame-Vector3.new(0,.3,0)
-		wait(.6)
-		cd.obby=true
+		wait(.5)
 		getFruit()
 		repeat
 			hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
-			wait(.05)
+			wait()
 			fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
-		until countFruits()<5
+		until countFruits()<=1
+		cd.obby=true
 	end
 	if tog.prestige and cd.prestige then
 		cd.prestige=false
 		pcall(function()
 			if(not plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible or my.money>=tonumber(plr.leaderstats.Prestige.Value.."5000000"))and my.tycoon:FindFirstChild"Buttons"and my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige"then
-				my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige".CFrame=hrp.CFrame
 				hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
 				fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
 				hum.WalkToPoint=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
+				my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige".CFrame=hrp.CFrame
 			end
 			if my.tycoon:FindFirstChild"Purchased"and my.tycoon.Purchased:FindFirstChild"Golden Tree Statue"then
 				game:GetService"ReplicatedStorage".RequestPrestige:FireServer()
@@ -182,12 +186,10 @@ game:GetService"RunService".Heartbeat:Connect(function()
 	end
 	if tog.walk and cd.walk and not((not plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible or my.money>=tonumber(plr.leaderstats.Prestige.Value.."5000000"))and my.tycoon:FindFirstChild"Buttons"and my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige")then
 		cd.walk=false
-		pcall(function()
-			local r=35
-			if my.tycoon:FindFirstChild"Essentials"then
-				hum.WalkToPoint=my.tycoon.Essentials.SpawnLocation.Position+Vector3.new(math.random(-r,r),0,math.random(-r,r))
-			end
-		end)
+		local r=35
+		if my.tycoon:FindFirstChild"Essentials"and hum then
+			hum.WalkToPoint=my.tycoon.Essentials.SpawnLocation.Position+Vector3.new(math.random(-r,r),0,math.random(-r,r))
+		end
 		wait(math.random(1.5,3))
 		cd.walk=true
 	end
@@ -217,7 +219,7 @@ game.UserInputService.JumpRequest:Connect(function()
 	end
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
-local UI=GUI:CreateWindow("FJT","v2")
+local UI=GUI:CreateWindow("FJT","v2.1")
 local Main=UI:addPage("Main",30,true,1)
 local Local=UI:addPage("Local",30,false,1)
 Main:addToggle("Fruits",function(v)
@@ -234,6 +236,15 @@ Main:addToggle("Prestige",function(v)
 end)
 Main:addToggle("Randomly Walk",function(v)
 	tog.walk=v
+end)
+Main:addButton("Juice",function()
+	if my.tycoon and my.tycoon:FindFirstChild"Essentials"then
+		repeat
+			hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
+			wait()
+			fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
+		until countFruits()<=1
+	end
 end)
 Local:addTextBox("WalkSpeed",hum.WalkSpeed,function(v)
 	hum.WalkSpeed=tonumber(v)
