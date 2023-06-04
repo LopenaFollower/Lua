@@ -1,5 +1,4 @@
-if game.PlaceId~=537413528 then return end
-repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer
+if game.PlaceId~=537413528 then return else repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer end
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr and chr:FindFirstChildWhichIsA"Humanoid"
