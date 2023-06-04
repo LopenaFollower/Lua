@@ -172,9 +172,11 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		cd.prestige=false
 		pcall(function()
 			if(not plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible or my.money>=tonumber(plr.leaderstats.Prestige.Value.."5000000"))and my.tycoon:FindFirstChild"Buttons"and my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige"then
-				hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
+				if(hum.Position-my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position).magnitude>1.5 then
+					hum.WalkToPoint=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
+					hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
+				end
 				fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
-				hum.WalkToPoint=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
 				my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige".CFrame=hrp.CFrame
 			end
 			if my.tycoon:FindFirstChild"Purchased"and my.tycoon.Purchased:FindFirstChild"Golden Tree Statue"then
