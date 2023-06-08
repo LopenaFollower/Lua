@@ -172,9 +172,12 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		cd.prestige=false
 		pcall(function()
 			if(not plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible or my.money>=tonumber(plr.leaderstats.Prestige.Value.."5000000"))and my.tycoon:FindFirstChild"Buttons"and my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige"then
-				if(hum.Position-my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position).magnitude>1.5 then
+				if(hrp.Position-my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position).magnitude>3 then
 					hum.WalkToPoint=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
 					hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
+				end
+				if my.money>=tonumber(plr.leaderstats.Prestige.Value.."5000000")then
+					hum:ChangeState"Jumping"
 				end
 				fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
 				my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige".CFrame=hrp.CFrame
@@ -205,7 +208,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 	if my.tycoon:FindFirstChild"Drops"and cd.drops then
 		cd.drops=false
 		for _,v in pairs(my.tycoon.Drops:GetChildren())do
-			if v.Name~="JuiceBottle"then
+			if v.Name~="JuiceBottle"and v.Position.y>6 then
 				v.CFrame=my.tycoon:FindFirstChild"Essentials".FruitHolder.HolderBottom.CFrame-Vector3.new(math.random(-8,8),.1,math.random(-5,5))
 			end
 		end
