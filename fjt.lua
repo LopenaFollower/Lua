@@ -9,13 +9,13 @@ local my={
 	tpws=1
 }
 local tog={
-	fruit=false,
-	obby=false,
-	button=false,
-	prestige=false,
-	walk=false,
-	infj=false,
-	tpw=false,
+	fruit=true,
+	obby=true,
+	button=true,
+	prestige=true,
+	walk=true,
+	infj=true,
+	tpw=true,
 }
 local cd={
 	fruit=true,
@@ -137,7 +137,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 							v.Size=hrp.Size
 						end
 					end
-					if my.money>6e6 then
+					if my.money>1e6 and v.Position.y<10 then
 						v.CanCollide=false
 						v.CFrame=hrp.CFrame
 						v.Size=hrp.Size
@@ -220,25 +220,25 @@ game.UserInputService.JumpRequest:Connect(function()
 		hum:ChangeState"Jumping"
 	end
 end)
-local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
-local UI=GUI:CreateWindow("FJT","v2.1")
+local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
+local UI=GUI:CreateWindow("FJT","v3")
 local Main=UI:addPage("Main",30,true,1)
 local Local=UI:addPage("Local",30,false,1)
 Main:addToggle("Fruits",function(v)
 	tog.fruit=v
-end)
+end,tog.fruit)
 Main:addToggle("Buttons",function(v)
 	tog.button=v
-end)
+end,tog.button)
 Main:addToggle("Obby",function(v)
 	tog.obby=v
-end)
+end,tog.obby)
 Main:addToggle("Prestige",function(v)
 	tog.prestige=v
-end)
+end,tog.prestige)
 Main:addToggle("Randomly Walk",function(v)
 	tog.walk=v
-end)
+end,tog.walk)
 Main:addButton("Juice",function()
 	if my.tycoon and my.tycoon:FindFirstChild"Essentials"then
 		repeat
@@ -259,10 +259,10 @@ Local:addTextBox("HipHeight",hum.HipHeight,function(v)
 end)
 Local:addToggle("Inf Jump",function(v)
 	tog.infj=v
-end)
+end,tog.infj)
 Local:addToggle("TpWalk",function(v)
 	tog.tpw=v
-end)
+end,tog.tpw)
 Local:addTextBox("TpWalk Speed",my.tpws,function(v)
 	my.tpws=tonumber(v)
 end)
