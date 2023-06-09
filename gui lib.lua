@@ -51,7 +51,7 @@ function Library:CreateWindow(windowname,windowinfo)
 	TabContainer.Name="TabContainer"
 	TabContainer.Parent=DashBoard
 	TabContainer.BackgroundColor3=Color3.fromRGB(15,15,15)
-	TabContainer.BackgroundTransparency=1.000
+	TabContainer.BackgroundTransparency=1
 	TabContainer.BorderColor3=Color3.fromRGB(15,15,15)
 	TabContainer.BorderSizePixel=0
 	TabContainer.Position=UDim2.new(.0280373823,0,.0391304344,0)
@@ -80,7 +80,7 @@ function Library:CreateWindow(windowname,windowinfo)
 	Title.Name="Title"
 	Title.Parent=Frame
 	Title.BackgroundColor3=Color3.fromRGB(20,20,20)
-	Title.BackgroundTransparency=1.000
+	Title.BackgroundTransparency=1
 	Title.BorderColor3=Color3.fromRGB(20,20,20)
 	Title.BorderSizePixel=0
 	Title.Position=UDim2.new(.0428240746,0,.028070176,0)
@@ -88,13 +88,13 @@ function Library:CreateWindow(windowname,windowinfo)
 	Title.Font=Enum.Font.GothamSemibold
 	Title.Text=windowname
 	Title.TextColor3=Color3.fromRGB(255,255,255)
-	Title.TextSize=14.000
+	Title.TextSize=14
 	Title.TextXAlignment=Enum.TextXAlignment.Left
 
 	Yep.Name="Yep"
 	Yep.Parent=Frame
 	Yep.BackgroundColor3=Color3.fromRGB(20,20,20)
-	Yep.BackgroundTransparency=1.000
+	Yep.BackgroundTransparency=1
 	Yep.BorderColor3=Color3.fromRGB(20,20,20)
 	Yep.BorderSizePixel=0
 	Yep.Position=UDim2.new(.88499999,0,.0495263338,0)
@@ -103,11 +103,11 @@ function Library:CreateWindow(windowname,windowinfo)
 	Yep.Font=Enum.Font.SourceSans
 	Yep.Text=""
 	Yep.TextColor3=Color3.fromRGB(0,0,0)
-	Yep.TextSize=14.000
+	Yep.TextSize=14
 
 	Cre.Name="Cre"
 	Cre.Parent=Yep
-	Cre.BackgroundTransparency=1.000
+	Cre.BackgroundTransparency=1
 	Cre.Size=UDim2.new(0,38,0,21)
 	Cre.Image="rbxassetid://4384401360"
 	Cre.ScaleType=Enum.ScaleType.Fit
@@ -115,7 +115,7 @@ function Library:CreateWindow(windowname,windowinfo)
 	YepTitle.Name="YepTitle"
 	YepTitle.Parent=Yep
 	YepTitle.BackgroundColor3=Color3.fromRGB(20,20,20)
-	YepTitle.BackgroundTransparency=1.000
+	YepTitle.BackgroundTransparency=1
 	YepTitle.BorderColor3=Color3.fromRGB(20,20,20)
 	YepTitle.BorderSizePixel=0
 	YepTitle.Position=UDim2.new(1.57894742,0,-.318181813,0)
@@ -123,8 +123,8 @@ function Library:CreateWindow(windowname,windowinfo)
 	YepTitle.Font=Enum.Font.GothamSemibold
 	YepTitle.Text=windowinfo or "UI Made by Bytes#0001"-- real owner
 	YepTitle.TextColor3=Color3.fromRGB(255,255,255)
-	YepTitle.TextSize=9.000
-	YepTitle.TextTransparency=1.000
+	YepTitle.TextSize=9
+	YepTitle.TextTransparency=1
 	YepCorner.Name="YepCorner"
 	YepCorner.Parent=YepTitle
 
@@ -214,7 +214,7 @@ function Library:CreateWindow(windowname,windowinfo)
 		Tab.Font=Enum.Font.GothamSemibold
 		Tab.Text=pagename or "nil"
 		Tab.TextColor3=Color3.fromRGB(255,255,255)
-		Tab.TextSize=11.000
+		Tab.TextSize=11
 		Tab.TextTransparency=.300
 
 		TabCorner.CornerRadius=UDim.new(0,7)
@@ -225,7 +225,7 @@ function Library:CreateWindow(windowname,windowinfo)
 		Home.Parent=PageFolder
 		Home.Active=true
 		Home.BackgroundColor3=Color3.fromRGB(15,15,15)
-		Home.BackgroundTransparency=1.000
+		Home.BackgroundTransparency=1
 		Home.BorderColor3=Color3.fromRGB(15,15,15)
 		Home.BorderSizePixel=0
 		Home.Position=UDim2.new(0,0,.0391303785,0)
@@ -257,7 +257,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			end
 		end)
 
-		if visible==true then 
+		if visible then 
 			Tab.TextTransparency=0
 			for i,v in pairs(PageFolder:GetChildren()) do 
 				if v:IsA("Frame") and v~=Home then 
@@ -299,19 +299,19 @@ function Library:CreateWindow(windowname,windowinfo)
 			LabelTitle.Name="LabelTitle"
 			LabelTitle.Parent=LabelHolder
 			LabelTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
-			LabelTitle.BackgroundTransparency=1.000
+			LabelTitle.BackgroundTransparency=1
 			LabelTitle.BorderColor3=Color3.fromRGB(17,17,17)
 			LabelTitle.BorderSizePixel=0
 			LabelTitle.Size=UDim2.new(0,288,0,15)
 			LabelTitle.Font=Enum.Font.GothamSemibold
 			LabelTitle.Text=labelname or ""
 			LabelTitle.TextColor3=Color3.fromRGB(255,255,255)
-			LabelTitle.TextSize=11.000
+			LabelTitle.TextSize=11
 
 			LabelInfo.Name="LabelInfo"
 			LabelInfo.Parent=LabelHolder
 			LabelInfo.BackgroundColor3=Color3.fromRGB(17,17,17)
-			LabelInfo.BackgroundTransparency=1.000
+			LabelInfo.BackgroundTransparency=1
 			LabelInfo.BorderColor3=Color3.fromRGB(17,17,17)
 			LabelInfo.BorderSizePixel=0
 			LabelInfo.Position=UDim2.new(0,0,.653846145,0)
@@ -319,7 +319,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			LabelInfo.Font=Enum.Font.GothamSemibold
 			LabelInfo.Text=labelinfo or ""
 			LabelInfo.TextColor3=Color3.fromRGB(255,255,255)
-			LabelInfo.TextSize=9.000
+			LabelInfo.TextSize=9
 			LabelInfo.TextTransparency=.300
 			return LabelHolder
 		end
@@ -343,7 +343,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			Button.Name="Button"
 			Button.Parent=ButtonHolder
 			Button.BackgroundColor3=Color3.fromRGB(17,17,17)
-			Button.BackgroundTransparency=1.000
+			Button.BackgroundTransparency=1
 			Button.BorderColor3=Color3.fromRGB(17,17,17)
 			Button.BorderSizePixel=0
 			Button.Size=UDim2.new(0,288,0,26)
@@ -351,7 +351,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			Button.Font=Enum.Font.GothamSemibold
 			Button.Text=buttonname
 			Button.TextColor3=Color3.fromRGB(255,255,255)
-			Button.TextSize=11.000
+			Button.TextSize=11
 			
 			ButtonCorner.CornerRadius=UDim.new(0,5)
 			ButtonCorner.Name="ButtonCorner"
@@ -370,7 +370,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			return ButtonHolder
 		end
 
-		function PageElements:addToggle(togglename,toggledefault,callback)
+		function PageElements:addToggle(togglename,callback,toggledefault)
 			local ToggleHolder=Instance.new("Frame")
 			local ToggleHolderCorner=Instance.new("UICorner")
 			local ToggleTitle=Instance.new("TextLabel")
@@ -398,7 +398,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			ToggleTitle.Name="ToggleTitle"
 			ToggleTitle.Parent=ToggleHolder
 			ToggleTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
-			ToggleTitle.BackgroundTransparency=1.000
+			ToggleTitle.BackgroundTransparency=1
 			ToggleTitle.BorderColor3=Color3.fromRGB(17,17,17)
 			ToggleTitle.BorderSizePixel=0
 			ToggleTitle.Position=UDim2.new(.024305556,0,0,0)
@@ -406,13 +406,13 @@ function Library:CreateWindow(windowname,windowinfo)
 			ToggleTitle.Font=Enum.Font.GothamSemibold
 			ToggleTitle.Text=togglename or ""
 			ToggleTitle.TextColor3=Color3.fromRGB(255,255,255)
-			ToggleTitle.TextSize=11.000
+			ToggleTitle.TextSize=11
 			ToggleTitle.TextXAlignment=Enum.TextXAlignment.Left
 			
 			ToggleButton.Name="ToggleButton"
 			ToggleButton.Parent=ToggleHolder
 			ToggleButton.BackgroundColor3=Color3.fromRGB(17,17,17)
-			ToggleButton.BackgroundTransparency=1.000
+			ToggleButton.BackgroundTransparency=1
 			ToggleButton.BorderColor3=Color3.fromRGB(17,17,17)
 			ToggleButton.Position=UDim2.new(.802083313,0,1.17375305e-06,0)
 			ToggleButton.Size=UDim2.new(0,57,0,25)
@@ -420,7 +420,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			ToggleButton.Font=Enum.Font.SourceSans
 			ToggleButton.Text=""
 			ToggleButton.TextColor3=Color3.fromRGB(0,0,0)
-			ToggleButton.TextSize=14.000
+			ToggleButton.TextSize=14
 			
 			ToggleFrame.Name="ToggleFrame"
 			ToggleFrame.Parent=ToggleButton
@@ -485,7 +485,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			SliderTitle.Name="SliderTitle"
 			SliderTitle.Parent=SliderHolder
 			SliderTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
-			SliderTitle.BackgroundTransparency=1.000
+			SliderTitle.BackgroundTransparency=1
 			SliderTitle.BorderColor3=Color3.fromRGB(17,17,17)
 			SliderTitle.BorderSizePixel=0
 			SliderTitle.Position=UDim2.new(.024305556,0,.15384616,0)
@@ -493,7 +493,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			SliderTitle.Font=Enum.Font.GothamSemibold
 			SliderTitle.Text=slidername
 			SliderTitle.TextColor3=Color3.fromRGB(255,255,255)
-			SliderTitle.TextSize=11.000
+			SliderTitle.TextSize=11
 			SliderTitle.TextXAlignment=Enum.TextXAlignment.Left
 			
 			SliderHolderScript.CornerRadius=UDim.new(0,5)
@@ -511,7 +511,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			SliderButton.Font=Enum.Font.SourceSans
 			SliderButton.Text=""
 			SliderButton.TextColor3=Color3.fromRGB(0,0,0)
-			SliderButton.TextSize=14.000
+			SliderButton.TextSize=14
 			
 			SliderButtonCorner.Name="SliderButtonCorner"
 			SliderButtonCorner.Parent=SliderButton
@@ -528,7 +528,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			SliderNumber.Name="SliderNumber"
 			SliderNumber.Parent=SliderHolder
 			SliderNumber.BackgroundColor3=Color3.fromRGB(17,17,17)
-			SliderNumber.BackgroundTransparency=1.000
+			SliderNumber.BackgroundTransparency=1
 			SliderNumber.BorderColor3=Color3.fromRGB(17,17,17)
 			SliderNumber.BorderSizePixel=0
 			SliderNumber.Position=UDim2.new(.88499999,0,.192000002,1)
@@ -536,7 +536,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			SliderNumber.Font=Enum.Font.GothamSemibold
 			SliderNumber.Text=minvalue or "0"
 			SliderNumber.TextColor3=Color3.fromRGB(255,255,255)
-			SliderNumber.TextSize=10.000
+			SliderNumber.TextSize=10
 			SliderNumber.TextXAlignment=Enum.TextXAlignment.Left
 			 
 			local mouse=game.Players.LocalPlayer:GetMouse()
@@ -588,7 +588,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			TextBoxTitle.Name="TextBoxTitle"
 			TextBoxTitle.Parent=TextBoxHolder
 			TextBoxTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
-			TextBoxTitle.BackgroundTransparency=1.000
+			TextBoxTitle.BackgroundTransparency=1
 			TextBoxTitle.BorderColor3=Color3.fromRGB(17,17,17)
 			TextBoxTitle.BorderSizePixel=0
 			TextBoxTitle.Position=UDim2.new(.024305556,0,.0769230798,0)
@@ -596,7 +596,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			TextBoxTitle.Font=Enum.Font.GothamSemibold
 			TextBoxTitle.Text=textboxname
 			TextBoxTitle.TextColor3=Color3.fromRGB(255,255,255)
-			TextBoxTitle.TextSize=11.000
+			TextBoxTitle.TextSize=11
 			TextBoxTitle.TextXAlignment=Enum.TextXAlignment.Left
 			
 			TextBox.Parent=TextBoxHolder
@@ -606,7 +606,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			TextBox.Font=Enum.Font.GothamSemibold
 			TextBox.Text=textboxdefault or "nil"
 			TextBox.TextColor3=Color3.fromRGB(255,255,255)
-			TextBox.TextSize=9.000
+			TextBox.TextSize=9
 			
 			TextBoxCorner.CornerRadius=UDim.new(0,5)
 			TextBoxCorner.Name="TextBoxCorner"
@@ -655,7 +655,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			DropdownTitle.Name="DropdownTitle"
 			DropdownTitle.Parent=DropdownHolder
 			DropdownTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
-			DropdownTitle.BackgroundTransparency=1.000
+			DropdownTitle.BackgroundTransparency=1
 			DropdownTitle.BorderColor3=Color3.fromRGB(17,17,17)
 			DropdownTitle.BorderSizePixel=0
 			DropdownTitle.Position=UDim2.new(.024305556,0,0,0)
@@ -663,22 +663,22 @@ function Library:CreateWindow(windowname,windowinfo)
 			DropdownTitle.Font=Enum.Font.GothamSemibold
 			DropdownTitle.Text=dropdownname
 			DropdownTitle.TextColor3=Color3.fromRGB(255,255,255)
-			DropdownTitle.TextSize=11.000
+			DropdownTitle.TextSize=11
 			DropdownTitle.TextXAlignment=Enum.TextXAlignment.Left
 			
 			DropdownButton.Name="DropdownButton"
 			DropdownButton.Parent=DropdownHolder
 			DropdownButton.BackgroundColor3=Color3.fromRGB(255,255,255)
-			DropdownButton.BackgroundTransparency=1.000
+			DropdownButton.BackgroundTransparency=1
 			DropdownButton.Size=UDim2.new(0,288,0,26)
 			DropdownButton.Font=Enum.Font.SourceSans
 			DropdownButton.Text=""
 			DropdownButton.TextColor3=Color3.fromRGB(0,0,0)
-			DropdownButton.TextSize=14.000
+			DropdownButton.TextSize=14
 			
 			DropdownIcon.Name="DropdownIcon"
 			DropdownIcon.Parent=DropdownButton
-			DropdownIcon.BackgroundTransparency=1.000
+			DropdownIcon.BackgroundTransparency=1
 			DropdownIcon.Position=UDim2.new(.885416687,0,.192307711,0)
 			DropdownIcon.Size=UDim2.new(0,24,0,16)
 			DropdownIcon.Image="rbxassetid://3944690667"
@@ -703,7 +703,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			DropdownOptionContainer.Parent=DropdownContainer
 			DropdownOptionContainer.Active=true
 			DropdownOptionContainer.BackgroundColor3=Color3.fromRGB(17,17,17)
-			DropdownOptionContainer.BackgroundTransparency=1.000
+			DropdownOptionContainer.BackgroundTransparency=1
 			DropdownOptionContainer.BorderColor3=Color3.fromRGB(17,17,17)
 			DropdownOptionContainer.BorderSizePixel=0
 			DropdownOptionContainer.Position=UDim2.new(0,0,.0782608688,0)
@@ -770,7 +770,7 @@ function Library:CreateWindow(windowname,windowinfo)
 				Option.Font=Enum.Font.GothamSemibold
 				Option.Text=v
 				Option.TextColor3=Color3.fromRGB(255,255,255)
-				Option.TextSize=10.000
+				Option.TextSize=10
 				
 				OptionCorner.CornerRadius=UDim.new(0,6)
 				OptionCorner.Name="OptionCorner"
