@@ -126,22 +126,19 @@ game:GetService"RunService".Heartbeat:Connect(function()
 							game.TweenService:Create(v,TweenInfo.new(.1,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 							v.Size=Vector3.new(.01,.01,.01)
 						end
-					end
-					if v.Name:lower():find"floor"then
+					elseif v.Name:lower():find"floor"then
 						if my.money>=tonumber(price)then
 							v.CanCollide=false
-							game.TweenService:Create(v,TweenInfo.new(.2,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
+							game.TweenService:Create(v,TweenInfo.new(.125,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 							v.Size=Vector3.new(.01,.01,.01)
 						end
-					end
-					if v.Name:lower():find"juicespeed"then
+					elseif v.Name:lower():find"juicespeed"then
 						if my.money>=tonumber(price)then
 							v.CanCollide=false
-							game.TweenService:Create(v,TweenInfo.new(.3,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
+							game.TweenService:Create(v,TweenInfo.new(.15,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 							v.Size=Vector3.new(.01,.01,.01)
 						end
-					end
-					if my.money>6e7 and v.Position.y<=12 then
+					elseif my.money>6e7 and v.Position.y<=12 then
 						v.CanCollide=false
 						v.CFrame=hrp.CFrame
 						v.Size=Vector3.new(.01,.01,.01)
@@ -160,6 +157,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 	if cd.obby and tog.obby and tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
 		cd.obby=false
 		hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
+		hum:ChangeState"Jumping"
 		wait(.3)
 		getFruit()
 		repeat
