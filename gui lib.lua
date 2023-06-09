@@ -321,6 +321,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			LabelInfo.TextColor3=Color3.fromRGB(255,255,255)
 			LabelInfo.TextSize=9.000
 			LabelInfo.TextTransparency=.300
+			return LabelHolder
 		end
 
 		function PageElements:addButton(buttonname,callback)
@@ -366,6 +367,7 @@ function Library:CreateWindow(windowname,windowinfo)
 				Button.TextSize=11
 				pcall(callback)
 			end)
+			return ButtonHolder
 		end
 
 		function PageElements:addToggle(togglename,toggledefault,callback)
@@ -457,6 +459,7 @@ function Library:CreateWindow(windowname,windowinfo)
 				end
 				pcall(callback,ToggleEnabled)
 			end)
+			return ToggleHolder
 		end
 
 		function PageElements:addSlider(slidername,minvalue,maxvalue,callback)
@@ -533,7 +536,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			SliderNumber.Font=Enum.Font.GothamSemibold
 			SliderNumber.Text=minvalue or "0"
 			SliderNumber.TextColor3=Color3.fromRGB(255,255,255)
-			SliderNumber.TextSize=1.000
+			SliderNumber.TextSize=10.000
 			SliderNumber.TextXAlignment=Enum.TextXAlignment.Left
 			 
 			local mouse=game.Players.LocalPlayer:GetMouse()
@@ -562,6 +565,7 @@ function Library:CreateWindow(windowname,windowinfo)
 					end
 				end)
 			end)
+			return SliderHolder
 		end
 
 		function PageElements:addTextBox(textboxname,textboxdefault,callback)
@@ -620,9 +624,7 @@ function Library:CreateWindow(windowname,windowinfo)
 				TextBoxHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
 				callback(TextBox.Text)
 			end)
-		end
-		function PageElements:Remove()
-			Home:Destroy()
+			return TextBoxHolder
 		end
 		function PageElements:addDropdown(dropdownname,list,scrollsize,callback)
 			local DropdownHolder=Instance.new("Frame")
@@ -768,7 +770,7 @@ function Library:CreateWindow(windowname,windowinfo)
 				Option.Font=Enum.Font.GothamSemibold
 				Option.Text=v
 				Option.TextColor3=Color3.fromRGB(255,255,255)
-				Option.TextSize=1.000
+				Option.TextSize=10.000
 				
 				OptionCorner.CornerRadius=UDim.new(0,6)
 				OptionCorner.Name="OptionCorner"
@@ -806,6 +808,7 @@ function Library:CreateWindow(windowname,windowinfo)
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
 				end)
 			end
+			return DropdownHolder
 		end
 		return PageElements
 	end
