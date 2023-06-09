@@ -70,7 +70,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=plr.Character
-		hum=chr and chr:FindFirstChildWhichIsA"Humanoid"
+		hum=chr.Humanoid
 		hrp=chr.HumanoidRootPart
 		my.money=plr.leaderstats.Money.value
 		my.tycoon=workspace.Tycoons[tostring(plr.Team)]
@@ -173,7 +173,6 @@ game:GetService"RunService".Heartbeat:Connect(function()
 			if(not plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible or my.money>=tonumber(plr.leaderstats.Prestige.Value.."5000000"))and my.tycoon:FindFirstChild"Buttons"and my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige"then
 				if(hrp.Position-my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position).magnitude>3 then
 					hum.WalkToPoint=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
-					hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
 				end
 				if my.money>=tonumber(plr.leaderstats.Prestige.Value.."5000000")then
 					hum:ChangeState"Jumping"
