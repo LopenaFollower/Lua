@@ -426,8 +426,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			ToggleBallCorner.CornerRadius=UDim.new(0,100)
 			ToggleBallCorner.Name="ToggleBallCorner"
 			ToggleBallCorner.Parent=ToggleBall
-			ToggleButton.MouseButton1Down:Connect(function()
-				ToggleEnabled=not ToggleEnabled
+			function check()
 				if ToggleEnabled then
 					ToggleHolder.BackgroundColor3=Color3.fromRGB(16,16,16)
 					ToggleBall:TweenPosition(UDim2.new(.455,0,.158,0),"Out","Linear",.1)
@@ -442,7 +441,12 @@ function Library:CreateWindow(windowname,windowinfo)
 					ToggleBall:TweenPosition(UDim2.new(.123,0,.158,0),"Out","Linear",.1)
 				end
 				pcall(callback,ToggleEnabled)
+			end
+			ToggleButton.MouseButton1Down:Connect(function()
+				ToggleEnabled=not ToggleEnabled
+				check()
 			end)
+			check()
 			return ToggleHolder
 		end
 		function PageElements:addSlider(slidername,minvalue,maxvalue,callback)
