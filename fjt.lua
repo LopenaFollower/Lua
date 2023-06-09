@@ -149,7 +149,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 				end
 			end
 		end
-		if countFruits()>0 and my.money<=100 and my.prestiges>=15 and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
+		if countFruits()>=5 and my.money<=100 and my.prestiges>=15 and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
 			hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
 			wait()
 			fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
