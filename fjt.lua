@@ -14,8 +14,8 @@ local tog={
 	button=true,
 	prestige=true,
 	walk=true,
-	infj=true,
-	tpw=true,
+	infj=false,
+	tpw=false,
 }
 local cd={
 	fruit=true,
@@ -41,7 +41,6 @@ function getFruit()
 					game:GetService"ReplicatedStorage".CollectFruit:FireServer(v)
 				end
 			end
-			wait()
 			workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
 		else
 			plr.Backpack:FindFirstChild"Pick Fruit".Parent=workspace[plr.Name]
@@ -50,7 +49,10 @@ function getFruit()
 					game:GetService"ReplicatedStorage".CollectFruit:FireServer(v)
 				end
 			end
-			wait()
+			workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
+		end
+		wait()
+		if workspace[plr.Name]:FindFirstChild"Pick Fruit"then
 			workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
 		end
 	end)
@@ -80,7 +82,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 	if tog.fruit and cd.fruit and my.tycoon:FindFirstChild"Drops"and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
 		cd.fruit=false
 		pcall(function()
-			if #my.tycoon.Drops:GetChildren()>=10 or plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible then
+			if#my.tycoon.Drops:GetChildren()>=10 or plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible then
 				getFruit()
 			end
 		end)
@@ -91,9 +93,9 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		cd.button=false
 		local parent_folder=nil
 		pcall(function()
-			if #my.tycoon.Buttons.FirstFloorButtons:GetChildren()>0 then
+			if#my.tycoon.Buttons.FirstFloorButtons:GetChildren()>0 then
 				parent_folder=my.tycoon.Buttons.FirstFloorButtons
-			elseif #my.tycoon.Buttons.SecondFloorButtons:GetChildren()>1 then
+			elseif#my.tycoon.Buttons.SecondFloorButtons:GetChildren()>1 then
 				parent_folder=my.tycoon.Buttons.SecondFloorButtons
 			else
 				parent_folder=my.tycoon.Buttons.RoberryButtons
@@ -137,7 +139,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 							v.Size=hrp.Size
 						end
 					end
-					if my.money>1e6 and v.Position.y<10 then
+					if my.money>6e7 and v.Position.y<=12 then
 						v.CanCollide=false
 						v.CFrame=hrp.CFrame
 						v.Size=hrp.Size
