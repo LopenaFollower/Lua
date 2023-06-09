@@ -163,7 +163,7 @@ function Library:CreateWindow(windowname,windowinfo)
 	local startPos
 	
 	local function update(input)
-		local delta=input.Position
+		local delta=input.Position-dragStart
 		gui.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset + delta.X,startPos.Y.Scale,startPos.Y.Offset + delta.Y)
 	end
 	
