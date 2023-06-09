@@ -27,13 +27,13 @@ local cd={
 	drops=true
 }
 for _,v in pairs(workspace.Tycoons:GetChildren())do
-	if v.Owner.value==nil and v.Essentials and tostring(plr.TeamColor)=="White"then
+	if v.Owner.value==nil and v.Essentials and my.tycoon==nil and tostring(plr.TeamColor)=="White"then
+		my.tycoon=v
 		hrp.CFrame=v.Essentials.Entrance.CFrame
 		hum:ChangeState"Jumping"
-		my.tycoon=v
-		wait()
 	end
 end
+wait()
 function getFruit()
 	pcall(function()
 		if workspace[plr.Name]:FindFirstChild"Pick Fruit"then
@@ -108,7 +108,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 				if v:IsA"BasePart"then
 					v.CanCollide=false
 					v.CFrame=hrp.CFrame
-					v.Size=Vector.new(1,1,1)
+					v.Size=Vector3.new(.01,.01,.01)
 				end
 				if v:FindFirstChildWhichIsA"BillboardGui"then
 					v:FindFirstChildWhichIsA"BillboardGui":Destroy()
@@ -120,34 +120,31 @@ game:GetService"RunService".Heartbeat:Connect(function()
 				if v:IsA"BasePart"and v:FindFirstChild"ButtonLabel"then
 					local price=v.ButtonLabel.CostLabel.Text:gsub("%$","")
 					price=string.gsub(price,"%,","")
-					if v:FindFirstChildWhichIsA"BillboardGui"then
-						v:FindFirstChildWhichIsA"BillboardGui":Destroy()
-					end
 					if v.Name:lower():find"autocollect"then
 						if my.money>=tonumber(price)then
 							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.1,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
-							v.Size=Vector.new(1,1,1)
+							v.Size=Vector3.new(.01,.01,.01)
 						end
 					end
 					if v.Name:lower():find"floor"then
 						if my.money>=tonumber(price)then
 							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.2,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
-							v.Size=Vector.new(1,1,1)
+							v.Size=Vector3.new(.01,.01,.01)
 						end
 					end
 					if v.Name:lower():find"juicespeed"then
 						if my.money>=tonumber(price)then
 							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.3,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
-							v.Size=Vector.new(1,1,1)
+							v.Size=Vector3.new(.01,.01,.01)
 						end
 					end
 					if my.money>6e7 and v.Position.y<=12 then
 						v.CanCollide=false
 						v.CFrame=hrp.CFrame
-						v.Size=Vector.new(1,1,1)
+						v.Size=Vector3.new(.01,.01,.01)
 					end
 				end
 			end
