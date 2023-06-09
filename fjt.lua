@@ -108,7 +108,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 				if v:IsA"BasePart"then
 					v.CanCollide=false
 					v.CFrame=hrp.CFrame
-					v.Size=Vector3.new(.5,.5,5)
+					v.Size=Vector3.new(.5,.5,2)
 				end
 				if v:FindFirstChildWhichIsA"BillboardGui"then
 					v:FindFirstChildWhichIsA"BillboardGui":Destroy()
@@ -124,24 +124,24 @@ game:GetService"RunService".Heartbeat:Connect(function()
 						if my.money>=tonumber(price)then
 							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.1,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
-							v.Size=Vector3.new(.5,.5,5)
+							v.Size=Vector3.new(.5,.5,2)
 						end
 					elseif v.Name:lower():find"floor"then
 						if my.money>=tonumber(price)then
 							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.125,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
-							v.Size=Vector3.new(.5,.5,5)
+							v.Size=Vector3.new(.5,.5,2)
 						end
 					elseif v.Name:lower():find"juicespeed"then
 						if my.money>=tonumber(price)then
 							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.15,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
-							v.Size=Vector3.new(.5,.5,5)
+							v.Size=Vector3.new(.5,.5,2)
 						end
 					elseif my.money>6e7 and v.Position.y<=12 then
 						v.CanCollide=false
 						v.CFrame=hrp.CFrame
-						v.Size=Vector3.new(.5,.5,5)
+						v.Size=Vector3.new(.5,.5,2)
 					end
 				end
 			end
