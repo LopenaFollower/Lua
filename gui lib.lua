@@ -1,6 +1,28 @@
 --UI Made by Bytes#0001
 --Modified by github.com/lopenafollower
---uknow, add features
+--[[
+Features by me (github.com/lopenafollower):
+ * Fixed slider on mobile to detect release.
+
+ * Added a "removeGui" button.
+
+ * Converted TabContainer into a ScrollingFrame
+   to accommodate more pages.
+
+ * Updated PageElements to return their holder in case
+   you want to remove them using :Destroy().
+
+ * Added a "toggledefault" parameter to set
+   the toggle's initial state.
+   Example: page:addToggle("ToggleName", true, callback)
+   -sets the toggle to be checked when the GUI is loaded.
+
+ * Improved callback handling.
+
+ * Revised the default formats.
+
+ * General tidying up and organization.
+]]
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -8,7 +30,7 @@ if CoreGui:FindFirstChild"fu8rj82n"then
 end
 wait()
 local Library={}
-function Library:CreateWindow(windowname,windowinfo)
+function Library:CreateWindow(windowname,windowinfo,scrollSize)
 	local fu8rj82n=Instance.new"ScreenGui"
 	local Frame=Instance.new"Frame"
 	local FrameCorner=Instance.new"UICorner"
@@ -54,12 +76,10 @@ function Library:CreateWindow(windowname,windowinfo)
 	TabContainer.BorderSizePixel=0
 	TabContainer.Position=UDim2.new(.0280373823,0,.0391304344,0)
 	TabContainer.Size=UDim2.new(0,100,0,214)
-	--testing
 	TabContainer.ScrollBarThickness=3
 	TabContainer.ScrollBarImageColor3=Color3.fromRGB(5,5,5)
-	TabContainer.CanvasSize=UDim2.new(0,0,1e3,0)
+	TabContainer.CanvasSize=UDim2.new(0,0,scrollSize or 1e3,0)
 	TabContainer.Visible=true
-	--testing
 	TabContainer2.Name="TabContainer"
 	TabContainer2.Parent=TabContainer
 	TabContainer2.HorizontalAlignment=Enum.HorizontalAlignment.Center
@@ -209,13 +229,13 @@ function Library:CreateWindow(windowname,windowinfo)
 		Home.Size=UDim2.new(0,298,0,205)
 		Home.ScrollBarThickness=3
 		Home.ScrollBarImageColor3=Color3.fromRGB(5,5,5)
-		Home.CanvasSize=UDim2.new(0,0,scrollsize,0)or UDim2.new(0,0,4,0)
+		Home.CanvasSize=UDim2.new(0,0,scrollsize or 4,0)
 		Home.Visible=visible or false
 		PageLayout.Name="PageLayout"
 		PageLayout.Parent=Home
 		PageLayout.HorizontalAlignment=Enum.HorizontalAlignment.Center
 		PageLayout.SortOrder=Enum.SortOrder.LayoutOrder
-		PageLayout.Padding=UDim.new(0,elementspacing)or UDim.new(0,6)
+		PageLayout.Padding=UDim.new(0,elementspacing or 6)
 		Tab.MouseButton1Down:Connect(function()
 			Tab.TextSize=9
 			for i,v in pairs(PageFolder:GetChildren())do
@@ -312,7 +332,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			Button.Size=UDim2.new(0,288,0,26)
 			Button.AutoButtonColor=false
 			Button.Font=Enum.Font.GothamSemibold
-			Button.Text=buttonname
+			Button.Text=buttonname or"nil"
 			Button.TextColor3=Color3.fromRGB(255,255,255)
 			Button.TextSize=11
 			ButtonCorner.CornerRadius=UDim.new(0,5)
@@ -329,50 +349,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			end)
 			return ButtonHolder
 		end
-		function PageElements:destroyGui(lastcallback)
-			if destroyButton then
-				destroyButton=false
-				local ButtonHolder=Instance.new"Frame"
-				local Button=Instance.new"TextButton"
-				local ButtonCorner=Instance.new"UICorner"
-				local ButtonHolderCorner=Instance.new"UICorner"
-				local callback=lastcallback or function()end
-				ButtonHolder.Name="ButtonHolder"
-				ButtonHolder.Parent=Home
-				ButtonHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-				ButtonHolder.BorderColor3=Color3.fromRGB(17,17,17)
-				ButtonHolder.BorderSizePixel=0
-				ButtonHolder.Position=UDim2.new(.0167785231,0,0,0)
-				ButtonHolder.Size=UDim2.new(0,288,0,26)
-				Button.Name="Button"
-				Button.Parent=ButtonHolder
-				Button.BackgroundColor3=Color3.fromRGB(17,17,17)
-				Button.BackgroundTransparency=1
-				Button.BorderColor3=Color3.fromRGB(17,17,17)
-				Button.BorderSizePixel=0
-				Button.Size=UDim2.new(0,288,0,26)
-				Button.AutoButtonColor=false
-				Button.Font=Enum.Font.GothamSemibold
-				Button.Text="Destroy Gui"
-				Button.TextColor3=Color3.fromRGB(255,255,255)
-				Button.TextSize=11
-				ButtonCorner.CornerRadius=UDim.new(0,5)
-				ButtonCorner.Name="ButtonCorner"
-				ButtonCorner.Parent=Button
-				ButtonHolderCorner.CornerRadius=UDim.new(0,5)
-				ButtonHolderCorner.Name="ButtonHolderCorner"
-				ButtonHolderCorner.Parent=ButtonHolder
-				Button.MouseButton1Down:Connect(function()
-					Button.TextSize=9
-					wait(.1)
-					Button.TextSize=11
-					pcall(callback)
-					wait(1)
-					fu8rj82n:Destroy()
-				end)
-			end
-		end
-		function PageElements:addToggle(togglename,callback,toggledefault)
+		function PageElements:addToggle(togglename,toggledefault,callback)
 			local ToggleHolder=Instance.new"Frame"
 			local ToggleHolderCorner=Instance.new"UICorner"
 			local ToggleTitle=Instance.new"TextLabel"
@@ -434,8 +411,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			ToggleBallCorner.CornerRadius=UDim.new(0,100)
 			ToggleBallCorner.Name="ToggleBallCorner"
 			ToggleBallCorner.Parent=ToggleBall
-			ToggleButton.MouseButton1Down:Connect(function()
-				ToggleEnabled=not ToggleEnabled
+			local function check()
 				if ToggleEnabled then
 					ToggleHolder.BackgroundColor3=Color3.fromRGB(16,16,16)
 					ToggleBall:TweenPosition(UDim2.new(.455,0,.158,0),"Out","Linear",.1)
@@ -450,21 +426,12 @@ function Library:CreateWindow(windowname,windowinfo)
 					ToggleBall:TweenPosition(UDim2.new(.123,0,.158,0),"Out","Linear",.1)
 				end
 				pcall(callback,ToggleEnabled)
-			end)
-			if ToggleEnabled then
-				ToggleHolder.BackgroundColor3=Color3.fromRGB(16,16,16)
-				ToggleBall:TweenPosition(UDim2.new(.455,0,.158,0),"Out","Linear",.1)
-				wait(.05)
-				ToggleHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-				ToggleBall:TweenPosition(UDim2.new(.455,0,.158,0),"Out","Linear",.1)
-			else
-				ToggleHolder.BackgroundColor3=Color3.fromRGB(16,16,16)
-				ToggleBall:TweenPosition(UDim2.new(.123,0,.158,0),"Out","Linear",.1)
-				wait(.05)
-				ToggleHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-				ToggleBall:TweenPosition(UDim2.new(.123,0,.158,0),"Out","Linear",.1)
 			end
-			pcall(callback,ToggleEnabled)
+			ToggleButton.MouseButton1Down:Connect(function()
+				ToggleEnabled=not ToggleEnabled
+				check()
+			end)
+			check()
 			return ToggleHolder
 		end
 		function PageElements:addSlider(slidername,minvalue,maxvalue,callback)
@@ -694,7 +661,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			DropdownOptionContainer.Position=UDim2.new(0,0,.0782608688,0)
 			DropdownOptionContainer.Size=UDim2.new(0,288,0,8)
 			DropdownOptionContainer.Visible=false
-			DropdownOptionContainer.CanvasSize=UDim2.new(0,0,#list*.25,0)or UDim2.new(0,0,5,0)
+			DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or 5,0)
 			DropdownOptionContainer.ScrollBarThickness=3
 			DropdownOptionContainerLayout.Name="DropdownOptionContainerLayout"
 			DropdownOptionContainerLayout.Parent=DropdownOptionContainer
@@ -784,6 +751,49 @@ function Library:CreateWindow(windowname,windowinfo)
 				end)
 			end
 			return DropdownHolder
+		end
+		function PageElements:destroyGui(lastcallback)
+			if destroyButton then
+				destroyButton=false
+				local ButtonHolder=Instance.new"Frame"
+				local Button=Instance.new"TextButton"
+				local ButtonCorner=Instance.new"UICorner"
+				local ButtonHolderCorner=Instance.new"UICorner"
+				local callback=lastcallback or function()end
+				ButtonHolder.Name="ButtonHolder"
+				ButtonHolder.Parent=Home
+				ButtonHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
+				ButtonHolder.BorderColor3=Color3.fromRGB(17,17,17)
+				ButtonHolder.BorderSizePixel=0
+				ButtonHolder.Position=UDim2.new(.0167785231,0,0,0)
+				ButtonHolder.Size=UDim2.new(0,288,0,26)
+				Button.Name="Button"
+				Button.Parent=ButtonHolder
+				Button.BackgroundColor3=Color3.fromRGB(17,17,17)
+				Button.BackgroundTransparency=1
+				Button.BorderColor3=Color3.fromRGB(17,17,17)
+				Button.BorderSizePixel=0
+				Button.Size=UDim2.new(0,288,0,26)
+				Button.AutoButtonColor=false
+				Button.Font=Enum.Font.GothamSemibold
+				Button.Text="Destroy Gui"
+				Button.TextColor3=Color3.fromRGB(255,255,255)
+				Button.TextSize=11
+				ButtonCorner.CornerRadius=UDim.new(0,5)
+				ButtonCorner.Name="ButtonCorner"
+				ButtonCorner.Parent=Button
+				ButtonHolderCorner.CornerRadius=UDim.new(0,5)
+				ButtonHolderCorner.Name="ButtonHolderCorner"
+				ButtonHolderCorner.Parent=ButtonHolder
+				Button.MouseButton1Down:Connect(function()
+					Button.TextSize=9
+					wait(.1)
+					Button.TextSize=11
+					pcall(callback)
+					wait(1)
+					fu8rj82n:Destroy()
+				end)
+			end
 		end
 		return PageElements
 	end
