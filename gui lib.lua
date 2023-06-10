@@ -14,7 +14,7 @@ function Library:CreateWindow(windowname,windowinfo)
 	local FrameCorner=Instance.new"UICorner"
 	local DashBoard=Instance.new"Frame"
 	local DashBoardCorner=Instance.new"UICorner"
-	local TabContainer=Instance.new"Frame"
+	local TabContainer=Instance.new"ScrollingFrame"
 	local TabContainer2=Instance.new"UIListLayout"
 	local PageContainer=Instance.new"Frame"
 	local PageContainerCorner=Instance.new"UICorner"
@@ -47,12 +47,19 @@ function Library:CreateWindow(windowname,windowinfo)
 	DashBoardCorner.Parent=DashBoard
 	TabContainer.Name="TabContainer"
 	TabContainer.Parent=DashBoard
+	TabContainer.Active=true
 	TabContainer.BackgroundColor3=Color3.fromRGB(15,15,15)
 	TabContainer.BackgroundTransparency=1
 	TabContainer.BorderColor3=Color3.fromRGB(15,15,15)
 	TabContainer.BorderSizePixel=0
 	TabContainer.Position=UDim2.new(.0280373823,0,.0391304344,0)
 	TabContainer.Size=UDim2.new(0,100,0,214)
+	--testing
+	TabContainer.ScrollBarThickness=3
+	TabContainer.ScrollBarImageColor3=Color3.fromRGB(5,5,5)
+	TabContainer.CanvasSize=UDim2.new(0,0,1e3,0)
+	TabContainer.Visible=true
+	--testing
 	TabContainer2.Name="TabContainer"
 	TabContainer2.Parent=TabContainer
 	TabContainer2.HorizontalAlignment=Enum.HorizontalAlignment.Center
@@ -523,25 +530,26 @@ function Library:CreateWindow(windowname,windowinfo)
 			SliderNumber.Position=UDim2.new(.88499999,0,.192000002,1)
 			SliderNumber.Size=UDim2.new(0,33,0,6)
 			SliderNumber.Font=Enum.Font.GothamSemibold
-			SliderNumber.Text=minvalue or"0"
+			SliderNumber.Text=minvalue or 0
 			SliderNumber.TextColor3=Color3.fromRGB(255,255,255)
 			SliderNumber.TextSize=10
 			SliderNumber.TextXAlignment=Enum.TextXAlignment.Left
 			local mouse=game.Players.LocalPlayer:GetMouse()
 			local Value
-			--attempt to fix mobile slider
 			local dragInput
+			--fixed slider for mobile
 			SliderButton.InputBegan:Connect(function(input)
 				if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
 					Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))or 0
 					pcall(callback,SliderNumber.Text)
 					SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
-					input.Changed:Connect(function()
+					releaseinteraction=input.Changed:Connect(function()
 						if input.UserInputState==Enum.UserInputState.End then
 							Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
 							pcall(callback,SliderNumber.Text)
 							SliderHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
 							SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
+							releaseinteraction:Disconnect()
 						end
 					end)
 				end
@@ -560,30 +568,6 @@ function Library:CreateWindow(windowname,windowinfo)
 					SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
 				end
 			end)
-			--[[
-			SliderButton.MouseButton1Down:Connect(function()
-				Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))or 0
-				pcall(callback,SliderNumber.Text)
-				SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
-				moveconnection=mouse.Move:Connect(function()
-					SliderNumber.Text=Value
-					Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
-					pcall(callback,SliderNumber.Text)
-					SliderHolder.BackgroundColor3=Color3.fromRGB(14,14,14)
-					SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
-				end)
-				releaseconnection=UserInputService.InputEnded:Connect(function(Mouse)
-					if Mouse.UserInputType==Enum.UserInputType.MouseButton1 then
-						Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
-						pcall(callback,SliderNumber.Text)
-						SliderHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-						SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
-						moveconnection:Disconnect()
-						releaseconnection:Disconnect()
-					end
-				end)
-			end)
-			]]--
 			return SliderHolder
 		end
 		function PageElements:addTextBox(textboxname,textboxdefault,callback)
