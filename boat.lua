@@ -283,13 +283,13 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		autobuy.cd=true
 	end
 end)
-local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/not%20my%20gui%20lib.lua")()
+local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
 local UI=GUI:CreateWindow("BABFB","...")
 local Main=UI:addPage("Main",3,true,1)
 local Shop=UI:addPage("Shop",3,false,1)
 local Teleport=UI:addPage("Teleport",3,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
-Main:addToggle("Start",function(v)
+Main:addToggle("Start",nil,function(v)
 	toggle.farm=v
 end)
 Main:addDropdown("Mode",{"normal","die at last stage"},.5,function(v)
@@ -303,17 +303,17 @@ end)
 Main:addTextBox("Speed",23,function(val)
 	farm_speed=tonumber(val)
 end)
-Main:addToggle("Anti Lag",function(v)
+Main:addToggle("Anti Lag",nil,function(v)
 	toggle.delete=v
 end)
 Shop:addDropdown("Shop Items",items,#items*.25,function(v)
 	autobuy.item=v
 end)
 Shop:addLabel("will spend all ur gold")
-Shop:addToggle("Auto Buy",function(v)
+Shop:addToggle("Auto Buy",nil,function(v)
 	autobuy.s=v
 end)
-Shop:addToggle("Check gold",function(v)
+Shop:addToggle("Check gold",nil,function(v)
 	autobuy.check=v
 	autobuy.cd=true
 end)
@@ -359,7 +359,7 @@ end)
 Local:addTextBox("HipHeight",hum.HipHeight,function(v)
 	hum.HipHeight=tonumber(v)
 end)
-Local:addToggle("Inf Jump",function(v)
+Local:addToggle("Inf Jump",nil,function(v)
 	toggle.infj=v
 end)
 loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()

@@ -33,7 +33,7 @@ local debug={
 	min_juiceupgrade_money=1e8,--1e8
 	min_miscbuttom_money=6e7,--6e7
 	min_fruit_before_juice=5,--5
-	prestige_mult=1.75,--1.75
+	prestige_mult=2,--2
 	min_prestige=15,--15
 	buttons_cd=.1,--.1
 	obby_cd=1,--1
@@ -241,21 +241,21 @@ local UI=GUI:CreateWindow("FJT","v3.1")
 local Main=UI:addPage("Main",30,true,1)
 local Local=UI:addPage("Local",30,false,1)
 local Debugging=UI:addPage("Debugging",30,false,1)
-Main:addToggle("Fruits",function(v)
+Main:addToggle("Fruits",tog.fruit,function(v)
 	tog.fruit=v
-end,tog.fruit)
-Main:addToggle("Buttons",function(v)
+end)
+Main:addToggle("Buttons",tog.button,function(v)
 	tog.button=v
-end,tog.button)
-Main:addToggle("Obby",function(v)
+end)
+Main:addToggle("Obby",tog.obby,function(v)
 	tog.obby=v
-end,tog.obby)
-Main:addToggle("Prestige",function(v)
+end)
+Main:addToggle("Prestige",tog.prestige,function(v)
 	tog.prestige=v
-end,tog.prestige)
-Main:addToggle("Randomly Walk",function(v)
+end)
+Main:addToggle("Randomly Walk",tog.walk,function(v)
 	tog.walk=v
-end,tog.walk)
+end)
 Main:addButton("Juice",function()
 	if my.tycoon and my.tycoon:FindFirstChild"Essentials"then
 		repeat
@@ -274,12 +274,12 @@ end)
 Local:addTextBox("HipHeight",hum.HipHeight,function(v)
 	hum.HipHeight=tonumber(v)
 end)
-Local:addToggle("Inf Jump",function(v)
+Local:addToggle("Inf Jump",tog.infj,function(v)
 	tog.infj=v
-end,tog.infj)
-Local:addToggle("TpWalk",function(v)
+end)
+Local:addToggle("TpWalk",tog.tpw,function(v)
 	tog.tpw=v
-end,tog.tpw)
+end)
 Local:addTextBox("TpWalk Speed",my.tpws,function(v)
 	my.tpws=tonumber(v)
 end)
