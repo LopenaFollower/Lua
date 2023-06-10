@@ -359,9 +359,9 @@ function Library:CreateWindow(windowname,windowinfo)
 					wait(.1)
 					Button.TextSize=11
 					pcall(callback)
+					wait(1)
+					fu8rj82n:Destroy()
 				end)
-				wait(1)
-				fu8rj82n:Destroy()
 			end
 		end
 		function PageElements:addToggle(togglename,callback,toggledefault)
