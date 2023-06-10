@@ -26,6 +26,24 @@ local cd={
 	walk=true,
 	drops=true
 }
+local binds={}
+local debug={
+	min_drops_collect=1,--1
+	auto_fruit_cd=.5,--.5
+	min_juiceupgrade_money=1e8,--1e8
+	min_miscbuttom_money=6e7,--6e7
+	min_fruit_before_juice=5,--5
+	prestige_mult=1.75,--1.75
+	min_prestige=15,--15
+	buttons_cd=.1,--.1
+	obby_cd=1,--1
+	juicer_magnitude=3,--3
+	prestige_cd=.25,--.25
+	random_walk_range=35,--35
+	min_randomwalk_wait=1.5,--1.5
+	max_randomwalk_wait=3,--3
+	drops_cd=.1--.1
+}
 for _,v in pairs(workspace.Tycoons:GetChildren())do
 	if v.Owner.value==nil and v.Essentials and my.tycoon==nil and tostring(plr.TeamColor)=="White"then
 		my.tycoon=v
@@ -67,7 +85,7 @@ function countFruits()
 	end
 	return t
 end
-game:GetService"RunService".Heartbeat:Connect(function()
+binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=plr.Character
@@ -84,11 +102,11 @@ game:GetService"RunService".Heartbeat:Connect(function()
 	if tog.fruit and cd.fruit and my.tycoon:FindFirstChild"Drops"and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
 		cd.fruit=false
 		pcall(function()
-			if#my.tycoon.Drops:GetChildren()>0 or plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible then
+			if#my.tycoon.Drops:GetChildren()>=debug.min_drops_collect or plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible then
 				getFruit()
 			end
 		end)
-		wait(.5)
+		wait(debug.auto_fruit_cd)
 		cd.fruit=true
 	end
 	if tog.button and cd.button then
@@ -119,38 +137,32 @@ game:GetService"RunService".Heartbeat:Connect(function()
 			for _,v in pairs(my.tycoon.Buttons:GetChildren())do
 				if v:IsA"BasePart"and v:FindFirstChild"ButtonLabel"then
 					local price=tonumber(v.ButtonLabel.CostLabel.Text:gsub("%,",""):match("%d+"))
+					v.CanCollide=false
+					v.Size=Vector3.new(.1,.1,1)
 					if v.Name:lower():find"autocollect"then
 						if my.money>=price then
-							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.1,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
-							v.Size=Vector3.new(.1,.1,1)
 						end
 					elseif v.Name:lower():find"floor"then
 						if my.money>=price then
-							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.125,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
-							v.Size=Vector3.new(.1,.1,1)
 						end
-					elseif v.Name:lower():find"juicespeed"and(tonumber(string.match(v.Name,"%d"))<6 and my.money>=1e8)or(tonumber(string.match(v.Name,"%d"))<=2 and my.money>=1e2)then
+					elseif v.Name:lower():find"juicespeed"and tonumber(string.match(v.Name,"%d"))<6 and my.money>=debug.min_juiceupgrade_money then
 						if my.money>=price then
-							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.15,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
-							v.Size=Vector3.new(.1,.1,1)
 						end
-					elseif my.money>6e7 and v.Position.y<=12 then
-						v.CanCollide=false
+					elseif my.money>debug.min_miscbuttom_money and v.Position.y<=12 then
 						v.CFrame=hrp.CFrame
-						v.Size=Vector3.new(.1,.1,1)
 					end
 				end
 			end
 		end
-		if countFruits()>=5 and my.money<my.prestiges*1.75 and my.prestiges>=15 and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
+		if countFruits()>=debug.min_fruit_before_juice and my.money<=math.ceil(my.prestiges*debug.prestige_mult)and my.prestiges>=debug.min_prestige and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
 			hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
 			wait()
 			fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
 		end
-		wait(.1)
+		wait(debug.buttons_cd)
 		cd.button=true
 	end
 	if cd.obby and tog.obby and tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
@@ -166,14 +178,14 @@ game:GetService"RunService".Heartbeat:Connect(function()
 			wait(.1)
 			fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
 		until countFruits()<=1
-		wait(1)
+		wait(debug.obby_cd)
 		cd.obby=true
 	end
 	if tog.prestige and cd.prestige then
 		cd.prestige=false
 		pcall(function()
 			if(not plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible or my.money>=tonumber(my.prestiges.."5000000"))and my.tycoon:FindFirstChild"Buttons"and my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige"then
-				if(hrp.Position-my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position).magnitude>3 then
+				if(hrp.Position-my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position).magnitude>debug.juicer_magnitude then
 					hum.WalkToPoint=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
 				end
 				if my.money>=tonumber(my.prestiges.."5000000")and not hum.Jump and hum:GetState()~=Enum.HumanoidStateType.Freefall then
@@ -186,16 +198,16 @@ game:GetService"RunService".Heartbeat:Connect(function()
 				game:GetService"ReplicatedStorage".RequestPrestige:FireServer()
 			end
 		end)
-		wait(.25)
+		wait(debug.prestige_cd)
 		cd.prestige=true
 	end
 	if tog.walk and cd.walk and not((not plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible or my.money>=tonumber(my.prestiges.."5000000"))and my.tycoon:FindFirstChild"Buttons"and my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige")then
 		cd.walk=false
-		local r=35
+		local r=debug.random_walk_range
 		if my.tycoon:FindFirstChild"Essentials"and hum then
 			hum.WalkToPoint=my.tycoon.Essentials.SpawnLocation.Position+Vector3.new(math.random(-r,r),0,math.random(-r,r))
 		end
-		wait(math.random(1.5,3))
+		wait(math.random(debug.min_randomwalk_wait,debug.max_randomwalk_wait))
 		cd.walk=true
 	end
 	if tog.tpw and chr and hum then
@@ -212,14 +224,14 @@ game:GetService"RunService".Heartbeat:Connect(function()
 				v.CFrame=my.tycoon:FindFirstChild"Essentials".FruitHolder.HolderBottom.CFrame-Vector3.new(math.random(-8,8),.1,math.random(-5,5))
 			end
 		end
-		wait(.1)
+		wait(debug.drops_cd)
 		cd.drops=true
 	end
 end)
 workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
 workspace.ObbyParts.Stages.Hard.VictoryPart.Size=workspace.ObbyParts.ObbyStartPart.Size
 workspace.ObbyParts.Stages.Hard.VictoryPart.CanCollide=false
-game.UserInputService.JumpRequest:Connect(function()
+binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	if tog.infj and hum then
 		hum:ChangeState"Jumping"
 	end
@@ -228,6 +240,7 @@ local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollow
 local UI=GUI:CreateWindow("FJT","v3.1")
 local Main=UI:addPage("Main",30,true,1)
 local Local=UI:addPage("Local",30,false,1)
+local Debugging=UI:addPage("Debugging",30,false,1)
 Main:addToggle("Fruits",function(v)
 	tog.fruit=v
 end,tog.fruit)
@@ -270,4 +283,17 @@ end,tog.tpw)
 Local:addTextBox("TpWalk Speed",my.tpws,function(v)
 	my.tpws=tonumber(v)
 end)
+Local:destroyGui(function()
+	for _,v in pairs(binds)do
+		v:Disconnect()
+	end
+end)
+for k,v in pairs(debug)do
+	Debugging:addTextBox(k,v,function(i)
+		local val=tonumber(i)
+		if val and type(val)=="number"and val>=0 and val<=1e9 then
+			debug[k]=val
+		end
+	end)
+end
 loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
