@@ -118,22 +118,21 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		if my.tycoon:FindFirstChild"Buttons"then
 			for _,v in pairs(my.tycoon.Buttons:GetChildren())do
 				if v:IsA"BasePart"and v:FindFirstChild"ButtonLabel"then
-					local price=v.ButtonLabel.CostLabel.Text:gsub("%$","")
-					price=string.gsub(price,"%,","")
+					local price=tonumber(v.ButtonLabel.CostLabel.Text:gsub("%,",""):match("%d+"))
 					if v.Name:lower():find"autocollect"then
-						if my.money>=tonumber(price)then
+						if my.money>=price then
 							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.1,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 							v.Size=Vector3.new(.1,.1,1)
 						end
 					elseif v.Name:lower():find"floor"then
-						if my.money>=tonumber(price)then
+						if my.money>=price then
 							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.125,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 							v.Size=Vector3.new(.1,.1,1)
 						end
-					elseif v.Name:lower():find"juicespeed"then
-						if my.money>=tonumber(price)then
+					elseif v.Name:lower():find"juicespeed"and tonumber(string.match(v.Name,"%d"))<6 and my.money>=1e7 then
+						if my.money>=price then
 							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.15,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 							v.Size=Vector3.new(.1,.1,1)
@@ -175,7 +174,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 				if(hrp.Position-my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position).magnitude>3 then
 					hum.WalkToPoint=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
 				end
-				if my.money>=tonumber(my.prestiges.."5000000")then
+				if my.money>=tonumber(my.prestiges.."5000000")and not hum.Jump then
 					hum:ChangeState"Jumping"
 				end
 				fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
