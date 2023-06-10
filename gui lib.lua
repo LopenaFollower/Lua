@@ -1,5 +1,6 @@
 --UI Made by Bytes#0001
 --Modified by github.com/lopenafollower
+--uknow, add features
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -528,21 +529,53 @@ function Library:CreateWindow(windowname,windowinfo)
 			SliderNumber.TextXAlignment=Enum.TextXAlignment.Left
 			local mouse=game.Players.LocalPlayer:GetMouse()
 			local Value
+			--attempt to fix mobile slider
+			local dragInput
+			SliderButton.InputBegan:Connect(function(input)
+				if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+					Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))or 0
+					pcall(callback,SliderNumber.Text)
+					SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
+					input.Changed:Connect(function()
+						if input.UserInputState==Enum.UserInputState.End then
+							Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
+							pcall(callback,SliderNumber.Text)
+							SliderHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
+							SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
+						end
+					end)
+				end
+			end)
+			SliderButton.InputChanged:Connect(function(input)
+				if input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch then
+					dragInput=input
+				end
+			end)
+			UserInputService.InputChanged:Connect(function(input)
+				if input==dragInput then
+					SliderNumber.Text=Value
+					Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
+					pcall(callback,SliderNumber.Text)
+					SliderHolder.BackgroundColor3=Color3.fromRGB(14,14,14)
+					SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
+				end
+			end)
+			--[[
 			SliderButton.MouseButton1Down:Connect(function()
 				Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))or 0
-				callback(SliderNumber.Text)
+				pcall(callback,SliderNumber.Text)
 				SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
 				moveconnection=mouse.Move:Connect(function()
 					SliderNumber.Text=Value
 					Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
-					callback(SliderNumber.Text)
+					pcall(callback,SliderNumber.Text)
 					SliderHolder.BackgroundColor3=Color3.fromRGB(14,14,14)
 					SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
 				end)
 				releaseconnection=UserInputService.InputEnded:Connect(function(Mouse)
 					if Mouse.UserInputType==Enum.UserInputType.MouseButton1 then
 						Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
-						callback(SliderNumber.Text)
+						pcall(callback,SliderNumber.Text)
 						SliderHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
 						SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
 						moveconnection:Disconnect()
@@ -550,6 +583,7 @@ function Library:CreateWindow(windowname,windowinfo)
 					end
 				end)
 			end)
+			]]--
 			return SliderHolder
 		end
 		function PageElements:addTextBox(textboxname,textboxdefault,callback)
@@ -598,7 +632,7 @@ function Library:CreateWindow(windowname,windowinfo)
 			end)
 			TextBox.FocusLost:Connect(function()
 				TextBoxHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-				callback(TextBox.Text)
+				pcall(callback,TextBox.Text)
 			end)
 			return TextBoxHolder
 		end
@@ -757,7 +791,7 @@ function Library:CreateWindow(windowname,windowinfo)
 					wait(.2)
 					DropdownOptionContainer.Visible=false
 					DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.3)
-					callback(v)
+					pcall(callback,v)
 					wait(.3)
 					makeelements(true)
 					DropdownContainer.Visible=false
