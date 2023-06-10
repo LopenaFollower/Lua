@@ -131,7 +131,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 							game.TweenService:Create(v,TweenInfo.new(.125,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 							v.Size=Vector3.new(.1,.1,1)
 						end
-					elseif v.Name:lower():find"juicespeed"and tonumber(string.match(v.Name,"%d"))<6 and my.money>=1e7 then
+					elseif v.Name:lower():find"juicespeed"and(tonumber(string.match(v.Name,"%d"))<6 and my.money>=1e8)or(tonumber(string.match(v.Name,"%d"))<=2 and my.money>=1e2)then
 						if my.money>=price then
 							v.CanCollide=false
 							game.TweenService:Create(v,TweenInfo.new(.15,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
@@ -145,7 +145,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 				end
 			end
 		end
-		if countFruits()>=5 and my.money<=100 and my.prestiges>=15 and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
+		if countFruits()>=5 and my.money<my.prestiges*1.75 and my.prestiges>=15 and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
 			hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
 			wait()
 			fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
@@ -157,6 +157,8 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		cd.obby=false
 		hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
 		hum:ChangeState"Jumping"
+		wait(.1)
+		hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
 		wait(.5)
 		getFruit()
 		repeat
@@ -174,7 +176,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 				if(hrp.Position-my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position).magnitude>3 then
 					hum.WalkToPoint=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
 				end
-				if my.money>=tonumber(my.prestiges.."5000000")and not hum.Jump then
+				if my.money>=tonumber(my.prestiges.."5000000")and not hum.Jump and hum:GetState()~=Enum.HumanoidStateType.Freefall then
 					hum:ChangeState"Jumping"
 				end
 				fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
