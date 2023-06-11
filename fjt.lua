@@ -30,7 +30,6 @@ local binds={}
 local debug={
 	min_drops_collect=1,--1
 	auto_fruit_cd=.5,--.5
-	min_juiceupgrade_money=1e8,--1e8
 	min_miscbuttom_money=6e7,--6e7
 	min_fruit_before_juice=5,--5
 	prestige_mult=2,--2
@@ -141,15 +140,15 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 					v.Size=Vector3.new(.1,.1,1)
 					if v.Name:lower():find"autocollect"then
 						if my.money>=price then
-							game.TweenService:Create(v,TweenInfo.new(.1,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
+							game.TweenService:Create(v,TweenInfo.new(.01,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 						end
 					elseif v.Name:lower():find"floor"then
 						if my.money>=price then
-							game.TweenService:Create(v,TweenInfo.new(.125,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
+							game.TweenService:Create(v,TweenInfo.new(.0125,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 						end
-					elseif v.Name:lower():find"juicespeed"and tonumber(string.match(v.Name,"%d"))<6 and my.money>=debug.min_juiceupgrade_money then
+					elseif v.Name:lower():find"juicespeed"and tonumber(string.match(v.Name,"%d"))<6 and my.money>=loadstring("return 5e"..(tonumber(string.match(v.Name,"%d"))+2))()then
 						if my.money>=price then
-							game.TweenService:Create(v,TweenInfo.new(.15,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
+							game.TweenService:Create(v,TweenInfo.new(.015,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 						end
 					elseif my.money>debug.min_miscbuttom_money and v.Position.y<=12 then
 						v.CFrame=hrp.CFrame
@@ -169,8 +168,6 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.obby=false
 		hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
 		hum:ChangeState"Jumping"
-		wait(.1)
-		hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
 		wait(.5)
 		getFruit()
 		repeat
@@ -228,8 +225,8 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.drops=true
 	end
 end)
-workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
-workspace.ObbyParts.Stages.Hard.VictoryPart.Size=workspace.ObbyParts.ObbyStartPart.Size
+workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame-Vector3.new(0,4,0)
+workspace.ObbyParts.Stages.Hard.VictoryPart.Size=Vector3.new(2,2,2)
 workspace.ObbyParts.Stages.Hard.VictoryPart.CanCollide=false
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	if tog.infj and hum then
