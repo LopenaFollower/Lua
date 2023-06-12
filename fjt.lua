@@ -149,7 +149,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 						if my.money>=price then
 							game.TweenService:Create(v,TweenInfo.new(.0125,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 						end
-					elseif v.Name:lower():find"juicespeed"and tonumber(string.match(v.Name,"%d"))<6 and my.money>=loadstring("return 5e"..(tonumber(string.match(v.Name,"%d"))+2))()then
+					elseif v.Name:lower():find"juicespeed"and tonumber(string.match(v.Name,"%d"))<6 and my.money>=loadstring("return 5e"..string.match(v.Name,"%d"))()then
 						if my.money>=price then
 							game.TweenService:Create(v,TweenInfo.new(.015,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
 						end
@@ -231,7 +231,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.drops=true
 	end
 end)
-workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame-Vector3.new(0,4,0)
+workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame-Vector3.new(0,3.3,0)
 workspace.ObbyParts.Stages.Hard.VictoryPart.Size=Vector3.new(2,2,2)
 workspace.ObbyParts.Stages.Hard.VictoryPart.CanCollide=false
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
@@ -240,9 +240,10 @@ binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	end
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("FJT","v3.1")
+local UI=GUI:CreateWindow("FJT","v3.2")
 local Main=UI:addPage("Main",30,true,1)
 local Local=UI:addPage("Local",30,false,1)
+local Stats=UI:addPage("Stats",30,false,1)
 local Debugging=UI:addPage("Debugging",30,false,1)
 Main:addToggle("Fruits",tog.fruit,function(v)
 	tog.fruit=v
@@ -268,10 +269,10 @@ Main:addButton("Juice",function()
 		until countFruits()<=1
 	end
 end)
-Local:addTextBox("WalkSpeed",hum.WalkSpeed,function(v)
+Local:addTextBox("WalkSpeed",game.StarterPlayer.CharacterWalkSpeed,function(v)
 	hum.WalkSpeed=tonumber(v)
 end)
-Local:addTextBox("JumpPower",hum.JumpPower,function(v)
+Local:addTextBox("JumpPower",game.StarterPlayer.CharacterJumpPower,function(v)
 	hum.JumpPower=tonumber(v)
 end)
 Local:addTextBox("HipHeight",hum.HipHeight,function(v)
@@ -289,6 +290,21 @@ end)
 Local:destroyGui(function()
 	for _,v in pairs(binds)do
 		v:Disconnect()
+	end
+end)
+task.spawn(function()
+	local stats={}
+	while wait(1)do
+		pcall(function()
+			for _,v in pairs(stats)do
+				v:Destroy()
+			end
+			for _,v in pairs(plr.PlayerGui.MenusGui.StatsFrame.ScrollerHolder.ScrollingFrame:GetChildren())do
+				if v:IsA"ImageLabel"then
+					stats[#stats+1]=Stats:addLabel(v.StatLabel.Text,v.AmountLabel.Text);
+				end
+			end
+		end)
 	end
 end)
 for k,v in pairs(debug)do
