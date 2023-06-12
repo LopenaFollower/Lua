@@ -108,7 +108,7 @@ for i,plrs in pairs(players:GetChildren())do
 	if plrs.Name~=plr.Name then
 		plrs.Chatted:Connect(function(msg)
 			for word,reason in next,words do
-				if msg:lower():match(word)then
+				if msg:lower():find(word)then
 					players:ReportAbuse(plrs,reason,"He is breaking roblox TOS")
 					wait(1.5)
 					players:ReportAbuse(plrs,reason,"He is breaking roblox TOS")
@@ -120,7 +120,7 @@ end
 players.ChildAdded:Connect(function(plrs)
 	plrs.Chatted:Connect(function(msg)
 		for word,reason in next,words do
-			if msg:lower():match(word)then
+			if msg:lower():find(word)then
 				players:ReportAbuse(plrs,reason,"He is breaking roblox TOS")
 				wait(1.5)
 				players:ReportAbuse(plrs,reason,"He is breaking roblox TOS")
