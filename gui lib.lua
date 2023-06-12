@@ -1,6 +1,6 @@
---UI Made by Bytes#0001
---Modified by github.com/lopenafollower
 --[[
+Entire thing Made by Bytes#0001
+Modified by github.com/lopenafollower
 Features by me (github.com/lopenafollower):
  * Fixed slider on mobile to detect release.
 
@@ -349,7 +349,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			Tab.TextSize=11
 			for i,v in pairs(TabContainer:GetChildren())do
 				if v:IsA"GuiButton"and v~=Tab then
-					v.TextTransparency=.3
+					v.TextTransparency=.5
 				end
 			end
 		end)
@@ -361,7 +361,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				end
 			end
 		else
-			Tab.TextTransparency=.3
+			Tab.TextTransparency=.5
 		end
 		Tab.MouseEnter:Connect(function()
 			Tab.BackgroundColor3=Color3.fromRGB(10,10,10)
@@ -409,7 +409,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			LabelInfo.Text=labelinfo or""
 			LabelInfo.TextColor3=Color3.fromRGB(255,255,255)
 			LabelInfo.TextSize=9
-			LabelInfo.TextTransparency=.300
+			LabelInfo.TextTransparency=.3
 			return LabelHolder
 		end
 		function PageElements:addButton(buttonname,callback)
