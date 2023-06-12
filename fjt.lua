@@ -32,7 +32,6 @@ local debug={
 	auto_fruit_cd=.5,--.5
 	min_miscbuttom_money=6e7,--6e7
 	min_fruit_before_juice=5,--5
-	prestige_mult=2,--2
 	min_prestige=15,--15
 	buttons_cd=.1,--.1
 	obby_cd=1,--1
@@ -52,6 +51,14 @@ for _,v in pairs(workspace.Tycoons:GetChildren())do
 		hrp.CFrame=v.Essentials.Entrance.CFrame
 		hum:ChangeState"Jumping"
 	end
+end
+function findChildWithName(parent,name)
+	for _,v in pairs(parent:GetChildren())do
+		if v.Name:lower():find(name) then
+			return true
+		end
+	end
+	return false
 end
 wait()
 function getFruit()
@@ -159,7 +166,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				end
 			end
 		end
-		if countFruits()>=debug.min_fruit_before_juice and my.money<=math.ceil(my.prestiges*debug.prestige_mult)and my.prestiges>=debug.min_prestige and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
+		if countFruits()>=debug.min_fruit_before_juice and not findChildWithName(my.tycoon.Purchased,"raspberry")and my.prestiges>=debug.min_prestige and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
 			hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
 			wait()
 			fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
