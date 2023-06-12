@@ -41,7 +41,10 @@ local debug={
 	random_walk_range=35,--35
 	min_randomwalk_wait=1.5,--1.5
 	max_randomwalk_wait=3,--3
-	drops_cd=.1--.1
+	drops_cd=.1,--.1
+	button_size_x=.1,--.1
+	button_size_y=.1,--.1
+	button_size_z=1,--1
 }
 for _,v in pairs(workspace.Tycoons:GetChildren())do
 	if v.Owner.value==nil and v.Essentials and my.tycoon==nil and tostring(plr.TeamColor)=="White"then
@@ -125,7 +128,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				if v:IsA"BasePart"then
 					v.CanCollide=false
 					v.CFrame=hrp.CFrame
-					v.Size=Vector3.new(.1,.1,1)
+					v.Size=Vector3.new(debug.button_size_x,debug.button_size_y,debug.button_size_z)
 				end
 				if v:FindFirstChildWhichIsA"BillboardGui"then
 					v:FindFirstChildWhichIsA"BillboardGui":Destroy()
@@ -137,7 +140,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				if v:IsA"BasePart"and v:FindFirstChild"ButtonLabel"then
 					local price=tonumber(v.ButtonLabel.CostLabel.Text:gsub("%,",""):match("%d+"))
 					v.CanCollide=false
-					v.Size=Vector3.new(.1,.1,1)
+					v.Size=Vector3.new(debug.button_size_x,debug.button_size_y,debug.button_size_z)
 					if v.Name:lower():find"autocollect"then
 						if my.money>=price then
 							game.TweenService:Create(v,TweenInfo.new(.01,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame}):Play()
@@ -167,8 +170,11 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	if cd.obby and tog.obby and tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
 		cd.obby=false
 		hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
+		hum.WalkToPoint=workspace.ObbyParts.ObbyStartPart.Position
 		hum:ChangeState"Jumping"
-		wait(.5)
+		repeat
+			wait()
+		until tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)~="Lime green"
 		getFruit()
 		repeat
 			hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
