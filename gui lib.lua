@@ -940,10 +940,12 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				for i,v in pairs(DropdownOptionContainer:GetChildren())do
 					if v.Name=="Option"then
 						v:Destroy()
+						print("destroyed option "..v.Text)
 					end
 				end
 				DropdownOptionContainer.CanvasSize=UDim2.new(0,0,#newlist*.3 or 5,0)
 				for i,v in pairs(newlist)do
+					print("creating option "..v)
 					local Option=Instance.new"TextButton"
 					local OptionCorner=Instance.new"UICorner"
 					Option.Name="Option"
@@ -989,6 +991,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 						DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
 					end)
 				end
+				print("done")
 			end
 			return methods
 		end
