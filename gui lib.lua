@@ -1,130 +1,131 @@
---[[
-Entire thing Made by Bytes#0001
-Modified by github.com/lopenafollower
-Features by me (github.com/lopenafollower):
- * Fixed slider on mobile to detect release.
+--Entire thing Made by Bytes#0001
+--Modified by github.com/lopenafollower
+--Features by me (github.com/lopenafollower):
+-- * Fixed slider on mobile to detect release.
+--
+-- * Added a "removeGui" button.
+--
+-- * Converted TabContainer into a ScrollingFrame
+--   to accommodate more pages.
+--
+-- * Added a "toggledefault" parameter to set
+--   the toggle's initial state.
+--   Example: page:addToggle("ToggleName", true, callback)
+--   -sets the toggle to be checked when the GUI is loaded.
+--
+-- * Added PageElement methods.
+--
+-- * Improved callback handling.
+--
+-- * Revised the default formats.
+--
+-- * General tidying up and organization.
+--
+--Documentation:
+--Library:CreateWindow(windowname,windowinfo,scrollSize)
+-- * Creates a Window
+-- Parameters:
+-- * windowname (string)
+-- * windowinfo (string)
+-- * scrollSize (number)
+--  - Total height of the ScrollingFrame
+--
+--Page:addPage(pagename,scrollsize,visible,elementspacing)
+-- * Adds a Page to a window
+-- Parameters:
+-- * pagename (string)
+-- * scrollsize (number)
+--  - Total height of the ScrollingFrame
+-- * visible (bool)
+--  - Decides the initial page that will
+--    be shown upon loading.
+-- * elementspacing (number)
+--  - The padding between elements.
+--
+--PageElements:addLabel(labelname,labelinfo)
+-- * Creates a Label
+-- Parameters:
+-- * labelname (string)
+-- * labelinfo (string)
+--
+--PageElements:addButton(buttonname,callback)
+-- * Creates a Button
+-- Parameters:
+-- * buttonname (string)
+-- * callback (function)
+--
+--PageElements:addToggle(togglename,toggledefault,callback)
+-- * Creates a Toggle
+-- Parameters:
+-- * togglename (string)
+-- * toggledefault (bool)
+--  - The initial state of the toggle.
+-- * callback (function)
+--
+--PageElements:addSlider(slidername,minvalue,maxvalue,callback)
+-- * Creates a Slider
+-- Parameters:
+-- * slidername (string)
+-- * minvalue (number)
+-- * maxvalue (number)
+-- * callback (function)
+--
+--PageElements:addTextBox(textboxname,textboxdefault,callback)
+-- * Creates a Textbox
+-- Parameters:
+-- * textboxname (string)
+-- * textboxdefault (string)
+--  - The initial value of the textbox.
+-- * callback (function)
+--
+--PageElements:addDropdown(dropdownname,list,scrollsize,callback)
+-- * Creates a Textbox
+-- Parameters:
+-- * dropdownname (string)
+-- * list (table)
+-- * scrollsize (number)
+--  - Total height of the ScrollingFrame
+-- * callback (function)
+--
+--PageElements:destroyGui(callback)
+-- * Create a Button
+-- Parameters:
+-- * callback (function)
+--  - will call the callback and destroy the gui
+--
+--Example use:
+--local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
+--local UI=GUI:CreateWindow("Window","info")
+--local Main=UI:addPage("Main",3,true,1)
+--local Tab2=UI:addPage("Tab2",3,false,1)
+--
+--Main:addLabel("Label","Info")
+--
+--Main:addButton("Button",function()
+--	print("button pressed")
+--end)
+--
+--Main:addToggle("Toggle",false,function(v)
+--	print("toggle: "..v)
+--end)
+--
+--Main:addSlider("Slider",0,100,function(v)
+--	print("slider value: "..v)
+--end)
+--
+--Main:addTextBox("TextBox","default",function(v)
+--	print("textbox: "..v)
+--end)
+--
+--local list={1, 2, 3, "4"}
+--Main:addDropdown("Dropdown",list,5,function(v)
+--	print("dropdown selected: "..v)
+--end)
+--
+--Tab2:destroyGui(function()
+--	print("goodbye")
+--end)
 
- * Added a "removeGui" button.
-
- * Converted TabContainer into a ScrollingFrame
-   to accommodate more pages.
-
- * Updated PageElements to return their holder in case
-   you want to remove them using :Destroy().
-
- * Added a "toggledefault" parameter to set
-   the toggle's initial state.
-   Example: page:addToggle("ToggleName", true, callback)
-   -sets the toggle to be checked when the GUI is loaded.
-
- * Improved callback handling.
-
- * Revised the default formats.
-
- * General tidying up and organization.
-
-Documentation:
-Library:CreateWindow(windowname,windowinfo,scrollSize)
- * Creates a Window
- Parameters:
- * windowname (string)
- * windowinfo (string(
- * scrollSize (number)
-  - Total height of the ScrollingFrame
-
-Page:addPage(pagename,scrollsize,visible,elementspacing)
- * Adds a Page to a window
- Parameters:
- * pagename (string)
- * scrollsize (number)
-  - Total height of the ScrollingFrame
- * visible (bool)
-  - Decides the initial page that will
-    be shown upon loading.
- * elementspacing (number)
-  - The padding between elements.
-
-PageElements:addLabel(labelname,labelinfo)
- * Creates a Label
- Parameters:
- * labelname (string)
- * labelinfo (string)
-
-PageElements:addButton(buttonname,callback)
- * Creates a Button
- Parameters:
- * buttonname (string)
- * callback (function)
-
-PageElements:addToggle(togglename,toggledefault,callback)
- * Creates a Toggle
- Parameters:
- * togglename (string)
- * toggledefault (bool)
-  - The initial state of the toggle.
- * callback (function)
-
-PageElements:addSlider(slidername,minvalue,maxvalue,callback)
- * Creates a Slider
- Parameters:
- * slidername (string)
- * minvalue (number)
- * maxvalue (number)
- * callback (function)
-
-PageElements:addTextBox(textboxname,textboxdefault,callback)
- * Creates a Textbox
- Parameters:
- * textboxname (string)
- * textboxdefault (string)
- * callback (function)
- 
-PageElements:addDropdown(dropdownname,list,scrollsize,callback)
- * Creates a Textbox
- Parameters:
- * textboxname (string)
- * list (table)
- * scrollsize (number)
-  - Total height of the ScrollingFrame
- * callback (function)
-
-PageElements:destroyGui(callback)
- * Create a Button
-  - will call the callback and destroy the gui
-
-Example use:
-local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("Window","info")
-local Main=UI:addPage("Main",3,true,1)
-local Tab2=UI:addPage("Tab2",3,false,1)
-
-Main:addLabel("Label","Info")
-
-Main:addButton("Button",function()
-	print("button pressed")
-end)
-
-Main:addToggle("Toggle",false,function(v)
-	print("toggle: "..v)
-end)
-
-Main:addSlider("Slider",0,100,function(v)
-	print("slider value: "..v)
-end)
-
-Main:addTextBox("TextBox","default",function(v)
-	print("textbox: "..v)
-end)
-
-local list={1, 2, 3, "4"}
-Main:addDropdown("Dropdown",list,5,function(v)
-	print("dropdown selected: "..v)
-end)
-
-Tab2:destroyGui(function()
-	print("goodbye")
-end)
-]]
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -410,7 +411,17 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			LabelInfo.TextColor3=Color3.fromRGB(255,255,255)
 			LabelInfo.TextSize=9
 			LabelInfo.TextTransparency=.3
-			return LabelHolder
+			local methods={}
+			function methods:remove()
+				LabelHolder:Destroy()
+			end
+			function methods:updateTitle(t)
+				LabelTitle.Text=tostring(t)or""
+			end
+			function methods:updateInfo(t)
+				LabelInfo.Text=tostring(t)or""
+			end
+			return methods
 		end
 		function PageElements:addButton(buttonname,callback)
 			local ButtonHolder=Instance.new"Frame"
