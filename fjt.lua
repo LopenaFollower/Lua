@@ -36,7 +36,7 @@ local debug={
 	min_prestige=15,--15
 	buttons_cd=.1,--.1
 	obby_cd=1,--1
-	juicer_magnitude=3,--3
+	juicer_magnitude=15,--15
 	prestige_cd=.25,--.25
 	random_walk_range=35,--35
 	min_randomwalk_wait=1.5,--1.5
@@ -305,11 +305,11 @@ task.spawn(function()
 	while wait(1)do
 		pcall(function()
 			for _,v in pairs(stats)do
-				v:Destroy()
+				v:remove()
 			end
 			for _,v in pairs(plr.PlayerGui.MenusGui.StatsFrame.ScrollerHolder.ScrollingFrame:GetChildren())do
 				if v:IsA"ImageLabel"then
-					stats[#stats+1]=Stats:addLabel(v.StatLabel.Text,v.AmountLabel.Text);
+					stats[#stats+1]=Stats:addLabel(v.StatLabel.Text,v.AmountLabel.Text)
 				end
 			end
 		end)
@@ -318,7 +318,7 @@ end)
 for k,v in pairs(debug)do
 	Debugging:addTextBox(k,v,function(i)
 		local val=i
-		if val and type(val)=="number"and tonumber(val)>=0 and tonumber(val)<=1e9 then
+		if val and type(tonumber(val))=="number"and tonumber(val)>=0 and tonumber(val)<=1e9 then
 			debug[k]=tonumber(val)
 		elseif val and type(val)=="string"and val:len()>0 then
 			debug[k]=val
