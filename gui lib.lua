@@ -702,14 +702,10 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				SliderTitle.Text=tostring(t)or""
 			end
 			function methods:updateMin(t)
-				if type(tonumber(t))=="number"then
-					minvalue=tonumber(t)
-				end
+				minvalue=tonumber(t)
 			end
 			function methods:updateMax(t)
-				if type(tonumber(t))=="number"then
-					maxvalue=tonumber(t)
-				end
+				maxvalue=tonumber(t)
 			end
 			return methods
 		end
@@ -942,7 +938,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			end
 			function methods:updateList(newlist)
 				for i,v in pairs(DropdownOptionContainer:GetChildren())do
-					if v.Name=="Option"and v~=DropdownOptionContainerLayout then
+					if v.Name=="Option"then
 						v:Destroy()
 					end
 				end
