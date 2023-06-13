@@ -32,7 +32,7 @@ local debug={
 	auto_fruit_cd=.5,--.5
 	min_miscbuttom_money=6e7,--6e7
 	min_fruit_before_juice=5,--5
-	auto_juice_stop_at="blue",
+	auto_juice_stop_at="lime",
 	min_prestige=15,--15
 	buttons_cd=.1,--.1
 	obby_cd=1,--1
@@ -167,7 +167,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				end
 			end
 		end
-		if countFruits()>=debug.min_fruit_before_juice and not findChildWithName(my.tycoon.Purchased,debug.auto_juice_stop_at)and my.prestiges>=debug.min_prestige and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
+		if countFruits()>=debug.min_fruit_before_juice and not findChildWithName(my.tycoon.Purchased,debug.auto_juice_stop_at)and my.prestiges>=debug.min_prestige then
 			hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
 			wait()
 			fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
@@ -177,11 +177,13 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	end
 	if cd.obby and tog.obby and tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
 		cd.obby=false
-		hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
-		hum.WalkToPoint=workspace.ObbyParts.ObbyStartPart.Position
-		hum:ChangeState"Jumping"
 		repeat
-			wait()
+			if tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
+				hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
+				hum.WalkToPoint=workspace.ObbyParts.ObbyStartPart.Position
+				hum:ChangeState"Jumping"
+				wait(.4)
+			end
 		until tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)~="Lime green"
 		getFruit()
 		repeat
@@ -248,7 +250,7 @@ binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	end
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("FJT","v3.2")
+local UI=GUI:CreateWindow("FJT","v3.4")
 local Main=UI:addPage("Main",30,true,1)
 local Local=UI:addPage("Local",30,false,1)
 local Stats=UI:addPage("Stats",30,false,1)
