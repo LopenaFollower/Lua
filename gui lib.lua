@@ -946,6 +946,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 						v:Destroy()
 					end
 				end
+				DropdownOptionContainer.CanvasSize=UDim2.new(0,0,#newlist*.3 or 5,0)
 				for i,v in pairs(newlist)do
 					local Option=Instance.new"TextButton"
 					local OptionCorner=Instance.new"UICorner"
