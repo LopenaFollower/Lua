@@ -115,7 +115,7 @@
 -- Methods:
 -- Dropdown:remove()
 -- Dropdown:updateText(string)
--- Dropdown:updateList(table)
+-- Dropdown:updateList(table,scrollsize)
 --
 --PageElements:destroyGui(callback)
 -- * Create a Button
@@ -936,14 +936,15 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			function methods:updateText(t)
 				DropdownTitle.Text=tostring(t)or""
 			end
-			function methods:updateList(newlist)
+			function methods:updateList(newlist,scrollsize)
+				print("called at all")
 				for i,v in pairs(DropdownOptionContainer:GetChildren())do
 					if v.Name=="Option"then
 						v:Destroy()
 						print("destroyed option "..v.Text)
 					end
 				end
-				DropdownOptionContainer.CanvasSize=UDim2.new(0,0,#newlist*.3 or 5,0)
+				DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or 5,0)
 				for i,v in pairs(newlist)do
 					print("creating option "..v)
 					local Option=Instance.new"TextButton"
