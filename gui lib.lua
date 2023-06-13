@@ -768,6 +768,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			function methods:updateText(t)
 				TextBoxTitle.Text=tostring(t)or""
 			end
+			return methods
 		end
 		function PageElements:addDropdown(dropdownname,list,scrollsize,callback)
 			local DropdownHolder=Instance.new"Frame"
@@ -940,7 +941,6 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				DropdownTitle.Text=tostring(t)or""
 			end
 			function methods:updateList(newlist)
-				if #newlist<1 then return end
 				for i,v in pairs(DropdownOptionContainer:GetChildren())do
 					if v.Name=="Option"and v~=DropdownOptionContainerLayout then
 						v:Destroy()
