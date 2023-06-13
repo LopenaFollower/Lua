@@ -48,11 +48,20 @@
 -- * labelname (string)
 -- * labelinfo (string)
 --
+-- Methods:
+-- Label:remove()
+-- Label:updateTitle(string)
+-- Label:updateInfo(string)
+--
 --PageElements:addButton(buttonname,callback)
 -- * Creates a Button
 -- Parameters:
 -- * buttonname (string)
 -- * callback (function)
+--
+-- Methods:
+-- Button:remove()
+-- Button:updateText(string)
 --
 --PageElements:addToggle(togglename,toggledefault,callback)
 -- * Creates a Toggle
@@ -62,6 +71,10 @@
 --  - The initial state of the toggle.
 -- * callback (function)
 --
+-- Methods:
+-- Toggle:remove()
+-- Toggle:updateText(string)
+--
 --PageElements:addSlider(slidername,minvalue,maxvalue,callback)
 -- * Creates a Slider
 -- Parameters:
@@ -69,6 +82,14 @@
 -- * minvalue (number)
 -- * maxvalue (number)
 -- * callback (function)
+--
+-- Methods:
+-- Slider:remove()
+-- Slider:updateText(string)
+-- Slider:updateMin(number)
+--  - Updates the min value of the slider.
+-- Slider:updateMax(number)
+--  - Updates the max value of the slider
 --
 --PageElements:addTextBox(textboxname,textboxdefault,callback)
 -- * Creates a Textbox
@@ -78,6 +99,10 @@
 --  - The initial value of the textbox.
 -- * callback (function)
 --
+-- Methods:
+-- TextBox:remove()
+-- TextBox:updateText(string)
+--
 --PageElements:addDropdown(dropdownname,list,scrollsize,callback)
 -- * Creates a Textbox
 -- Parameters:
@@ -86,6 +111,11 @@
 -- * scrollsize (number)
 --  - Total height of the ScrollingFrame
 -- * callback (function)
+--
+-- Methods:
+-- Dropdown:remove()
+-- Dropdown:updateText(string)
+-- Dropdown:updateList(table)
 --
 --PageElements:destroyGui(callback)
 -- * Create a Button
@@ -460,7 +490,14 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				Button.TextSize=11
 				pcall(callback)
 			end)
-			return ButtonHolder
+			local methods={}
+			function methods:remove()
+				ButtonHolder:Destroy()
+			end
+			function methods:updateText(t)
+				Button.Text=tostring(t)or""
+			end
+			return methods
 		end
 		function PageElements:addToggle(togglename,toggledefault,callback)
 			local ToggleHolder=Instance.new"Frame"
@@ -545,7 +582,14 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				check()
 			end)
 			check()
-			return ToggleHolder
+			local methods={}
+			function methods:remove()
+				ToggleHolder:Destroy()
+			end
+			function methods:updateText(t)
+				ToggleTitle.Text=tostring(t)or""
+			end
+			return methods
 		end
 		function PageElements:addSlider(slidername,minvalue,maxvalue,callback)
 			local SliderHolder=Instance.new"Frame"
@@ -650,7 +694,24 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 					SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
 				end
 			end)
-			return SliderHolder
+			local methods={}
+			function methods:remove()
+				SliderHolder:Destroy()
+			end
+			function methods:updateText(t)
+				SliderTitle.Text=tostring(t)or""
+			end
+			function methods:updateMin(t)
+				if type(tonumber(t))=="number"then
+					minvalue=tonumber(t)or""
+				end
+			end
+			function methods:updateMax(t)
+				if type(tonumber(t))=="number"then
+					maxvalue=tonumber(t)or""
+				end
+			end
+			return methods
 		end
 		function PageElements:addTextBox(textboxname,textboxdefault,callback)
 			local TextBoxHolder=Instance.new"Frame"
@@ -700,7 +761,13 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				TextBoxHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
 				pcall(callback,TextBox.Text)
 			end)
-			return TextBoxHolder
+			local methods={}
+			function methods:remove()
+				TextBoxHolder:Destroy()
+			end
+			function methods:updateText(t)
+				TextBoxTitle.Text=tostring(t)or""
+			end
 		end
 		function PageElements:addDropdown(dropdownname,list,scrollsize,callback)
 			local DropdownHolder=Instance.new"Frame"
@@ -865,7 +932,68 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
 				end)
 			end
-			return DropdownHolder
+			local methods={}
+			function methods:remove()
+				DropdownHolder:Destroy()
+			end
+			function methods:updateText(t)
+				DropdownTitle.Text=tostring(t)or""
+			end
+			function methods:updateList(newlist)
+				if #newlist<1 then return end
+				for i,v in pairs(DropdownOptionContainer:GetChildren())do
+					if v.Name=="Option"and v~=DropdownOptionContainerLayout then
+						v:Destroy()
+					end
+				end
+				for i,v in pairs(newlist)do
+					local Option=Instance.new"TextButton"
+					local OptionCorner=Instance.new"UICorner"
+					Option.Name="Option"
+					Option.Parent=DropdownOptionContainer
+					Option.BackgroundColor3=Color3.fromRGB(15,15,15)
+					Option.BorderColor3=Color3.fromRGB(15,15,15)
+					Option.Position=UDim2.new(.0173611119,0,0,0)
+					Option.Size=UDim2.new(0,283,0,22)
+					Option.AutoButtonColor=false
+					Option.Font=Enum.Font.GothamSemibold
+					Option.Text=v
+					Option.TextColor3=Color3.fromRGB(255,255,255)
+					Option.TextSize=10
+					OptionCorner.CornerRadius=UDim.new(0,6)
+					OptionCorner.Name="OptionCorner"
+					OptionCorner.Parent=Option
+					Option.MouseEnter:Connect(function()
+						Option.BackgroundColor3=Color3.fromRGB(10,10,10)
+					end)
+					Option.MouseLeave:Connect(function()
+						Option.BackgroundColor3=Color3.fromRGB(15,15,15)
+					end)
+					Option.MouseButton1Down:Connect(function()
+						for i,v in pairs(Option.Parent:GetChildren())do
+							if v:IsA"GuiButton"and v~=Option then
+								v.TextColor3=Color3.fromRGB(255,255,255)
+							end
+						end
+						Option.TextColor3=Color3.fromRGB(137,246,255)
+					end)
+					Option.MouseButton1Down:Connect(function()
+						DropDownEnabled=false
+						DropdownIcon.ImageColor3=Color3.fromRGB(255,255,255)
+						DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
+						wait(.2)
+						DropdownOptionContainer.Visible=false
+						DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.3)
+						pcall(callback,v)
+						wait(.3)
+						makeelements(true)
+						DropdownContainer.Visible=false
+						DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.1)
+						DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
+					end)
+				end
+			end
+			return methods
 		end
 		function PageElements:destroyGui(callback)
 			if destroyButton then
