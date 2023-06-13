@@ -703,12 +703,12 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			end
 			function methods:updateMin(t)
 				if type(tonumber(t))=="number"then
-					minvalue=tonumber(t)or""
+					minvalue=tonumber(t)
 				end
 			end
 			function methods:updateMax(t)
 				if type(tonumber(t))=="number"then
-					maxvalue=tonumber(t)or""
+					maxvalue=tonumber(t)
 				end
 			end
 			return methods
