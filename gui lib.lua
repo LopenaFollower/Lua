@@ -937,16 +937,13 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				DropdownTitle.Text=tostring(t)or""
 			end
 			function methods:updateList(newlist,scrollsize)
-				print("called at all")
 				for i,v in pairs(DropdownOptionContainer:GetChildren())do
-					if v.Name=="Option"then
+					if v.Name=="Option"and v~=DropdownOptionContainerLayout then
 						v:Destroy()
-						print("destroyed option "..v.Text)
 					end
 				end
 				DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or 5,0)
 				for i,v in pairs(newlist)do
-					print("creating option "..v)
 					local Option=Instance.new"TextButton"
 					local OptionCorner=Instance.new"UICorner"
 					Option.Name="Option"
@@ -992,7 +989,6 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 						DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
 					end)
 				end
-				print("done")
 			end
 			return methods
 		end
