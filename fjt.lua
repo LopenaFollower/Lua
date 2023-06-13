@@ -3,6 +3,7 @@ local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr.Humanoid
 local hrp=chr.HumanoidRootPart
+local running=true
 local my={
 	money=0,
 	prestiges=0,
@@ -15,6 +16,7 @@ local tog={
 	button=true,
 	prestige=true,
 	walk=true,
+	drops=true,
 	infj=false,
 	tpw=false
 }
@@ -35,7 +37,7 @@ local debug={
 	auto_juice_stop_at="lime",
 	min_prestige=15,--15
 	buttons_cd=.1,--.1
-	obby_cd=1,--1
+	obby_cd=.5,--1
 	juicer_magnitude=15,--15
 	prestige_cd=.25,--.25
 	random_walk_range=35,--35
@@ -182,7 +184,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
 				hum.WalkToPoint=workspace.ObbyParts.ObbyStartPart.Position
 				hum:ChangeState"Jumping"
-				wait(.4)
+				wait(.5)
 			end
 		until tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)~="Lime green"
 		getFruit()
@@ -230,7 +232,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			chr:TranslateBy(hum.MoveDirection)
 		end
 	end
-	if my.tycoon:FindFirstChild"Drops"and cd.drops then
+	if tog.drops and my.tycoon:FindFirstChild"Drops"and cd.drops then
 		cd.drops=false
 		for _,v in pairs(my.tycoon.Drops:GetChildren())do
 			if v.Name~="JuiceBottle"and v.Position.y>6 then
@@ -250,13 +252,16 @@ binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	end
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("FJT","v3.4")
+local UI=GUI:CreateWindow("FJT","v3.5")
 local Main=UI:addPage("Main",30,true,1)
 local Local=UI:addPage("Local",30,false,1)
 local Stats=UI:addPage("Stats",30,false,1)
 local Debugging=UI:addPage("Debugging",30,false,1)
 Main:addToggle("Fruits",tog.fruit,function(v)
 	tog.fruit=v
+end)
+Main:addToggle("TP Drops",tog.drops,function(v)
+	tog.drops=v
 end)
 Main:addToggle("Buttons",tog.button,function(v)
 	tog.button=v
@@ -298,13 +303,14 @@ Local:addTextBox("TpWalk Speed",my.tpws,function(v)
 	my.tpws=tonumber(v)
 end)
 Local:destroyGui(function()
+	running=false
 	for _,v in pairs(binds)do
 		v:Disconnect()
 	end
 end)
 task.spawn(function()
 	local stats={}
-	while wait(1)do
+	while wait(1)and running do
 		pcall(function()
 			for _,v in pairs(stats)do
 				v:remove()
