@@ -316,6 +316,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				if input.UserInputState==Enum.UserInputState.End then
 					dragging=false
 					--workspace.CurrentCamera.ViewportSize
+					print(gui.AbsolutePosition.x.."\n"..workspace.CurrentCamera.ViewportSize.x)
 					if gui.AbsolutePosition.x>=100 then
 						gui.Position=UDim2.new(gui.AbsolutePosition.x-5,0,gui.AbsolutePosition.y,0)
 					end
