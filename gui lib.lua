@@ -155,6 +155,28 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
+function CamViewport()
+	if workspace.CurrentCamera then
+		return 
+	end
+end
+
+function UpdateToViewport(Holder)
+	if Holder.Position.X.Offset < -workspace.CurrentCamera.ViewportSize.X then
+		Holder.Position=UDim2.new(
+Holder.Position.X.Scale,
+-workspace.CurrentCamera.ViewportSize.X,
+Holder.Position.Y.Scale,
+Holder.Position.Y.Offset)
+	end
+	if Holder.Position.Y.Offset < -workspace.CurrentCamera.ViewportSize.Y then
+		Holder.Position=UDim2.new(
+Holder.Position.X.Scale,
+Holder.Position.X.Offset,
+Holder.Position.Y.Scale,
+-workspace.CurrentCamera.ViewportSize.Y)
+	end
+end
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -313,6 +335,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			input.Changed:Connect(function()
 				if input.UserInputState==Enum.UserInputState.End then
 					dragging=false
+					UpdateToViewport(gui)
 				end
 			end)
 		end
