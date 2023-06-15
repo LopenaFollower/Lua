@@ -316,10 +316,10 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				if input.UserInputState==Enum.UserInputState.End then
 					dragging=false
 					if gui.AbsolutePosition.x>workspace.CurrentCamera.ViewportSize.x-5 then
-						gui.Position=UDim2.new(workspace.CurrentCamera.ViewportSize.x-5,0,gui.AbsolutePosition.y,0)
+						gui.Position=Vector2.new(workspace.CurrentCamera.ViewportSize.x-5,gui.AbsolutePosition.y)
 					end
 					if gui.AbsolutePosition.y>workspace.CurrentCamera.ViewportSize.y-5 then
-						gui.Position=UDim2.new(gui.AbsolutePosition.x,0,workspace.CurrentCamera.ViewportSize.y-5,0)
+						gui.Position=Vector2.new(gui.AbsolutePosition.x,workspace.CurrentCamera.ViewportSize.y-5)
 					end
 				end
 			end)
