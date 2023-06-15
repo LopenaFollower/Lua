@@ -209,8 +209,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				wait()
 			end
 		until tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)~="Lime green"
-		hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
-		hrp.CFrame=CFrame.new(hrp.CFrame.p,hrp.CFrame.p+Vector3.new(math.random(-1,1),0,math.random(-1,1)))
+		hrp.Position=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
 		getFruit()
 		repeat
 			juice()
@@ -264,7 +263,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 end)
 workspace.ObbyParts.Stages.Hard.VictoryPart.Size=Vector3.new(2,.1,2)
 workspace.ObbyParts.Stages.Hard.VictoryPart.CanCollide=false
-workspace.ObbyParts.RealObbyStartPart.Transparency=0
+workspace.ObbyParts.Stages.Hard.VictoryPart.Transparency=1
 workspace.ObbyParts.RealObbyStartPart.Size=Vector3.new(2,.1,2)
 workspace.ObbyParts.RealObbyStartPart.CanCollide=false
 for _,v in pairs(workspace.ObbyParts:GetDescendants())do
