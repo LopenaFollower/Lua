@@ -36,12 +36,12 @@ local debug={
 	min_drops_collect=1,--1
 	auto_fruit_cd=.5,--.5
 	min_miscbuttom_money=6e7,--6e7
-	min_fruit_before_juice=5,--5
+	min_fruit_before_juice=1,--5
 	auto_juice_stop_at="coco",
 	min_prestige=15,--15
 	buttons_cd=.1,--.1
 	obby_cd=.5,--1
-	juicer_magnitude=7.5,--15
+	juicer_magnitude=10,--15
 	prestige_cd=.25,--.25
 	random_walk_range=35,--35
 	min_randomwalk_wait=1.5,--1.5
@@ -101,16 +101,18 @@ function countFruits()
 	end
 	return t
 end
-function juice()
+function juice(b)
 	if(hrp.Position-my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position).magnitude>debug.juicer_magnitude then
 		hum.WalkToPoint=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
 	else
 		hum.WalkToPoint=hrp.Position
 	end
 	wait()
-	pcall(function()
-		fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
-	end)
+	if b then
+		pcall(function()
+			fireproximityprompt(my.tycoon.Essentials.JuiceMaker.AddFruitButton.PromptAttachment.AddPrompt)
+		end)
+	end
 end
 binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
@@ -123,6 +125,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		my.tycoon=workspace.Tycoons[tostring(plr.Team)]
 		hum.WalkSpeed=my.ws
 		hum.JumpPower=my.jp
+		my.tycoon.Essentials.SpawnLocation.CanCollide=false
 		my.tycoon.Essentials.JuiceMaker.Sign.SurfaceGui.TextLabel.Text=plr.PlayerGui.ObbyBillboards.ObbySignBillBoard.BottomText.Text
 		if plr.PlayerGui:FindFirstChild"NotificationsGui"then
 			plr.PlayerGui.NotificationsGui:Destroy()
@@ -195,7 +198,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			end
 		end
 		if countFruits()>=debug.min_fruit_before_juice and not findChildWithName(my.tycoon.Purchased,debug.auto_juice_stop_at)and my.prestiges>=debug.min_prestige then
-			juice()
+			juice(true)
 		end
 		wait(debug.buttons_cd)
 		cd.button=true
@@ -204,15 +207,20 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.obby=false
 		repeat
 			if tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
-				workspace.ObbyParts.RealObbyStartPart.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
-				workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
+				local anchor=my.tycoon.Essentials.SpawnLocation.Position
+				workspace.ObbyParts.RealObbyStartPart.CFrame=CFrame.new(anchor.x,hrp.CFrame.y+y_offset,anchor.z)
+				workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=CFrame.new(anchor.x,hrp.CFrame.y+y_offset,anchor.z)
+				hum.WalkToPoint=anchor
 				wait()
+				if not hum.Jump and hum:GetState()~=Enum.HumanoidStateType.Freefall then
+					hum:ChangeState"Jumping"
+				end
 			end
 		until tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)~="Lime green"
-		hrp.Position=my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position
+		juice(false)
 		getFruit()
 		repeat
-			juice()
+			juice(true)
 		until countFruits()<=1
 		wait(debug.obby_cd)
 		cd.obby=true
@@ -221,7 +229,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.prestige=false
 		pcall(function()
 			if(not plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible or my.money>=tonumber(my.prestiges.."5000000"))and my.tycoon:FindFirstChild"Buttons"and my.tycoon:FindFirstChild"Buttons":FindFirstChild"Prestige"then
-				juice()
+				juice(true)
 				if my.money>=tonumber(my.prestiges.."5000000")and not hum.Jump and hum:GetState()~=Enum.HumanoidStateType.Freefall then
 					hum:ChangeState"Jumping"
 				end
@@ -261,11 +269,11 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.drops=true
 	end
 end)
-workspace.ObbyParts.Stages.Hard.VictoryPart.Size=Vector3.new(2,.1,2)
+workspace.ObbyParts.Stages.Hard.VictoryPart.Size=Vector3.new(1,1,1)
 workspace.ObbyParts.Stages.Hard.VictoryPart.CanCollide=false
-workspace.ObbyParts.Stages.Hard.VictoryPart.Transparency=1
-workspace.ObbyParts.RealObbyStartPart.Size=Vector3.new(2,.1,2)
-workspace.ObbyParts.RealObbyStartPart.CanCollide=false
+workspace.ObbyParts.Stages.Hard.VictoryPart:FindFirstChild"RewardGui":Destroy()
+workspace.ObbyParts.RealObbyStartPart.Transparency=0
+workspace.ObbyParts.RealObbyStartPart.Size=Vector3.new(1,1,1)
 for _,v in pairs(workspace.ObbyParts:GetDescendants())do
 	if v.Name:lower():find"kill"then
 		v:Destroy()
@@ -303,7 +311,7 @@ end)
 Main:addButton("Juice",function()
 	if my.tycoon and my.tycoon:FindFirstChild"Essentials"and countFruits()>0 then
 		repeat
-			juice()
+			juice(true)
 		until countFruits()<=1
 	end
 end)
@@ -333,7 +341,7 @@ Local:destroyGui(function()
 end)
 task.spawn(function()
 	local stats={}
-	while wait(1)and running do
+	while running do
 		pcall(function()
 			for _,v in pairs(stats)do
 				v:remove()
@@ -344,6 +352,7 @@ task.spawn(function()
 				end
 			end
 		end)
+		wait(1)
 	end
 end)
 for k,v in pairs(debug)do
