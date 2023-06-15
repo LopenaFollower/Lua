@@ -176,6 +176,7 @@ Holder.Position.X.Offset,
 Holder.Position.Y.Scale,
 -workspace.CurrentCamera.ViewportSize.Y)
 	end
+	print(Holder.Position.X.Offset.." "..workspace.CurrentCamera.ViewportSize.X)
 end
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
