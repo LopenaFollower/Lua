@@ -8,8 +8,8 @@
 -- * Converted TabContainer into a ScrollingFrame
 --   to accommodate more pages.
 --
--- * Added a "toggledefault" parameter to set
---   the toggle's initial state.
+-- * Added a "toggledefault" parameter for
+--   toggles to set its's initial state.
 --   Example: page:addToggle("ToggleName", true, callback)
 --   -sets the toggle to be checked when the GUI is loaded.
 --
@@ -155,13 +155,11 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
 	CoreGui.fu8rj82n:Destroy()
 end
-wait()
 local Library={}
 function Library:CreateWindow(windowname,windowinfo,scrollSize)
 	local fu8rj82n=Instance.new"ScreenGui"
@@ -170,7 +168,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 	local DashBoard=Instance.new"Frame"
 	local DashBoardCorner=Instance.new"UICorner"
 	local TabContainer=Instance.new"ScrollingFrame"
-	local TabContainer2=Instance.new"UIListLayout"
+	local TabContainerLayout=Instance.new"UIListLayout"
 	local PageContainer=Instance.new"Frame"
 	local PageContainerCorner=Instance.new"UICorner"
 	local PageFolder=Instance.new"Folder"
@@ -213,11 +211,11 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 	TabContainer.ScrollBarImageColor3=Color3.fromRGB(5,5,5)
 	TabContainer.CanvasSize=UDim2.new(0,0,scrollSize or 1e3,0)
 	TabContainer.Visible=true
-	TabContainer2.Name="TabContainer"
-	TabContainer2.Parent=TabContainer
-	TabContainer2.HorizontalAlignment=Enum.HorizontalAlignment.Center
-	TabContainer2.SortOrder=Enum.SortOrder.LayoutOrder
-	TabContainer2.Padding=UDim.new(0,8)
+	TabContainerLayout.Name="TabContainer"
+	TabContainerLayout.Parent=TabContainer
+	TabContainerLayout.HorizontalAlignment=Enum.HorizontalAlignment.Center
+	TabContainerLayout.SortOrder=Enum.SortOrder.LayoutOrder
+	TabContainerLayout.Padding=UDim.new(0,8)
 	PageContainer.Name="PageContainer"
 	PageContainer.Parent=Frame
 	PageContainer.BackgroundColor3=Color3.fromRGB(15,15,15)
@@ -315,12 +313,6 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			input.Changed:Connect(function()
 				if input.UserInputState==Enum.UserInputState.End then
 					dragging=false
-					if gui.AbsolutePosition.x>200 then
-						gui.Position=Vector2.new(50,gui.AbsolutePosition.y)
-					end
-					if gui.AbsolutePosition.y>200 then
-						gui.Position=Vector2.new(gui.AbsolutePosition.x,50)
-					end
 				end
 			end)
 		end
@@ -448,13 +440,13 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			LabelInfo.TextSize=9
 			LabelInfo.TextTransparency=.3
 			local methods={}
-			function methods:remove()
+			local function methods:remove()
 				LabelHolder:Destroy()
 			end
-			function methods:updateTitle(t)
+			local function methods:updateTitle(t)
 				LabelTitle.Text=tostring(t)or""
 			end
-			function methods:updateInfo(t)
+			local function methods:updateInfo(t)
 				LabelInfo.Text=tostring(t)or""
 			end
 			return methods
@@ -497,10 +489,10 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				pcall(callback)
 			end)
 			local methods={}
-			function methods:remove()
+			local function methods:remove()
 				ButtonHolder:Destroy()
 			end
-			function methods:updateText(t)
+			local function methods:updateText(t)
 				Button.Text=tostring(t)or""
 			end
 			return methods
@@ -589,10 +581,10 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			end)
 			check()
 			local methods={}
-			function methods:remove()
+			local function methods:remove()
 				ToggleHolder:Destroy()
 			end
-			function methods:updateText(t)
+			local function methods:updateText(t)
 				ToggleTitle.Text=tostring(t)or""
 			end
 			return methods
@@ -701,16 +693,16 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				end
 			end)
 			local methods={}
-			function methods:remove()
+			local function methods:remove()
 				SliderHolder:Destroy()
 			end
-			function methods:updateText(t)
+			local function methods:updateText(t)
 				SliderTitle.Text=tostring(t)or""
 			end
-			function methods:updateMin(t)
+			local function methods:updateMin(t)
 				minvalue=tonumber(t)
 			end
-			function methods:updateMax(t)
+			local function methods:updateMax(t)
 				maxvalue=tonumber(t)
 			end
 			return methods
@@ -764,10 +756,10 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				pcall(callback,TextBox.Text)
 			end)
 			local methods={}
-			function methods:remove()
+			local function methods:remove()
 				TextBoxHolder:Destroy()
 			end
-			function methods:updateText(t)
+			local function methods:updateText(t)
 				TextBoxTitle.Text=tostring(t)or""
 			end
 			return methods
@@ -936,13 +928,13 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				end)
 			end
 			local methods={}
-			function methods:remove()
+			local function methods:remove()
 				DropdownHolder:Destroy()
 			end
-			function methods:updateText(t)
+			local function methods:updateText(t)
 				DropdownTitle.Text=tostring(t)or""
 			end
-			function methods:updateList(newlist,scrollsize)
+			local function methods:updateList(newlist,scrollsize)
 				for i,v in pairs(DropdownOptionContainer:GetChildren())do
 					if v.Name=="Option"and v~=DropdownOptionContainerLayout then
 						v:Destroy()
@@ -1036,7 +1028,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 					wait(.1)
 					Button.TextSize=11
 					pcall(callback)
-					wait(1)
+					wait(.1)
 					fu8rj82n:Destroy()
 				end)
 			end
