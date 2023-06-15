@@ -155,29 +155,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-function CamViewport()
-	if workspace.CurrentCamera then
-		return 
-	end
-end
-
-function UpdateToViewport(Holder)
-	if Holder.Position.X.Offset < -workspace.CurrentCamera.ViewportSize.X then
-		Holder.Position=UDim2.new(
-Holder.Position.X.Scale,
--workspace.CurrentCamera.ViewportSize.X,
-Holder.Position.Y.Scale,
-Holder.Position.Y.Offset)
-	end
-	if Holder.Position.Y.Offset < -workspace.CurrentCamera.ViewportSize.Y then
-		Holder.Position=UDim2.new(
-Holder.Position.X.Scale,
-Holder.Position.X.Offset,
-Holder.Position.Y.Scale,
--workspace.CurrentCamera.ViewportSize.Y)
-	end
-	print(Holder.Position.X.Offset.." "..workspace.CurrentCamera.ViewportSize.X)
-end
+local Version=30482
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -291,7 +269,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 	YepTitle.Position=UDim2.new(1.57894742,0,-.318181813,0)
 	YepTitle.Size=UDim2.new(0,128,0,33)
 	YepTitle.Font=Enum.Font.GothamSemibold
-	YepTitle.Text=windowinfo or""
+	YepTitle.Text=windowinfo or Version
 	YepTitle.TextColor3=Color3.fromRGB(255,255,255)
 	YepTitle.TextSize=9
 	YepTitle.TextTransparency=1
@@ -336,7 +314,13 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			input.Changed:Connect(function()
 				if input.UserInputState==Enum.UserInputState.End then
 					dragging=false
-					UpdateToViewport(gui)
+					if gui.Position.X.Offset < -workspace.CurrentCamera.ViewportSize.X then
+						gui.Position=UDim2.new(gui.Position.X.Scale,-workspace.CurrentCamera.ViewportSize.X,gui.Position.Y.Scale,gui.Position.Y.Offset)
+					end
+					if gui.Position.Y.Offset < -workspace.CurrentCamera.ViewportSize.Y then
+						gui.Position=UDim2.new(gui.Position.X.Scale,gui.Position.X.Offset,gui.Position.Y.Scale,-workspace.CurrentCamera.ViewportSize.Y)
+					end
+					print(gui.Position.X.Offset.." "..workspace.CurrentCamera.ViewportSize.X)
 				end
 			end)
 		end
