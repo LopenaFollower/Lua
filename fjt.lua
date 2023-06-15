@@ -159,7 +159,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			for _,v in pairs(parent_folder:GetChildren())do
 				task.spawn(function()
 					if v:IsA"BasePart"then
-						wait(math.random()/5)
+						wait(math.random(0,.1))
 						v.CanCollide=false
 						v.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
 						v.Size=Vector3.new(debug.button_size_x,debug.button_size_y,debug.button_size_z)
@@ -204,16 +204,13 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.obby=false
 		repeat
 			if tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
-				local anchor=workspace.ObbyParts.ObbyStartPart.Position
-				if(hrp.Position-Vector3.new(anchor.x,hrp.Position.y,anchor.z)).magnitude>.25 then
-					hrp.CFrame=workspace.ObbyParts.ObbyStartPart.CFrame
-				end
-				hum.WalkToPoint=anchor
-				workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=CFrame.new(anchor.x,hrp.Position.y+y_offset,anchor.z)
+				workspace.ObbyParts.RealObbyStartPart.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
+				workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
 				wait()
 			end
 		until tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)~="Lime green"
 		hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
+		hrp.CFrame=CFrame.new(hrp.CFrame.p,hrp.CFrame.p+Vector3.new(math.random(-1,1),0,math.random(-1,1)))
 		getFruit()
 		repeat
 			juice()
@@ -266,6 +263,15 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	end
 end)
 workspace.ObbyParts.Stages.Hard.VictoryPart.Size=Vector3.new(2,.1,2)
+workspace.ObbyParts.Stages.Hard.VictoryPart.CanCollide=false
+workspace.ObbyParts.RealObbyStartPart.Transparency=0
+workspace.ObbyParts.RealObbyStartPart.Size=Vector3.new(2,.1,2)
+workspace.ObbyParts.RealObbyStartPart.CanCollide=false
+for _,v in pairs(workspace.ObbyParts:GetDescendants())do
+	if v.Name:lower():find"kill"then
+		v:Destroy()
+	end
+end
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	if tog.infj and hum then
 		hum:ChangeState"Jumping"
