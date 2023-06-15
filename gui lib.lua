@@ -463,13 +463,13 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			LabelInfo.TextSize=9
 			LabelInfo.TextTransparency=.3
 			local methods={}
-			local function methods:remove()
+			function methods:remove()
 				LabelHolder:Destroy()
 			end
-			local function methods:updateTitle(t)
+			function methods:updateTitle(t)
 				LabelTitle.Text=tostring(t)or""
 			end
-			local function methods:updateInfo(t)
+			function methods:updateInfo(t)
 				LabelInfo.Text=tostring(t)or""
 			end
 			return methods
@@ -512,10 +512,10 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				pcall(callback)
 			end)
 			local methods={}
-			local function methods:remove()
+			function methods:remove()
 				ButtonHolder:Destroy()
 			end
-			local function methods:updateText(t)
+			function methods:updateText(t)
 				Button.Text=tostring(t)or""
 			end
 			return methods
@@ -604,10 +604,10 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 			end)
 			check()
 			local methods={}
-			local function methods:remove()
+			function methods:remove()
 				ToggleHolder:Destroy()
 			end
-			local function methods:updateText(t)
+			function methods:updateText(t)
 				ToggleTitle.Text=tostring(t)or""
 			end
 			return methods
@@ -716,16 +716,16 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				end
 			end)
 			local methods={}
-			local function methods:remove()
+			function methods:remove()
 				SliderHolder:Destroy()
 			end
-			local function methods:updateText(t)
+			function methods:updateText(t)
 				SliderTitle.Text=tostring(t)or""
 			end
-			local function methods:updateMin(t)
+			function methods:updateMin(t)
 				minvalue=tonumber(t)
 			end
-			local function methods:updateMax(t)
+			function methods:updateMax(t)
 				maxvalue=tonumber(t)
 			end
 			return methods
@@ -779,10 +779,10 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				pcall(callback,TextBox.Text)
 			end)
 			local methods={}
-			local function methods:remove()
+			function methods:remove()
 				TextBoxHolder:Destroy()
 			end
-			local function methods:updateText(t)
+			function methods:updateText(t)
 				TextBoxTitle.Text=tostring(t)or""
 			end
 			return methods
@@ -951,13 +951,13 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 				end)
 			end
 			local methods={}
-			local function methods:remove()
+			function methods:remove()
 				DropdownHolder:Destroy()
 			end
-			local function methods:updateText(t)
+			function methods:updateText(t)
 				DropdownTitle.Text=tostring(t)or""
 			end
-			local function methods:updateList(newlist,scrollsize)
+			function methods:updateList(newlist,scrollsize)
 				for i,v in pairs(DropdownOptionContainer:GetChildren())do
 					if v.Name=="Option"and v~=DropdownOptionContainerLayout then
 						v:Destroy()
