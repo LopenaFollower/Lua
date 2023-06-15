@@ -103,13 +103,13 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		subject.c=false
 		repeat
 			wait()
-			hrp.CFrame=workspace[subject.plr.Name].HumanoidRootPart.CFrame*CFrame.new(0,-.3,math.random(.5,3.5))
+			hrp.CFrame=workspace[subject.plr.Name].HumanoidRootPart.CFrame*CFrame.new(0,-.3,math.random(.5,5))
 		until late or subject.plr.Character.Humanoid.Sit
 		if subject.plr.Character.Humanoid.Sit then
 			hrp.Velocity=Vector3.new(9e5,9e12,9e5)
-			wait(.3)
+			wait(.4)
 			workspace[plr.Name]:FindFirstChildWhichIsA"Tool".Parent=plr.Backpack
-			wait(.5)
+			wait(.6)
 			hrp.CFrame=cpos
 			hrp.AssemblyAngularVelocity=Vector3.new(0,0,0)
 	        hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
@@ -174,6 +174,7 @@ Main:addButton("Kill",function()
 		end
 	end
 	wait(5)
-	subject.plr=nil
 	late=true
+	wait(.1)
+	subject.plr=nil
 end)
