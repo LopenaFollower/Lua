@@ -37,7 +37,7 @@ local debug={
 	auto_fruit_cd=.5,--.5
 	min_miscbuttom_money=6e7,--6e7
 	min_fruit_before_juice=1,--5
-	auto_juice_stop_at="coco",
+	auto_juice_stop_at="ro%-berry",
 	min_prestige=15,--15
 	buttons_cd=.1,--.1
 	obby_cd=.5,--1
@@ -61,7 +61,7 @@ for _,v in pairs(workspace.Tycoons:GetChildren())do
 end
 function findChildWithName(parent,name)
 	for _,v in pairs(parent:GetChildren())do
-		if v.Name:lower():find(name:lower()) then
+		if v.Name:lower():find(name:lower())then
 			return true
 		end
 	end
@@ -131,7 +131,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	if tog.fruit and cd.fruit and my.tycoon:FindFirstChild"Drops"and not(my.tycoon:FindFirstChild"Purchased"and my.tycoon:FindFirstChild"Purchased":FindFirstChild"Auto Collector")then
 		cd.fruit=false
 		pcall(function()
-			if#my.tycoon.Drops:GetChildren()>=debug.min_drops_collect or plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible then
+			if#my.tycoon.Drops:GetChildren()>=debug.min_drops_collect or(plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible and#my.tycoon.Drops:GetChildren()>=1)then
 				getFruit()
 			end
 		end)
@@ -280,6 +280,14 @@ end
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	if tog.infj and hum then
 		hum:ChangeState"Jumping"
+	end
+end)
+binds.joins=game.Players.PlayerAdded:Connect(function(p)
+	for i,v in pairs({"testers","devs","mods","admins","wes/quark"})do
+		if v:lower():find(p:GetRoleInGroup(7413477))then
+			wait(2)
+			plr:Kick("Safety kick, role("+v+") joined the game.")
+		end
 	end
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
