@@ -10,7 +10,7 @@ local my={
 	tycoon=nil,
 	tpws=1,
 	ws=40,
-	jp=game.StarterPlayer.CharacterJumpPower
+	jp=20
 }
 local tog={
 	fruit=true,
@@ -70,21 +70,13 @@ end
 wait()
 function getFruit()
 	pcall(function()
-		if workspace[plr.Name]:FindFirstChild"Pick Fruit"then
-			for _,v in pairs(my.tycoon.Drops:GetChildren())do
-				if v.Name~="JuiceBottle"then
-					game:GetService"ReplicatedStorage".CollectFruit:FireServer(v)
-				end
-			end
-			workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
-		else
+		if not workspace[plr.Name]:FindFirstChild"Pick Fruit"then
 			plr.Backpack:FindFirstChild"Pick Fruit".Parent=workspace[plr.Name]
-			for _,v in pairs(my.tycoon.Drops:GetChildren())do
-				if v.Name~="JuiceBottle"then
-					game:GetService"ReplicatedStorage".CollectFruit:FireServer(v)
-				end
+		end
+		for _,v in pairs(my.tycoon.Drops:GetChildren())do
+			if v.Name~="JuiceBottle"then
+				game:GetService"ReplicatedStorage".CollectFruit:FireServer(v)
 			end
-			workspace[plr.Name]:FindFirstChild"Pick Fruit".Parent=plr.Backpack
 		end
 		wait()
 		if workspace[plr.Name]:FindFirstChild"Pick Fruit"then
@@ -162,7 +154,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			for _,v in pairs(parent_folder:GetChildren())do
 				task.spawn(function()
 					if v:IsA"BasePart"then
-						wait(math.random(0,.1))
+						wait(math.random(0,.05))
 						v.CanCollide=false
 						v.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
 						v.Size=Vector3.new(debug.button_size_x,debug.button_size_y,debug.button_size_z)
@@ -208,15 +200,15 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		repeat
 			if tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
 				local anchor=my.tycoon.Essentials.SpawnLocation.Position
-				workspace.ObbyParts.RealObbyStartPart.CFrame=CFrame.new(anchor.x,hrp.CFrame.y+y_offset,anchor.z)
-				workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=CFrame.new(anchor.x,hrp.CFrame.y+y_offset,anchor.z)
+				workspace.ObbyParts.RealObbyStartPart.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
+				workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=CFrame.new(anchor.x,hrp.CFrame.y,anchor.z)
 				hum.WalkToPoint=anchor
 				wait()
 				if not hum.Jump and hum:GetState()~=Enum.HumanoidStateType.Freefall then
 					hum:ChangeState"Jumping"
 				end
 			end
-		until tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)~="Lime green"
+		until plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible
 		juice(false)
 		getFruit()
 		repeat
@@ -269,11 +261,17 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.drops=true
 	end
 end)
-workspace.ObbyParts.Stages.Hard.VictoryPart.Size=Vector3.new(1,1,1)
+workspace.ObbyParts.Stages.Hard.VictoryPart.Size=Vector3.new(1,.1,1)
 workspace.ObbyParts.Stages.Hard.VictoryPart.CanCollide=false
-workspace.ObbyParts.Stages.Hard.VictoryPart:FindFirstChild"RewardGui":Destroy()
+workspace.ObbyParts.Stages.Hard.VictoryPart.Touched:Connect(function()
+	wait(.1)
+	hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
+end)
+if workspace.ObbyParts.Stages.Hard.VictoryPart:FindFirstChild"RewardGui"then
+	workspace.ObbyParts.Stages.Hard.VictoryPart:FindFirstChild"RewardGui":Destroy()
+end
 workspace.ObbyParts.RealObbyStartPart.Transparency=0
-workspace.ObbyParts.RealObbyStartPart.Size=Vector3.new(1,1,1)
+workspace.ObbyParts.RealObbyStartPart.Size=Vector3.new(1,.1,1)
 for _,v in pairs(workspace.ObbyParts:GetDescendants())do
 	if v.Name:lower():find"kill"then
 		v:Destroy()
