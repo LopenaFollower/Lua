@@ -265,7 +265,7 @@ workspace.ObbyParts.Stages.Hard.VictoryPart.Size=Vector3.new(1,.1,1)
 workspace.ObbyParts.Stages.Hard.VictoryPart.CanCollide=false
 workspace.ObbyParts.Stages.Hard.VictoryPart.Touched:Connect(function()
 	wait(.1)
-	hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame
+	hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame-Vector3.new(0,1,0)
 end)
 if workspace.ObbyParts.Stages.Hard.VictoryPart:FindFirstChild"RewardGui"then
 	workspace.ObbyParts.Stages.Hard.VictoryPart:FindFirstChild"RewardGui":Destroy()
