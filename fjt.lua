@@ -198,17 +198,19 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	if cd.obby and tog.obby and tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
 		cd.obby=false
 		repeat
-			if tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
-				local anchor=my.tycoon.Essentials.SpawnLocation.Position
-				workspace.ObbyParts.RealObbyStartPart.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
-				workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=CFrame.new(anchor.x,hrp.CFrame.y,anchor.z)
-				hum.WalkToPoint=anchor
-				wait()
-				if not hum.Jump and hum:GetState()~=Enum.HumanoidStateType.Freefall then
-					hum:ChangeState"Jumping"
+			pcall(function()
+				if tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
+					local anchor=my.tycoon:FindFirstChild"Essentials".SpawnLocation
+					workspace.ObbyParts.RealObbyStartPart.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
+					workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=CFrame.new(anchor.Position.x,hrp.CFrame.y,anchor.Position.z)
+					game.TweenService:Create(hrp,TweenInfo.new(.3,Enum.EasingStyle.Linear),{CFrame=anchor.CFrame}):Play()
+					wait()
+					if not hum.Jump and hum:GetState()~=Enum.HumanoidStateType.Freefall then
+						hum:ChangeState"Jumping"
+					end
 				end
-			end
-		until plr.PlayerGui.FrenzyGui.FrenzyLabel.Visible
+			end)
+		until tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)~="Lime green"
 		juice(false)
 		getFruit()
 		repeat
