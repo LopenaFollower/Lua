@@ -201,6 +201,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			pcall(function()
 				if tostring(workspace.ObbyParts.ObbyStartPart.BrickColor)=="Lime green"then
 					local anchor=my.tycoon:FindFirstChild"Essentials".SpawnLocation
+					hum.WalkToPoint=anchor.Position
 					workspace.ObbyParts.RealObbyStartPart.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
 					workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=CFrame.new(anchor.Position.x,hrp.CFrame.y,anchor.Position.z)
 					if(hrp.Position-my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position).magnitude<=3 then
@@ -325,11 +326,11 @@ end)
 Main:addToggle("Prestige",tog.prestige,function(v)
 	tog.prestige=v
 end)
-Main:addToggle("Randomly Walk",tog.walk,function(v)
-	tog.walk=v
-end)
 Main:addToggle("Auto Juice",tog.prestige,function(v)
 	tog.juice=v
+end)
+Main:addToggle("Randomly Walk",tog.walk,function(v)
+	tog.walk=v
 end)
 Local:addTextBox("WalkSpeed",my.ws,function(v)
 	my.ws=tonumber(v)
