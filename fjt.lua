@@ -20,7 +20,8 @@ local tog={
 	walk=false,
 	drops=true,
 	infj=false,
-	tpw=false
+	tpw=false,
+	juuce=false
 }
 local cd={
 	fruit=true,
@@ -28,7 +29,8 @@ local cd={
 	button=true,
 	prestige=true,
 	walk=true,
-	drops=true
+	drops=true,
+	juice=true
 }
 local y_offset=0
 local binds={}
@@ -37,8 +39,8 @@ local debug={
 	auto_fruit_cd=.5,--.5
 	min_miscbuttom_money=6e7,--6e7
 	min_fruit_before_juice=1,--5
-	auto_juice_stop_at="ro%-berry",
-	min_prestige=15,--15
+	auto_juice_stop_at="roberry tree 4",
+	min_prestige=1,--15
 	buttons_cd=.1,--.1
 	obby_cd=.5,--1
 	juicer_magnitude=10,--15
@@ -51,6 +53,7 @@ local debug={
 	button_size_y=.1,--.1
 	button_size_z=1,--1
 	y_offset=2.5,
+	tween_speed=.25--.25
 }
 for _,v in pairs(workspace.Tycoons:GetChildren())do
 	if v.Owner.value==nil and v.Essentials and my.tycoon==nil and tostring(plr.TeamColor)=="White"then
@@ -61,7 +64,7 @@ for _,v in pairs(workspace.Tycoons:GetChildren())do
 end
 function findChildWithName(parent,name)
 	for _,v in pairs(parent:GetChildren())do
-		if v.Name:lower():find(name:lower())then
+		if v.Name:lower():gsub("-",""):find(name:lower())then
 			return true
 		end
 	end
@@ -189,9 +192,6 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				end
 			end
 		end
-		if countFruits()>=debug.min_fruit_before_juice and not findChildWithName(my.tycoon.Purchased,debug.auto_juice_stop_at)and my.prestiges>=debug.min_prestige then
-			juice(true)
-		end
 		wait(debug.buttons_cd)
 		cd.button=true
 	end
@@ -203,7 +203,9 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 					local anchor=my.tycoon:FindFirstChild"Essentials".SpawnLocation
 					workspace.ObbyParts.RealObbyStartPart.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
 					workspace.ObbyParts.Stages.Hard.VictoryPart.CFrame=CFrame.new(anchor.Position.x,hrp.CFrame.y,anchor.Position.z)
-					game.TweenService:Create(hrp,TweenInfo.new(.3,Enum.EasingStyle.Linear),{CFrame=anchor.CFrame}):Play()
+					if(hrp.Position-my.tycoon.Essentials.JuiceMaker.AddFruitButton.Position).magnitude<=3 then
+						game.TweenService:Create(hrp,TweenInfo.new(debug.tween_speed,Enum.EasingStyle.Linear),{CFrame=anchor.CFrame}):Play()
+					end
 					wait()
 					if not hum.Jump and hum:GetState()~=Enum.HumanoidStateType.Freefall then
 						hum:ChangeState"Jumping"
@@ -262,12 +264,22 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		wait(debug.drops_cd)
 		cd.drops=true
 	end
+	if tog.juice and cd.juice then
+		if countFruits()>=debug.min_fruit_before_juice and not findChildWithName(my.tycoon.Purchased,debug.auto_juice_stop_at)and my.prestiges>=debug.min_prestige then
+			juice(true)
+		end
+	end
 end)
 workspace.ObbyParts.Stages.Hard.VictoryPart.Size=Vector3.new(1,.1,1)
 workspace.ObbyParts.Stages.Hard.VictoryPart.CanCollide=false
+local touched=false
 workspace.ObbyParts.Stages.Hard.VictoryPart.Touched:Connect(function()
+	if touched then return end
+	touched=true
 	wait(.1)
-	hrp.CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame-Vector3.new(0,1,0)
+	game.TweenService:Create(hrp,TweenInfo.new(debug.tween_speed,Enum.EasingStyle.Linear),{CFrame=my.tycoon.Essentials.JuiceMaker.AddFruitButton.CFrame}):Play()
+	wait(.25)
+	touched=false
 end)
 if workspace.ObbyParts.Stages.Hard.VictoryPart:FindFirstChild"RewardGui"then
 	workspace.ObbyParts.Stages.Hard.VictoryPart:FindFirstChild"RewardGui":Destroy()
@@ -316,12 +328,8 @@ end)
 Main:addToggle("Randomly Walk",tog.walk,function(v)
 	tog.walk=v
 end)
-Main:addButton("Juice",function()
-	if my.tycoon and my.tycoon:FindFirstChild"Essentials"and countFruits()>0 then
-		repeat
-			juice(true)
-		until countFruits()<=1
-	end
+Main:addToggle("Auto Juice",tog.prestige,function(v)
+	tog.juice=v
 end)
 Local:addTextBox("WalkSpeed",my.ws,function(v)
 	my.ws=tonumber(v)
@@ -365,12 +373,11 @@ task.spawn(function()
 end)
 for k,v in pairs(debug)do
 	Debugging:addTextBox(k,v,function(i)
-		local val=i
-		if not val or val:len()>1 then return end
-		if type(tonumber(val))=="number"and tonumber(val)>=0 and tonumber(val)<=1e9 then
-			debug[k]=tonumber(val)
-		elseif type(val)=="string"then
-			debug[k]=val
+		if not i or i:len()>1 then return end
+		if type(tonumber(i))=="number"and tonumber(i)>=0 and tonumber(i)<=1e9 then
+			debug[k]=tonumber(i)
+		elseif type(i)=="string"then
+			debug[k]=i
 		end
 	end)
 end
