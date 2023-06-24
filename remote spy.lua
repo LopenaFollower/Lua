@@ -210,8 +210,9 @@ end)
 function createNewLog()
 	pcall(function()
 		if logInfo.pa~=""then
+			local full=logInfo.full
 			holder[#holder+1]=Logs:addButton(logInfo.pa,function()
-				clipboard(logInfo.full)
+				clipboard(full)
 			end)
 		end
 		logInfo.pa=""

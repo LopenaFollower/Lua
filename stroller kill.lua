@@ -8,7 +8,9 @@ local subject={
 	c=false,
 	p=nil
 }
+local bidens={}
 local late=false
+local equipAll=false
 local cpos=hrp.CFrame
 local ESPenabled=true
 function notif(title,text,delay)
@@ -17,7 +19,6 @@ function notif(title,text,delay)
 	    Text=text or"";
 	    Duration=delay or 1;
 	})
-	print("\n"..title.." "..text)
 end
 function playerdistance(a,b)
 	return math.round((a.Character.HumanoidRootPart.Position-b.Character.HumanoidRootPart.Position).magnitude)
@@ -62,7 +63,7 @@ function ESP(t)
 				end)
 				local function espLoop()
 					if game.CoreGui:FindFirstChild(t.Name.."_ESP")then
-						if t.Character and t.Character.HumanoidRootPart and t.Character:FindFirstChildOfClass"Humanoid"and chr and hrp and hum then
+						if t.Character and t.Character:FindFirstChild"HumanoidRootPart"and t.Character:FindFirstChildOfClass"Humanoid"and chr and hrp and hum then
 							BillboardGui.Adornee=t.Character.Head
 							TextLabel.Text="Name: "..t.Name.." | Sitting: "..tostring(t.Character:FindFirstChildOfClass"Humanoid".Sit).." | Studs: "..playerdistance(t,plr)
 						end
@@ -76,7 +77,7 @@ function ESP(t)
 		end
 	end)
 end
-game:GetService"RunService".Heartbeat:Connect(function()
+bidens.main=game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=plr.Character
@@ -91,6 +92,13 @@ game:GetService"RunService".Heartbeat:Connect(function()
 	end
 	if hrp.CFrame.y<-70 then
 		hrp.CFrame=CFrame.new(3,5,-4)
+	end
+	if equipAll then
+		pcall(function()
+			for _,v in pairs(plr.Backpack:GetChildren())do
+				v.Parent=workspace[plr.Name]
+			end
+		end)
 	end
 	if chr and hum then
 		if hum.MoveDirection.Magnitude>0 then
@@ -140,7 +148,7 @@ game:GetService"RunService".Heartbeat:Connect(function()
 		end
 	end
 end)
-game.UserInputService.JumpRequest:Connect(function()
+bidens.jump=game.UserInputService.JumpRequest:Connect(function()
 	if hum then
 		hum:ChangeState"Jumping"
 	end
@@ -177,4 +185,15 @@ Main:addButton("Kill",function()
 	late=true
 	wait(.1)
 	subject.plr=nil
+end)
+Main:addToggle("Equip all tools",false,function(v)
+	equipAll=v
+end)
+Main:destroyGui(function()
+	late=true
+	equipAll=false
+	ESPenabled=false
+	for _,v in pairs(bidens)do
+		v:Disconnect()
+	end
 end)

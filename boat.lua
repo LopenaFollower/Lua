@@ -359,7 +359,6 @@ end)
 Local:addTextBox("HipHeight",hum.HipHeight,function(v)
 	hum.HipHeight=tonumber(v)
 end)
-Local:addToggle("Inf Jump",nil,function(v)
+Local:addToggle("Inf Jump",false,function(v)
 	toggle.infj=v
 end)
-loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()

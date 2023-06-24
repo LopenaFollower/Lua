@@ -5,8 +5,10 @@ local hrp=chr.HumanoidRootPart
 local start=false
 local cd=true
 local ball={}
+local ar=false
 local r=30
 local cdn=.1
+local cda=true
 function nearest()
 	local r
 	for _,v in pairs(workspace.Balls:GetChildren())do
@@ -118,6 +120,12 @@ local heartbeat=game:GetService"RunService".Heartbeat:Connect(function()
 		wait(cdn)
 		cd=true
 	end
+	if ar and cda then
+		cda=false
+		game.ReplicatedStorage.SaveDataStore:FireServer(plr.UserId)
+		wait(5)
+		cda=true
+	end
 	hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown,false)
 	hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,false)
 	for i=1,20 do
@@ -139,6 +147,9 @@ local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollow
 local UI=GUI:CreateWindow("Window","info")
 local Main=UI:addPage("Main",3,true,1)
 local Balls=UI:addPage("Ball Count",20,false,1)
+Main:addToggle("auto save(caution)",false,function(v)
+	ar=v
+end)
 Main:addToggle("blender",false,function(v)
 	start=v
 	fling()
@@ -152,6 +163,7 @@ end)
 Main:addLabel()
 Main:destroyGui(function()
 	start=false
+	ar=false
 	heartbeat:Disconnect()
 end)
 for i=1,20 do
