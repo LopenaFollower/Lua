@@ -1,8 +1,5 @@
---Remote Spy created by Vaeb
-local logInfo={
-	pa="",
-	full="",
-}
+--Remote Spy created by Vaeb, GUI by 0x3b5
+local logInfo={pa="",full=""}
 local scanRemotes=true
 local ignoreNames={Event=true,MessagesChanged=true,}
 setreadonly(getrawmetatable(game),false)
@@ -13,11 +10,11 @@ function small(a,b,c)
 	local ab=a:byte()or -1
 	local bb=b:byte()or -1
 	if ab==bb then
-		if c and #a==1 and #b==1 then
+		if c and#a==1 and#b==1 then
 			return -1
-		elseif #b==1 then
+		elseif#b==1 then
 			return false
-		elseif #a==1 then
+		elseif#a==1 then
 			return true
 		else
 			return small(a:sub(2),b:sub(2),c)
@@ -44,16 +41,13 @@ function parseData(obj,numTabs,isKey,overflow,noTables,forceDict)
 			if not hasTables and typeof(v)=="table"then
 				hasTables=true
 			end
-
 			if not isDict and k~=nextIndex then
 				isDict=true
 			else
 				nextIndex=nextIndex+1
 			end
-
 			data[#data+1]={k,v}
 		end
-
 		if isDict or hasTables or forceDict then
 			out[#out+1]=(isCyclic and"Cyclic "or"").."{"
 			table.sort(data,function(a,b)
@@ -101,7 +95,6 @@ function parseData(obj,numTabs,isKey,overflow,noTables,forceDict)
 			end
 			out[#out+1]="{"..table.concat(data2,", ").."}"
 		end
-
 		return table.concat(out,"\n")
 	else
 		local returnVal=nil
@@ -139,33 +132,25 @@ function parseData(obj,numTabs,isKey,overflow,noTables,forceDict)
 		return returnVal
 	end
 end
-
 function tableToString(t)
 	return parseData(t,0,false,{},nil,false)
 end
-
 local detectClasses={
 	BindableEvent=true;
 	BindableFunction=true;
 	RemoteEvent=true;
 	RemoteFunction=true;
 }
-
 local classMethods={
 	BindableEvent="Fire";
 	BindableFunction="Invoke";
 	RemoteEvent="FireServer";
 	RemoteFunction="InvokeServer";
 }
-
 local realMethods={}
-
 for n,e in next,detectClasses do if e then realMethods[classMethods[n]]=Instance.new(n)[classMethods[n]]end end
-
 for k,v in next,gameMeta do pseudoEnv[k]=v end
-
 function getValues(s,k,...)return{realMethods[k](s,...)}end
-
 gameMeta.__index,gameMeta.__namecall=function(self,k)
 	if not realMethods[k]or ignoreNames[self.Name]or not scanRemotes then return pseudoEnv.__index(self,k)end
 	return function(_,...)
@@ -183,7 +168,7 @@ gameMeta.__index,gameMeta.__namecall=function(self,k)
 	end
 end
 function clipboard(s)
-	local clipBoard=setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
+	local clipBoard=setclipboard or toclipboard or set_clipboard or(Clipboard and Clipboard.set)
 	if clipBoard then
 		clipBoard(s)
 	end
@@ -191,14 +176,14 @@ end
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
 local UI=GUI:CreateWindow("Remote Spy","v2")
 local Settings=UI:addPage("RSpy Settings",30,true,1)
-local Logs=UI:addPage("Logs",300,false,1)
+local Logs=UI:addPage("Logs",3000,false,1)
 local holder={}
 local code=""
 Settings:addButton("Clear",function()
 	for _,v in pairs(holder)do
-		v:Destroy()
+		v:remove()
 	end
-end)
+end
 Settings:addTextBox("Input Code","",function(v)
 	code=v
 end)
@@ -214,11 +199,10 @@ function createNewLog()
 			holder[#holder+1]=Logs:addButton(logInfo.pa,function()
 				clipboard(full)
 			end)
+			logInfo.pa=""
 		end
-		logInfo.pa=""
 	end)
 end
-loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
 while wait()do
 	createNewLog()
 end

@@ -1,6 +1,6 @@
 --Entire thing Made by Bytes#0001
 --Modified by github.com/lopenafollower
---Features by me (github.com/lopenafollower):
+--Added features by me (github.com/lopenafollower):
 -- * Fixed slider on mobile to detect release.
 --
 -- * Added a "removeGui" button.
@@ -22,12 +22,12 @@
 -- * General tidying up and organization.
 --
 --Documentation:
---Library:CreateWindow(windowname,windowinfo,scrollSize)
+--Library:CreateWindow(windowname,windowinfo,scrollsize)
 -- * Creates a Window
 -- Parameters:
 -- * windowname (string)
 -- * windowinfo (string)
--- * scrollSize (number)
+-- * scrollsize (number)
 --  - Total height of the ScrollingFrame
 --
 --Page:addPage(pagename,scrollsize,visible,elementspacing)
@@ -104,7 +104,7 @@
 -- TextBox:updateText(string)
 --
 --PageElements:addDropdown(dropdownname,list,scrollsize,callback)
--- * Creates a Textbox
+-- * Creates a Dropdown
 -- Parameters:
 -- * dropdownname (string)
 -- * list (table)
@@ -115,13 +115,13 @@
 -- Methods:
 -- Dropdown:remove()
 -- Dropdown:updateText(string)
--- Dropdown:updateList(table,scrollsize)
+-- Dropdown:updateList(list,scrollsize)
 --
 --PageElements:destroyGui(callback)
--- * Create a Button
+-- * Creates a Button
 -- Parameters:
 -- * callback (function)
---  - will call the callback and destroy the gui
+--  - will fire the callback and destroy the gui
 --
 --Example use:
 --local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
@@ -148,14 +148,14 @@
 --end)
 --
 --local list={1, 2, 3, "4"}
---Main:addDropdown("Dropdown",list,5,function(v)
+--Main:addDropdown("Dropdown",list,1,function(v)
 --	print("dropdown selected: "..v)
 --end)
 --
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=263
+local Version=278
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -166,7 +166,7 @@ task.spawn(function()
 	loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
 end)
 local Library={}
-function Library:CreateWindow(windowname,windowinfo,scrollSize)
+function Library:CreateWindow(windowname,windowinfo,scrollsize)
 	local fu8rj82n=Instance.new"ScreenGui"
 	local Frame=Instance.new"Frame"
 	local FrameCorner=Instance.new"UICorner"
@@ -214,7 +214,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollSize)
 	TabContainer.Size=UDim2.new(0,100,0,214)
 	TabContainer.ScrollBarThickness=3
 	TabContainer.ScrollBarImageColor3=Color3.fromRGB(5,5,5)
-	TabContainer.CanvasSize=UDim2.new(0,0,scrollSize or 1e3,0)
+	TabContainer.CanvasSize=UDim2.new(0,0,scrollsize or 1e3,0)
 	TabContainer.Visible=true
 	TabContainerLayout.Name="TabContainer"
 	TabContainerLayout.Parent=TabContainer

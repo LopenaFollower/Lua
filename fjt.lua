@@ -21,7 +21,7 @@ local tog={
 	drops=true,
 	infj=false,
 	tpw=false,
-	juuce=false
+	juice=false
 }
 local cd={
 	fruit=true,
@@ -37,7 +37,7 @@ local binds={}
 local debug={
 	min_drops_collect=1,--1
 	auto_fruit_cd=.5,--.5
-	min_miscbuttom_money=6e7,--6e7
+	min_miscbutton_money=6e7,--6e7
 	min_fruit_before_juice=1,--5
 	auto_juice_stop_at="roberry tree 4",
 	min_prestige=1,--15
@@ -186,7 +186,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 						if my.money>=price then
 							game.TweenService:Create(v,TweenInfo.new(.015,Enum.EasingStyle.Linear),{CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)}):Play()
 						end
-					elseif my.money>debug.min_miscbuttom_money and v.Position.y<=12 then
+					elseif my.money>debug.min_miscbutton_money and v.Position.y<=12 then
 						v.CFrame=hrp.CFrame+Vector3.new(0,y_offset,0)
 					end
 				end
@@ -326,7 +326,7 @@ end)
 Main:addToggle("Prestige",tog.prestige,function(v)
 	tog.prestige=v
 end)
-Main:addToggle("Auto Juice",tog.prestige,function(v)
+Main:addToggle("Auto Juice",tog.juice,function(v)
 	tog.juice=v
 end)
 Main:addToggle("Randomly Walk",tog.walk,function(v)
