@@ -155,7 +155,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=293
+local Version=294
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -306,8 +306,6 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 	local function update(input)
 		local delta=input.Position-dragStart
 		gui.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y)
-		local vps=workspace.CurrentCamera.ViewportSize
-		print("xScale:"..startPos.X.Scale.."\nxOffset:"..(startPos.X.Offset+delta.X).."\nyScale:"..startPos.Y.Scale.."\nyOffset:"..(startPos.Y.Offset+delta.Y).."\nViewport {x:"..vps.x..", y:"..vps.y.."}")
 	end
 	gui.InputBegan:Connect(function(input)
 		if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
