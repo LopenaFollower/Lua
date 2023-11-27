@@ -155,13 +155,13 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=278
+local Version=281
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
 	CoreGui.fu8rj82n:Destroy()
 end
-print("Gui version: "+Version)
+print("Gui version: "..Version)
 loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
 local Library={}
 function Library:CreateWindow(windowname,windowinfo,scrollsize)
