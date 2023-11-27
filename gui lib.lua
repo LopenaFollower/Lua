@@ -161,10 +161,8 @@ local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
 	CoreGui.fu8rj82n:Destroy()
 end
-task.spawn(function()
-	print("Gui version: "+Version)
-	loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
-end)
+print("Gui version: "+Version)
+loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
 local Library={}
 function Library:CreateWindow(windowname,windowinfo,scrollsize)
 	local fu8rj82n=Instance.new"ScreenGui"
