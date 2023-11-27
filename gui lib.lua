@@ -155,7 +155,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=285
+local Version=293
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -302,13 +302,12 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 		YepTitle.TextTransparency=1
 	end)
 	local gui=Frame
-	local dragging
-	local dragInput
-	local dragStart
-	local startPos
+	local dragging,dragInput,dragStart,startPos
 	local function update(input)
 		local delta=input.Position-dragStart
 		gui.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y)
+		local vps=workspace.CurrentCamera.ViewportSize
+		print("xScale:"..startPos.X.Scale.."\nxOffset:"..(startPos.X.Offset+delta.X).."\nyScale:"..startPos.Y.Scale.."\nyOffset:"..(startPos.Y.Offset+delta.Y).."\nViewport {x:"..vps.x..", y:"..vps.y.."}")
 	end
 	gui.InputBegan:Connect(function(input)
 		if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
@@ -322,14 +321,14 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			end)
 		end
 	end)
-	gui.InputChanged:Connect(function(input)
-		if input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch then
-			dragInput=input
+	gui.InputChanged:Connect(function(e)
+		if e.UserInputType==Enum.UserInputType.MouseMovement or e.UserInputType==Enum.UserInputType.Touch then
+			dragInput=e
 		end
 	end)
-	UserInputService.InputChanged:Connect(function(input)
-		if input==dragInput and dragging then
-			update(input)
+	UserInputService.InputChanged:Connect(function(e)
+		if e==dragInput and dragging then
+			update(e)
 		end
 	end)
 	local FrameVisible=true
