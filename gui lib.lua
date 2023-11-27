@@ -161,7 +161,7 @@ local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
 	CoreGui.fu8rj82n:Destroy()
 end
-task spawn(function()
+task.spawn(function()
 	print("Gui version: "..Version)
 	loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
 end)
