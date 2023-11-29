@@ -128,14 +128,14 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.mine=false
 		if hrp then
 			local min1=hrp.CFrame-Vector3.new(mineRange.x,mineRange.y,mineRange.x)
-			local min2=hrp.CFrame-Vector3.new(8,5,8)
+			local min2=hrp.CFrame-Vector3.new(10,5,10)
 			local max1=hrp.CFrame+Vector3.new(mineRange.x,mineRange.y,mineRange.x)
-			local max2=hrp.CFrame+Vector3.new(8,5,8)
+			local max2=hrp.CFrame+Vector3.new(10,3,10)
 			local region1=Region3.new(min1.Position,max1.Position)
 			local region2=Region3.new(min2.Position,max2.Position)
 			local parts1=workspace:FindPartsInRegion3WithWhiteList(region1,{workspace.Blocks},100)
 			local parts2=workspace:FindPartsInRegion3WithWhiteList(region2,{workspace.Blocks},100)
-			local nlb=true
+			local nlb=false
 			for _,v in pairs(parts2)do
 				if v:IsA"BasePart"and v.Parent then
 					if ignore[v.Parent.Name]~="ye"then
@@ -143,43 +143,42 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 						v.CFrame=hrp.CFrame-Vector3.new(0,3.1+v.Size.y/2,0)
 						Remote:FireServer("MineBlock",{{v.Parent}})
 						rs:Wait()
-						nlb=false
+						nlb=true
 					end
 				end
 			end
-			if nlb then
-				for _,v in pairs(parts1)do
-					if v:IsA"BasePart"and v.Parent then
-						Remote:FireServer("MineBlock",{{v.Parent}})
-						rs:Wait()
-					end
-					if tog.sell then
-						local am,mx=gI()
-						if MAX~=nil then mx=MAX end
-						if am>=mx then
-							if chr and hrp then
-								local sL=hrp.Position
-								local sA=getnum(inventory.Text,1)
-								recordDepth(sL)
-								tog.vel=true
-								while getnum(inventory.Text,1)>=sA do
-									hrp.CFrame=CFrame.new(-38,13.8,22558)
-									Remote:FireServer("SellItems",{{}})
-									rs:Wait()
-								end
-								hrp.Anchored=true
-								local stt1=os.time()
-								while(hrp.Position-sL).magnitude>1 do
-									hrp.CFrame=CFrame.new(sL.x,sL.y,sL.z)
-									rs:Wait()
-									if os.time()-stt1>3.5 then break end
-								end
-								hrp.Anchored=false
-								tog.vel=false
+			for _,v in pairs(parts1)do
+				if v:IsA"BasePart"and v.Parent and not nlb then
+					Remote:FireServer("MineBlock",{{v.Parent}})
+					rs:Wait()
+				end
+				if tog.sell then
+					local am,mx=gI()
+					if MAX~=nil then mx=MAX end
+					if am>=mx then
+						if chr and hrp then
+							local sL=hrp.Position
+							local sA=getnum(inventory.Text,1)
+							recordDepth(sL)
+							tog.vel=true
+							while getnum(inventory.Text,1)>=sA do
+								hrp.CFrame=CFrame.new(-38,13.8,22558)
+								Remote:FireServer("SellItems",{{}})
+								rs:Wait()
 							end
+							hrp.Anchored=true
+							local stt1=os.time()
+							while(hrp.Position-sL).magnitude>1 do
+								hrp.CFrame=CFrame.new(sL.x,sL.y,sL.z)
+								rs:Wait()
+								if os.time()-stt1>3.5 then break end
+							end
+							hrp.Anchored=false
+							tog.vel=false
 						end
 					end
 				end
+				if nlb then break end
 			end
 		end
 		rs:Wait()
@@ -207,15 +206,16 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			chr:TranslateBy(hum.MoveDirection)
 		end
 	end
-	if mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x>=0.9999 and cd.collapse then
+	if mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x>=0.9995 and cd.collapse then
 		cd.collapse=false
 		notif("collapsed",tostring(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x),15)
-		wait(1)
+		wait(5)
 		tweenTo(hrp,.45,CFrame.new(anchorpos.x,15,anchorpos.z))
 		lowestY=15
 		lowestSavedY=10
 		cd.collapse=true
 	end
+	mp.Amount.Text=tostring(math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3)
 end)
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	if tog.infj and hum then
@@ -313,3 +313,4 @@ Local:destroyGui(function()
 	end
 end)
 notif("Mining Simulator","By 0x3b5",5)
+plr.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
