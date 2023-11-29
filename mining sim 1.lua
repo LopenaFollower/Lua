@@ -128,9 +128,9 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.mine=false
 		if hrp then
 			local min1=hrp.CFrame-Vector3.new(mineRange.x,mineRange.y,mineRange.x)
-			local min2=hrp.CFrame-Vector3.new(10,6,10)
+			local min2=hrp.CFrame-Vector3.new(9,5,9)
 			local max1=hrp.CFrame+Vector3.new(mineRange.x,mineRange.y,mineRange.x)
-			local max2=hrp.CFrame+Vector3.new(10,5,10)
+			local max2=hrp.CFrame+Vector3.new(9,5,9)
 			local region1=Region3.new(min1.Position,max1.Position)
 			local region2=Region3.new(min2.Position,max2.Position)
 			local parts1=workspace:FindPartsInRegion3WithWhiteList(region1,{workspace.Blocks},100)
