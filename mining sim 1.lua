@@ -1,48 +1,47 @@
 if game.PlaceId~=1417427737 then return else repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild"leaderstats"end
-local MAX=1e5
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr.Humanoid
 local hrp=chr.HumanoidRootPart
 local Remote=game.ReplicatedStorage.Network:InvokeServer()
+local MAX=7.5e4
 local tog={
-	mine=false,
+	mine=true,
 	sell=true,
-	anchor=false,
+	anchor=true,
 	rebirth=true,
 	crate=false,
 	vel=false,
 	infj=false,
-	buyegg=false,
-	eqegg=false,
 	tpw=true
 }
 local cd={
 	mine=true,
-	sell=true,
 	crate1=true,
 	crate2=true,
 	crwt=1,
 	vel=true,
 	misc=true,
-	egg1=true,
-	egg2=true,
 	collapse=true
 }
-local locs={"Surface","Space","Candy","Toy","Food","Dino","Sea","Beach","Forest","Cavern","Lava"}
 local mineArea="LavaSpawn"
-local mineRange={x=10,y=10}
+local mineRange={x=5,y=5}
 local tmp=hrp.Position
-local lowestSavedY=0
-local lowestY=0
-local mp
+local lowestSavedY=15
+local lowestY=15
+local anchorpos=nil
+local crateType="Common"
+local crateAmount=1
+local ignore={
+	["Lava Block"]="ye",
+	["Rock Bottom"]="ye"
+}
 function recordDepth(pos)
 	if pos.y<lowestSavedY then
 		lowestY=pos.y
 		lowestSavedY=pos.y
 	end
 end
-local anchorpos=nil
 if not workspace:FindFirstChild"platform"then
 	local p=Instance.new"Part"
 	p.Name="platform"
@@ -51,11 +50,8 @@ if not workspace:FindFirstChild"platform"then
 	p.Anchored=true
 	p.CFrame=CFrame.new(0,0,0)
 end
-local crateType="Common"
-local crateAmount=1
-local items={
-	"Common","Rare","Epic","Omega","Mythical","Common Hat Crate","Rare Hat Crate","Epic Hat Crate","Omega Hat Crate","Mythical Hat Crate","Spooky Hat Crate","Haunted Hat Crate","Christmas Hat Crate","Common Accessory Crate","Rare Accessory Crate","Epic Accessory Crate","Omega Accessory Crate","Mythical Accessory Crate","Common Trail Crate","Rare Trail Crate","Epic Trail Crate","Omega Trail Crate","Mythical Trail Crate","Spooky Trail Crate"
-}
+local items={"Common","Rare","Epic","Omega","Mythical","Common Hat Crate","Rare Hat Crate","Epic Hat Crate","Omega Hat Crate","Mythical Hat Crate","Spooky Hat Crate","Haunted Hat Crate","Christmas Hat Crate","Common Accessory Crate","Rare Accessory Crate","Epic Accessory Crate","Omega Accessory Crate","Mythical Accessory Crate","Common Trail Crate","Rare Trail Crate","Epic Trail Crate","Omega Trail Crate","Mythical Trail Crate","Spooky Trail Crate"}
+local locs={"Surface","Space","Candy","Toy","Food","Dino","Sea","Beach","Forest","Cavern","Lava"}
 local binds={}
 local inventory=plr.PlayerGui.ScreenGui.StatsFrame2.Inventory.Amount
 function gC()
@@ -92,6 +88,7 @@ function tweenTo(t,d,c)
 end
 local Remote=game.ReplicatedStorage.Network:InvokeServer()
 local rs=game:GetService"RunService".Stepped
+local mp
 binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
@@ -103,15 +100,16 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		mp=plr.PlayerGui.ScreenGui.Collapse
 		mp.Visible=true
 		lowestY=lowestY-.25
+		hum.HipHeight=2.2
 		tweenTo(workspace:FindFirstChild"platform",.01,CFrame.new(tmp.x,lowestY-3.1,tmp.z))
 	end)
-	if tog.anchor and cd.misc then
+	if tog.anchor and cd.misc and anchorpos then
 		cd.misc=false
 		tmp=hrp.Position
 		if hrp.CFrame.y<lowestY-10 then
 			hrp.CFrame=CFrame.new(tmp.x,lowestY,tmp.z)
 		end
-		if anchorpos and not tog.vel and(hrp.Position-Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)).magnitude>5 then--prevent wandering off
+		if not tog.vel and(hrp.Position-Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)).magnitude>5 then--prevent wandering off
 			tweenTo(hrp,.45,CFrame.new(anchorpos.x,lowestSavedY,anchorpos.z))
 			lowestY=lowestSavedY
 		end
@@ -129,14 +127,58 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	if tog.mine and cd.mine then
 		cd.mine=false
 		if hrp then
-			local min=hrp.CFrame-Vector3.new(mineRange.x,mineRange.y,mineRange.x)
-			local max=hrp.CFrame+Vector3.new(mineRange.x,mineRange.y,mineRange.x)
-			local region=Region3.new(min.Position,max.Position)
-			local parts=workspace:FindPartsInRegion3WithWhiteList(region,{workspace.Blocks},100)
-			for _,v in pairs(parts)do
-				if v:IsA"BasePart"then
-					Remote:FireServer("MineBlock",{{v.Parent}})
-					wait()
+			local min1=hrp.CFrame-Vector3.new(mineRange.x,mineRange.y,mineRange.x)
+			local min2=hrp.CFrame-Vector3.new(10,6,10)
+			local max1=hrp.CFrame+Vector3.new(mineRange.x,mineRange.y,mineRange.x)
+			local max2=hrp.CFrame+Vector3.new(10,5,10)
+			local region1=Region3.new(min1.Position,max1.Position)
+			local region2=Region3.new(min2.Position,max2.Position)
+			local parts1=workspace:FindPartsInRegion3WithWhiteList(region1,{workspace.Blocks},100)
+			local parts2=workspace:FindPartsInRegion3WithWhiteList(region2,{workspace.Blocks},100)
+			local nlb=true
+			for _,v in pairs(parts2)do
+				if v:IsA"BasePart"and v.Parent then
+					if ignore[v.Parent.Name]~="ye"then
+						print(v.Parent.Name)
+						v.CFrame=hrp.CFrame-Vector3.new(0,3.1+v.Size.y/2,0)
+						Remote:FireServer("MineBlock",{{v.Parent}})
+						rs:Wait()
+						nlb=false
+					end
+				end
+			end
+			if nlb then
+				for _,v in pairs(parts1)do
+					if v:IsA"BasePart"and v.Parent then
+						Remote:FireServer("MineBlock",{{v.Parent}})
+						rs:Wait()
+					end
+					if tog.sell then
+						local am,mx=gI()
+						if MAX~=nil then mx=MAX end
+						if am>=mx then
+							if chr and hrp then
+								local sL=hrp.Position
+								local sA=getnum(inventory.Text,1)
+								recordDepth(sL)
+								tog.vel=true
+								while getnum(inventory.Text,1)>=sA do
+									hrp.CFrame=CFrame.new(-38,13.8,22558)
+									Remote:FireServer("SellItems",{{}})
+									rs:Wait()
+								end
+								hrp.Anchored=true
+								local stt1=os.time()
+								while(hrp.Position-sL).magnitude>1 do
+									hrp.CFrame=CFrame.new(sL.x,sL.y,sL.z)
+									rs:Wait()
+									if os.time()-stt1>3.5 then break end
+								end
+								hrp.Anchored=false
+								tog.vel=false
+							end
+						end
+					end
 				end
 			end
 		end
@@ -145,40 +187,6 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	end
 	if tog.rebirth and gC()-1e6*(plr.leaderstats.Rebirths.value+1)>0 then
 		Remote:FireServer("Rebirth",{{}})
-	end
-	if tog.sell and cd.sell then
-		cd.sell=false
-		local am,mx=gI()
-		if MAX~=nil then mx=MAX end
-		if am>=mx then
-			if chr and hrp then
-				local sL=hrp.Position
-				local sA=getnum(inventory.Text,1)
-				local mine=tog.mine
-				recordDepth(sL)
-				tog.mine=false
-				tog.vel=true
-				while getnum(inventory.Text,1)>=sA do
-					hrp.CFrame=CFrame.new(-38,13.8,22558)
-					Remote:FireServer("SellItems",{{}})
-					rs:Wait()
-				end
-				hrp.Anchored=true
-				local stt1=os.time()
-				while(hrp.Position-sL).magnitude>1 do
-					hrp.CFrame=CFrame.new(sL.x,sL.y,sL.z)
-					rs:Wait()
-					if os.time()-stt1>3.5 then
-						break
-					end
-				end
-				hrp.Anchored=false
-				tog.mine=mine
-			end
-		end
-		rs:Wait()
-		cd.sell=true
-		tog.vel=false
 	end
 	if tog.opcrt and cd.crate1 then
 		cd.crate1=false
@@ -191,18 +199,6 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		Remote:FireServer("OpenCrate",{{crateType,crateAmount}})
 		wait(cd.crwt)
 		cd.crate2=true
-	end
-	if tog.eqegg and cd.egg1 then
-		cd.egg1=false
-		Remote:FireServer("equipPet",{{{"Omega Egg","Omega Egg",0}}})
-		wait(5)
-		cd.egg1=true
-	end
-	if tog.buyegg and cd.egg2 then
-		cd.egg2=false
-		Remote:FireServer("BuyPet",{{"Omega Egg",1}})
-		wait(.1)
-		cd.egg2=true
 	end
 	if tog.tpw and chr and hum then
 		if hum.MoveDirection.Magnitude>0 then
@@ -230,7 +226,6 @@ local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollow
 local UI=GUI:CreateWindow("Miners","...")
 local Main=UI:addPage("Main",3,true,1)
 local Platform=UI:addPage("Platform",3,false,1)
-local Eggs=UI:addPage("Eggs",3,false,1)
 local Settings=UI:addPage("Settings",3,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
 local Testing=UI:addPage("test",2,false,1)
@@ -245,7 +240,6 @@ Main:addToggle("Auto Mine",tog.mine,function(v)
 end)
 Main:addToggle("Auto Sell",tog.sell,function(v)
 	tog.sell=v
-	cd.sell=true
 end)
 Main:addToggle("Auto Rebirth",tog.rebirth,function(v)
 	tog.rebirth=v
@@ -282,15 +276,6 @@ Settings:addSlider("Mine Radius X",2,10,function(v)
 end)
 Settings:addSlider("Mine Radius Y",2,10,function(v)
 	mineRange.y=tonumber(v)
-end)
-Eggs:addDropdown("Egg Type",{},0,function(v)
-	--soon
-end)
-Eggs:addToggle("Auto Buy",tog.buyegg,function(v)
-
-end)
-Eggs:addToggle("Auto Equip",tog.eqegg,function(v)
-	tog.eqegg=v
 end)
 Settings:addTextBox("Selling Threshold",math.min(getnum(inventory.Text,2),MAX),function(v)
 	if v=="nil"or v==""or tonumber(v)>getnum(inventory.Text,2)then
