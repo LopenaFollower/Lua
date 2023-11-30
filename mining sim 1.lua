@@ -13,7 +13,8 @@ local tog={
 	crate=false,
 	vel=false,
 	infj=false,
-	tpw=true
+	tpw=true,
+	ignore=true
 }
 local cd={
 	mine=true,
@@ -22,7 +23,8 @@ local cd={
 	crwt=1,
 	vel=true,
 	misc=true,
-	collapse=true
+	collapse=true,
+	rb=true
 }
 local mineArea="LavaSpawn"
 local mineRange={x=5,y=5}
@@ -33,7 +35,19 @@ local anchorpos=nil
 local crateType="Common"
 local crateAmount=1
 local ignore={
+	["Dirt"]="ye",
+	["Stone"]="ye",
+	["Space Stone"]="ye",
+	["Sugar Stone"]="ye",
+	["Sand"]="ye",
+	["Flour"]="ye",
+	["Prehistoric Stone"]="ye",
+	["Grass"]="ye",
+	["Sandstone"]="ye",
+	["Cave Stone"]="ye",
+	["Mystic Stone"]="ye",
 	["Lava Block"]="ye",
+	["RootModel"]="ye",
 	["Rock Bottom"]="ye"
 }
 function recordDepth(pos)
@@ -89,6 +103,7 @@ end
 local Remote=game.ReplicatedStorage.Network:InvokeServer()
 local rs=game:GetService"RunService".Stepped
 local mp
+local rubberbands=0
 binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
@@ -112,6 +127,24 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		if not tog.vel and(hrp.Position-Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)).magnitude>5 then--prevent wandering off
 			tweenTo(hrp,.45,CFrame.new(anchorpos.x,lowestSavedY,anchorpos.z))
 			lowestY=lowestSavedY
+			if cd.rb then
+				rubberbands=rubberbands+1
+			end
+		end
+		if rubberbands>100 then
+			rubberbands=0
+			tog.anchor=false
+			cd.rb=false
+			wait(1.4)
+			Remote:FireServer("MoveTo",{{mineArea}})
+			wait(.2)
+			Remote:FireServer("MoveTo",{{mineArea}})
+			wait(1.4)
+			tog.anchor=true
+			task.spawn(function()
+				wait(1)
+				cd.rb=true
+			end)
 		end
 		hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown,false)
 		hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,false)
@@ -138,7 +171,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			local nlb=false
 			for _,v in pairs(parts2)do
 				if v:IsA"BasePart"and v.Parent then
-					if ignore[v.Parent.Name]~="ye"then
+					if ignore[v.Parent.Name]~="ye"or not tog.ignore then
 						print(v.Parent.Name)
 						v.CFrame=hrp.CFrame-Vector3.new(0,3.1+v.Size.y/2,0)
 						Remote:FireServer("MineBlock",{{v.Parent}})
@@ -167,11 +200,11 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 								rs:Wait()
 							end
 							hrp.Anchored=true
-							local stt1=os.time()
+							local st=os.time()
 							while(hrp.Position-sL).magnitude>1 do
 								hrp.CFrame=CFrame.new(sL.x,sL.y,sL.z)
 								rs:Wait()
-								if os.time()-stt1>3.5 then break end
+								if os.time()-st>3.5 then break end
 							end
 							hrp.Anchored=false
 							tog.vel=false
@@ -209,7 +242,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	if mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x>=0.9995 and cd.collapse then
 		cd.collapse=false
 		notif("collapsed",tostring(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x),15)
-		wait(5)
+		repeat wait()until math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3<75
 		tweenTo(hrp,.45,CFrame.new(anchorpos.x,15,anchorpos.z))
 		lowestY=15
 		lowestSavedY=10
@@ -237,6 +270,9 @@ Main:addDropdown("Farm Area",locs,#locs*.25,function(v)
 end)
 Main:addToggle("Auto Mine",tog.mine,function(v)
 	tog.mine=v
+end)
+Main:addToggle("Ignore Common Blocks",tog.ignore,function(v)
+	tog.ignore=v
 end)
 Main:addToggle("Auto Sell",tog.sell,function(v)
 	tog.sell=v
