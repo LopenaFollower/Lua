@@ -114,6 +114,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		tmp=hrp.Position
 		mp=plr.PlayerGui.ScreenGui.Collapse
 		mp.Visible=true
+		mp.Amount.Text=tostring(math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3)
 		lowestY=lowestY-.25
 		hum.HipHeight=2.2
 		tweenTo(workspace:FindFirstChild"platform",.01,CFrame.new(tmp.x,lowestY-3.1,tmp.z))
@@ -239,7 +240,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			chr:TranslateBy(hum.MoveDirection)
 		end
 	end
-	if mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x>=0.9995 and cd.collapse then
+	if mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x>=0.995 and cd.collapse then
 		cd.collapse=false
 		notif("collapsed",tostring(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x),15)
 		repeat wait()until math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3<75
@@ -248,7 +249,6 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		lowestSavedY=10
 		cd.collapse=true
 	end
-	mp.Amount.Text=tostring(math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3)
 end)
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	if tog.infj and hum then
