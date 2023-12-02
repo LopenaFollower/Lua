@@ -348,7 +348,7 @@ local UI=GUI:CreateWindow("Miners","...")
 local Main=UI:addPage("Main",3,true,1)
 local Anchor=UI:addPage("Anchor",3,false,1)
 local Pets=UI:addPage("Pet Farm",3,false,1)
-local Ores=UI:addPage("Ore ESP",30,false,1)
+local Ores=UI:addPage("Ore ESP",10,false,1)
 local Settings=UI:addPage("Settings",3,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
 local Testing=UI:addPage("test",2,false,1)
@@ -458,5 +458,5 @@ Local:destroyGui(function()
 		cd[i]=false
 	end
 end)
-notif("Mining Simulator","By 0x3b5",5)
+notif("Mining Simulator By 0x3b5","120",5)
 plr.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
