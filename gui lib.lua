@@ -74,7 +74,7 @@
 -- Methods:
 -- Toggle:remove()
 -- Toggle:updateText(string)
--- Toggle:updateStatus(b)
+-- Toggle:setStatus(boolean)
 --
 --PageElements:addSlider(slidername,minvalue,maxvalue,callback)
 -- * Creates a Slider
@@ -91,6 +91,7 @@
 --  - Updates the min value of the slider.
 -- Slider:updateMax(number)
 --  - Updates the max value of the slider
+-- Slider:setValue(number)
 --
 --PageElements:addTextBox(textboxname,textboxdefault,callback)
 -- * Creates a Textbox
@@ -103,6 +104,7 @@
 -- Methods:
 -- TextBox:remove()
 -- TextBox:updateText(string)
+-- TextBox:setValue(string)
 --
 --PageElements:addDropdown(dropdownname,list,scrollsize,callback)
 -- * Creates a Dropdown
@@ -156,7 +158,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=298
+local Version=303
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -714,6 +716,14 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			function methods:updateMax(t)
 				maxvalue=tonumber(t)
 			end
+			function methods:setValue(t)
+				local i=tonumber(t)
+				if type(i)=="number"and i<=maxvalue and i>=minvalue then
+					Value=i
+					SliderNumber.Text=Value
+					pcall(callback,SliderNumber.Text)
+				end
+			end
 			return methods
 		end
 		function PageElements:addTextBox(textboxname,textboxdefault,callback)
@@ -770,6 +780,10 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			end
 			function methods:updateText(t)
 				TextBoxTitle.Text=tostring(t)or""
+			end
+			function methods:setValue(t)
+				TextBox.Text=t
+				pcall(callback,TextBox.Text)
 			end
 			return methods
 		end
