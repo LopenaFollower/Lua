@@ -74,6 +74,7 @@
 -- Methods:
 -- Toggle:remove()
 -- Toggle:updateText(string)
+-- Toggle:updateStatus(b)
 --
 --PageElements:addSlider(slidername,minvalue,maxvalue,callback)
 -- * Creates a Slider
@@ -155,7 +156,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=294
+local Version=298
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -588,6 +589,12 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			end
 			function methods:updateText(t)
 				ToggleTitle.Text=tostring(t)or""
+			end
+			function methods:updateStatus(b)
+				if type(b)=="boolean"then
+					ToggleEnabled=b
+					check()
+				end
 			end
 			return methods
 		end
