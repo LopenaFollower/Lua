@@ -158,7 +158,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=303
+local Version=304
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -592,7 +592,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			function methods:updateText(t)
 				ToggleTitle.Text=tostring(t)or""
 			end
-			function methods:updateStatus(b)
+			function methods:setStatus(b)
 				if type(b)=="boolean"then
 					ToggleEnabled=b
 					check()
