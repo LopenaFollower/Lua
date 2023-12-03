@@ -3,15 +3,16 @@ local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr.Humanoid
 local hrp=chr.HumanoidRootPart
+local oldgrav=workspace.Gravity
 while true do
-    if pcall(function()plr.PlayerGui.ScreenGui.StatsFrame.Coins:FindFirstChild("Amount")end)then
+    if pcall(function()plr.PlayerGui.ScreenGui.StatsFrame.Coins:FindFirstChild"Amount"end)then
         if plr.PlayerGui.ScreenGui.StatsFrame.Tokens.Amount.Text~="Loading..."then
             break
         end
     end
     wait(1)
 end
-local mp,holder,anchorpos
+local mp,holder,anchorpos,pform,testing
 local MAX=7.5e4
 local tog={
 	mine=true,
@@ -22,8 +23,10 @@ local tog={
 	vel=false,
 	infj=false,
 	tpw=true,
-	egg=true,
-	ignore=true
+	egg=false,
+	float=false,
+	ignore=true,
+	esp=false
 }
 local cd={
 	mine=true,
@@ -33,13 +36,15 @@ local cd={
 	vel=true,
 	misc=true,
 	collapse=true,
-	rb=true
+	rb=true,
+	ore=true
 }
 local depth=200
 local mineArea="LavaSpawn"
 local mineRange={x=5,y=5}
 local lowestSavedY=15
 local lowestY=15
+local collapsed=false
 local crateType="Common"
 local crateAmount=1
 local ignore={
@@ -58,13 +63,38 @@ local ignore={
 	["RootModel"]="ye",
 	["Rock Bottom"]="ye"
 }
-local screengui=plr.PlayerGui.ScreenGui
+local oreMining={
+	tog=false,
+	status=0,
+	selling=false
+}
 local items={"Common","Rare","Epic","Omega","Mythical","Common Hat Crate","Rare Hat Crate","Epic Hat Crate","Omega Hat Crate","Mythical Hat Crate","Spooky Hat Crate","Haunted Hat Crate","Christmas Hat Crate","Common Accessory Crate","Rare Accessory Crate","Epic Accessory Crate","Omega Accessory Crate","Mythical Accessory Crate","Common Trail Crate","Rare Trail Crate","Epic Trail Crate","Omega Trail Crate","Mythical Trail Crate","Spooky Trail Crate"}
 local locs={"Surface","Space","Candy","Toy","Food","Dino","Sea","Beach","Forest","Cavern","Lava"}
-local oreIdList={"Airplane Ore","Amber","Amertrine","Amethyst","Anchors","Ancient Artifact","Ancient Gem","Ancient Stone","Aquamarine","Asteroid Rock","Bacon","Bananas","Bedrock","Black Diamond","Black Onyx","Block Ore","Blood Stone","Blue Beryl","Bonzanite","Breadstone","Candy Fish Ore","Candy Floss Ore","Cannibar","Car Ore","Cherry Ruby","Chest Ore","Chicken Nugget","Chlorite","Chromium","Citrine","Coal","Coconuts","Cookies","Copper","Coral","Craxium","Crystal Stone","Crystalite","Diamond","Dinosaur Bones","Dinosaur Eggs","Dravite","Egg Candy","Emerald","Fish Bones","Fluorite","Fossils","French Fries","Garnet","Glowstone","Godly Gem","Gold","Gold Ring Ore","Golden Coins","Grass Ore","Gummy Bear Ore","Gummy Ore","Gun Ore","Halite","Heart Candy","Hematite","Hotdogs","Ice","Ice Cream","Ice Pop","Icing","Illuminite","Iron","Jade","Jellybean Stone","Kelp","Krixanium","Lapis","Lavastone","Legendary Stone","Lily Pad","Log Ore","Lollipop Ore","Macaroni","Magic Wand","Meat Bones","Mithril","Mushroom Ore","Mythic Stone","Nachos","Obsidian","Opals","Oraxanium","Orb Ore","Orcalium","Orpiment","Pearls","Peppermint","Pezzottaite","Pizza","Plastic","Platinum","Praxium","Puzzle Ore","Pyrite","Quartz","Rainbowite","Red Beryl","Red Rock","Royal Ore","Ruby","Sapphire","Seaweed","Shadow Stone","Shells","Shovel Ore","Silver","Skeleton","Skeleton Stone","Skittles Ore","Slate","Spaceship Ore","Starfish","Sunglasses","Sunscreen Ore","Surfboard Ore","Talc","Tank Ore","Tanzanite","Teddybear Ore","Thermium","Titanium","Twig Ore","Twilight Gem","Unicorn Horn Ore","Unobtainium","Uranium","Watermelon","Yellow Beryl","Zircon"}
+local oreIdList={"Airplane Ore","Amber","Amertrine","Amethyst","Anchors","Ancient Artifact","Ancient Gem","Ancient Stone","Aquamarine","Asteroid Rock","Bacon","Bananas","Bedrock","Black Diamond","Black Onyx","Block Ore","Blood Stone","Blue Beryl","Bonzanite","Breadstone","Candy Fish Ore","Candy Floss Ore","Cannibar","Car Ore","Cherry Ruby","Chest Ore","Chicken Nugget","Chlorite","Chromium","Citrine","Coal","Coconuts","Cookies","Copper","Coral","Craxium","Crystal Stone","Crystalite","Diamond","Dinosaur Bones","Dinosaur Eggs","Dravite","Egg Candy","Emerald","Fish Bones","Fluorite","Fossils","French Fries","Garnet","Gem Block","Glowstone","Godly Gem","Gold","Gold Ring Ore","Golden Coins","Grass Ore","Gummy Bear Ore","Gummy Ore","Gun Ore","Halite","Heart Candy","Hematite","Hotdogs","Ice","Ice Cream","Ice Pop","Icing","Illuminite","Iron","Jade","Jellybean Stone","Kelp","Krixanium","Lapis","Lavastone","Legendary Stone","Lily Pad","Log Ore","Lollipop Ore","Macaroni","Magic Wand","Meat Bones","Mithril","Mushroom Ore","Mythic Stone","Nachos","Obsidian","Opals","Oraxanium","Orb Ore","Orcalium","Orpiment","Pearls","Peppermint","Pezzottaite","Pizza","Plastic","Platinum","Praxium","Puzzle Ore","Pyrite","Quartz","Rainbowite","Red Beryl","Red Rock","Royal Ore","Ruby","Sapphire","Seaweed","Shadow Stone","Shells","Shovel Ore","Silver","Skeleton","Skeleton Stone","Skittles Ore","Slate","Spaceship Ore","Starfish","Sunglasses","Sunscreen Ore","Surfboard Ore","Talc","Tank Ore","Tanzanite","Teddybear Ore","Thermium","Titanium","Twig Ore","Twilight Gem","Unicorn Horn Ore","Unobtainium","Uranium","Watermelon","Yellow Beryl","Zircon"}
 local binds={}
-local oreIds={}
+local oreEsp={}
+local saved={}
+local screengui=plr.PlayerGui.ScreenGui
 local inventory=screengui.StatsFrame2.Inventory.Amount
+if not workspace:FindFirstChild"platform"then
+	local p=Instance.new"Part"
+	p.Name="platform"
+	p.Parent=workspace
+	p.Size=Vector3.new(2,0,2)
+	p.Anchored=true
+	p.CFrame=CFrame.new(-114,1.9,272)
+end
+function highlightedOres()
+	local n,blocks=0,{}
+	for _,m in pairs(workspace.Blocks:GetChildren())do
+		local v=m:FindFirstChild"Part"or m:FindFirstChild"ColorPart"or m:FindFirstChild"Root"
+		if v and v:FindFirstChild"highlight"then
+			n=n+1
+			table.insert(blocks,v)
+		end
+	end
+	return n,blocks
+end
 function notif(ti,tx,d)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=ti or"";
@@ -97,7 +127,7 @@ function recordDepth(pos)
 		lowestSavedY=pos.y
 	end
 end
-function regulate_velocity()
+function noVelocity()
 	pcall(function()
 		hrp.AssemblyAngularVelocity=Vector3.new(0,0,0)
 		hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
@@ -106,6 +136,38 @@ function regulate_velocity()
 end
 function tweenTo(t,d,c)
 	game.TweenService:Create(t,TweenInfo.new(d,Enum.EasingStyle.Linear),{CFrame=c}):Play()
+end
+function esp(v)
+	if not v:FindFirstChild"highlight"then
+		local a=Instance.new("BoxHandleAdornment",v)
+		a.Name="highlight"
+		a.Adornee=v
+		a.AlwaysOnTop=true
+		a.ZIndex=0
+		a.Size=v.Size*Vector3.new(.75,.75,.75)
+		a.Transparency=.25
+		a.Color=BrickColor.new("White")
+	end
+end
+function nearest(list,type)
+	if not type then type=1 end
+	local r
+	for _,v in pairs(list)do
+		if r==nil then
+			r=v
+		else
+			if type==1 then
+				if(hrp.Position-v.Position).magnitude<(r.Position-hrp.Position).magnitude then
+					r=v
+				end
+			elseif type==2 then
+				if(Vector2.new(hrp.Position.x,hrp.Position.z)-Vector2.new(v.Position.x,v.Position.z)).magnitude<(Vector2.new(r.Position.x,r.Position.z)-Vector2.new(hrp.Position.x,hrp.Position.z)).magnitude then
+					r=v
+				end
+			end
+		end
+	end
+	return r
 end
 local Remote=game.ReplicatedStorage.Network:InvokeServer()
 local Remote=game.ReplicatedStorage.Network:InvokeServer()
@@ -123,6 +185,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		mp.Visible=true
 		mp.Amount.Text=tostring(math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3)
 		hum.HipHeight=2.2
+		pform=workspace:FindFirstChild"platform"
 		if not holder or not holder:FindFirstChild"HumanoidRootPart"then
 			for _,v in pairs(workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(2,2,2)).Position,(hrp.CFrame+Vector3.new(2,2,2)).Position),{workspace.MiningAreas},15))do
 				if v.Name=="HumanoidRootPart"then
@@ -132,15 +195,15 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				end
 			end
 		end
-		local nearent
+		local near
 		for _,v in pairs(workspace.TeleportPoints:GetChildren())do
 			if v:IsA"Model"then
-				if nearest then
-					if(nearest.Position-hrp.Position).magnitude>(v.SurfaceSpawn.Position-hrp.Position).magnitude then
-						nearest=v.SurfaceSpawn
+				if near then
+					if(near.Position-hrp.Position).magnitude>(v.SurfaceSpawn.Position-hrp.Position).magnitude then
+						near=v.SurfaceSpawn
 					end
 				else
-					nearest=v.SurfaceSpawn
+					near=v.SurfaceSpawn
 				end
 			end
 		end
@@ -155,9 +218,9 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		if hrp.CFrame.y<lowestY-500 then
 			tweenTo(hrp,.45,CFrame.new(hrp.Position.x,lowestY+5,hrp.Position.z))
 		end
-		if not tog.vel and(hrp.Position-Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)).magnitude>5 then--prevent wandering off
+		if not collapsed and not tog.vel and(hrp.Position-Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)).magnitude>5 then--prevent wandering off
 			tweenTo(hrp,.45,CFrame.new(anchorpos.x,lowestY,anchorpos.z))
-			if cd.rb then
+			if cd.rb and not oreMining.tog then
 				rubberbands=rubberbands+1
 			end
 		end
@@ -166,6 +229,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			tog.anchor=false
 			cd.rb=false
 			wait(1.4)
+			print(mineArea)
 			Remote:FireServer("MoveTo",{{mineArea}})
 			wait(.2)
 			Remote:FireServer("MoveTo",{{mineArea}})
@@ -183,7 +247,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	end
 	if tog.vel and cd.vel then
 		cd.vel=false
-		regulate_velocity()
+		noVelocity()
 		rs:Wait()
 		cd.vel=true
 	end
@@ -191,12 +255,13 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.mine=false
 		if hrp then
 			if tonumber(spl(screengui.TopInfoFrame.Depth.Text," ")[1])<depth then
-				tog.vel=true
 				for _,v in pairs(workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(1,10,1)).Position,(hrp.CFrame+Vector3.new(1,0,1)).Position),{workspace.Blocks},5))do
 					if v:IsA"BasePart"and v.Parent then
 						Remote:FireServer("MineBlock",{{v.Parent}})
 						rs:Wait()
-						recordDepth(hrp.Position)
+						lowestY=hrp.CFrame.y
+						workspace.Gravity=500
+						oreMining.selling=false
 					end
 					if tog.sell then
 						local am,mx=gI()
@@ -207,6 +272,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 								local sA=getnum(inventory.Text,1)
 								recordDepth(sL)
 								tog.vel=true
+								oreMining.selling=true
 								while getnum(inventory.Text,1)>=sA do
 									hrp.CFrame=CFrame.new(-38,13.8,22558)
 									Remote:FireServer("SellItems",{{}})
@@ -225,7 +291,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 						end
 					end
 				end
-				tog.vel=false
+				workspace.Gravity=oldgrav
 			else
 				local min=hrp.CFrame-Vector3.new(10,5,10)
 				local max=hrp.CFrame+Vector3.new(10,3,10)
@@ -239,6 +305,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 							Remote:FireServer("MineBlock",{{v.Parent}})
 							rs:Wait()
 							nlb=true
+							oreMining.selling=false
 						end
 					end
 				end
@@ -246,6 +313,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 					if v:IsA"BasePart"and v.Parent and not nlb then
 						Remote:FireServer("MineBlock",{{v.Parent}})
 						rs:Wait()
+						oreMining.selling=false
 					end
 					if tog.sell then
 						local am,mx=gI()
@@ -256,6 +324,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 								local sA=getnum(inventory.Text,1)
 								recordDepth(sL)
 								tog.vel=true
+								oreMining.selling=true
 								while getnum(inventory.Text,1)>=sA do
 									hrp.CFrame=CFrame.new(-38,13.8,22558)
 									Remote:FireServer("SellItems",{{}})
@@ -278,6 +347,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			end
 		end
 		rs:Wait()
+		oreMining.selling=false
 		cd.mine=true
 	end
 	if tog.rebirth and gC()-1e6*(plr.leaderstats.Rebirths.value+1)>0 then
@@ -305,17 +375,66 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	if mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x>=0.995 and cd.collapse then
 		cd.collapse=false
 		notif("collapse alert",tostring(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x),15)
+		collapsed=true
 		repeat wait()until math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3<75
-		tog.vel=true
+		wait(.3)
 		Remote:FireServer("MoveTo",{{mineArea}})
-		wait(.2)
-		if tog.anchor then
-			tweenTo(hrp,.1,CFrame.new(anchorpos.x,16,anchorpos.z))
-		end
-		tog.vel=false
-		lowestY=15
+		lowestY=17
 		lowestSavedY=10
+		collapsed=false
 		cd.collapse=true
+	end
+	if tog.float then
+		pform.CanCollide=true
+		pform.CFrame=hrp.CFrame-Vector3.new(0,3.12451,0)
+	end
+	if oreMining.tog and tog.esp and oreMining.status==0 and cd.ore and not oreMining.selling then
+		cd.ore=false
+		local mining=tog.mine
+		local anc=tog.anchor
+		local f=false
+		local c,bls=highlightedOres()
+		while c>0 and oreMining.tog do
+			f=true
+			if tog.mine and saved["mine"]then
+				tog.mine=false
+				saved["mine"]:setStatus(false)
+			end
+			if tog.anchor and saved["anchor"]then
+				tog.anchor=false
+				saved["anchor"]:setStatus(false)
+			end
+			wait(.2)
+			oreMining.status=1
+			local block=nearest(bls,2)
+			block.CanCollide=false
+			if(hrp.Position-Vector3.new(block.Position.x,hrp.CFrame.y,block.Position.z)).magnitude<2 then
+				tweenTo(hrp,.5,CFrame.new(block.CFrame.x,hrp.CFrame.y,block.CFrame.z))
+				wait(.5)
+			end
+			tweenTo(hrp,.1,CFrame.new(hrp.CFrame.x,block.CFrame.y,hrp.CFrame.z))
+			wait(.125)
+			repeat
+				Remote:FireServer("MineBlock",{{block.Parent}})
+				rs:Wait()
+				tweenTo(hrp,.01,block.CFrame)
+				pform.CanCollide=true
+				pform.CFrame=hrp.CFrame-Vector3.new(0,3.12451,0)
+			until#workspace:FindPartsInRegion3WithWhiteList(Region3.new(hrp.Position,hrp.Position),{workspace.Blocks},10)<1 or not oreMining.tog
+			c,bls=highlightedOres()
+		end
+		oreMining.status=0
+		if anc and f and anchorpos then
+			tweenTo(hrp,.45,CFrame.new(anchorpos.x,lowestY,anchorpos.z))
+			wait(.5)
+		end
+		if f then
+			pform.CanCollide=false
+		end
+		tog.anchor=anc
+		tog.mine=mining
+		wait(.5)
+		cd.ore=true
 	end
 end)
 binds.hatch=screengui.ChildAdded:Connect(function(v)
@@ -338,6 +457,15 @@ binds.hatch=screengui.ChildAdded:Connect(function(v)
 		end
 	end
 end)
+binds.bls=workspace.Blocks.ChildAdded:Connect(function(m)
+	if tog.esp and m:IsA"Model"then
+		wait(.1)
+		local v=m:FindFirstChild"Part"or m:FindFirstChild"ColorPart"or m:FindFirstChild"Root"
+		if v and oreEsp[m.Name]then
+			esp(v)
+		end
+	end
+end)
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	if tog.infj and hum then
 		hum:ChangeState"Jumping"
@@ -348,16 +476,16 @@ local UI=GUI:CreateWindow("Miners","...")
 local Main=UI:addPage("Main",3,true,1)
 local Anchor=UI:addPage("Anchor",3,false,1)
 local Pets=UI:addPage("Pet Farm",3,false,1)
-local Ores=UI:addPage("Ore ESP",10,false,1)
+local Ores=UI:addPage("Ore ESP",18.5,false,1)
 local Settings=UI:addPage("Settings",3,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
-local Testing=UI:addPage("test",2,false,1)
+local Test=UI:addPage("Testing",2,false,1)
 Main:addDropdown("Farm Area",locs,#locs*.25,function(v)
 	Remote:FireServer("MoveTo",{{v.."Spawn"}})
 	wait(.2)
 	Remote:FireServer("MoveTo",{{v.."Spawn"}})
 end)
-Main:addToggle("Auto Mine",tog.mine,function(v)
+saved["mine"]=Main:addToggle("Auto Mine",tog.mine,function(v)
 	tog.mine=v
 end)
 Main:addTextBox("Depth",depth,function(v)
@@ -385,11 +513,11 @@ end)
 Main:addTextBox("Crate Name(case-sensitive)","Common",function(v)
 	crateType=v
 end)
-Anchor:addToggle("Enable",tog.anchor,function(v)
+saved["anchor"]=Anchor:addToggle("Enable",tog.anchor,function(v)
 	tog.anchor=v
 end)
 Anchor:addButton("Set Anchor",function()
-	local n=true
+	local f=true
 	for _,v in pairs(workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(0,5,0)).Position,hrp.Position),{workspace.Blocks},15))do
 		if v:IsA"BasePart"and v.Parent then
 			anchorpos={x=v.Position.x,z=v.Position.z}
@@ -401,24 +529,62 @@ Anchor:addButton("Set Anchor",function()
 	end
 	lowestY=hrp.CFrame.y
 end)
+Anchor:addToggle("Float",tog.float,function(v)
+	tog.float=v
+end)
 Pets:addToggle("Farm Omega Egg",tog.egg,function(v)
 	tog.egg=v
 end)
 Ores:addLabel("Type IDs of the ore","ex: 4,8,5")
 Ores:addTextBox("IDs","",function(v)
-	oreIds=spl(v,",")
+	oreEsp={}
+	for _,v in pairs(workspace.Blocks:GetDescendants())do
+		if v:IsA"BoxHandleAdornment"then
+			v:Destroy()
+		end
+	end
+	for _,v in pairs(spl(v,","))do
+		oreEsp[oreIdList[tonumber(v)]]=true
+	end
+	for _,m in pairs(workspace.Blocks:GetChildren())do
+		local v=m:FindFirstChild"Part"or m:FindFirstChild"ColorPart"or m:FindFirstChild"Root"
+		if oreEsp[m.Name]then
+			esp(v)
+		end
+	end
+end)
+saved["oreEsp"]=Ores:addToggle("Enable",tog.esp,function(v)
+	tog.esp=v
+	if v then
+		for _,m in pairs(workspace.Blocks:GetChildren())do
+			local v=m:FindFirstChild"Part"or m:FindFirstChild"ColorPart"or m:FindFirstChild"Root"
+			if oreEsp[m.Name]then
+				esp(v)
+			end
+		end
+	end
+end)
+Ores:addToggle("Mine Ore",oreMining.tog,function(v)
+	if v and not tog.esp then
+		notif("required","turning on esp")
+		tog.esp=true
+		saved["oreEsp"]:setStatus(tog.esp)
+	end
+	oreMining.tog=v
 end)
 Ores:addLabel("~ ~ ~ IDs ~ ~ ~")
 for i,v in pairs(oreIdList)do
 	Ores:addLabel(v,i)
 	wait(.01)
 end
-Settings:addSlider("Mine Radius X",2,10,function(v)
+saved["mRadX"]=Settings:addSlider("Mine Radius X",2,10,function(v)
 	mineRange.x=tonumber(v)
 end)
-Settings:addSlider("Mine Radius Y",2,10,function(v)
+saved["mRadX"]:setValue(mineRange.x)
+saved["mRadY"]=Settings:addSlider("Mine Radius Y",2,10,function(v)
 	mineRange.y=tonumber(v)
 end)
+saved["mRadY"]:setValue(mineRange.y)
 Settings:addTextBox("Selling Threshold",math.min(getnum(inventory.Text,2),MAX),function(v)
 	if type(tonumber(v))=="number"and tonumber(v)>0 and tonumber(v)<=getnum(inventory.Text,2)then
 		MAX=tonumber(v)
@@ -457,6 +623,21 @@ Local:destroyGui(function()
 	for i,v in pairs(cd)do
 		cd[i]=false
 	end
+	for _,v in pairs(workspace.Blocks:GetDescendants())do
+		if v:IsA"BoxHandleAdornment"then
+			v:Destroy()
+		end
+	end
+	pform:Destroy()
 end)
-notif("Mining Simulator By 0x3b5","120",5)
+notif("Mining Simulator","By 0x3b5",5)
 plr.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
+repeat wait()until pform
+local cd=Instance.new("ClickDetector",pform)
+cd.MouseClick:Connect(function()
+	hrp.CFrame=hrp.CFrame-Vector3.new(0,10,0)
+end)
+--[[
+add tp blocks toggle
+improve auto ore
+]]
