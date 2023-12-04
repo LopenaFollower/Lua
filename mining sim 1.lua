@@ -26,7 +26,8 @@ local tog={
 	egg=false,
 	float=false,
 	ignore=true,
-	esp=false
+	esp=false,
+	tpbls=false
 }
 local cd={
 	mine=true,
@@ -83,6 +84,14 @@ if not workspace:FindFirstChild"platform"then
 	p.Size=Vector3.new(2,0,2)
 	p.Anchored=true
 	p.CFrame=CFrame.new(-114,1.9,272)
+end
+if not workspace:FindFirstChild"sll"then
+	local p=Instance.new"Part"
+	p.Name="sll"
+	p.Parent=workspace
+	p.Size=Vector3.new(2,0,2)
+	p.Anchored=true
+	p.CFrame=CFrame.new(-38,10.9525,22558)
 end
 function highlightedOres()
 	local n,blocks=0,{}
@@ -207,9 +216,11 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				end
 			end
 		end
-		mineArea=nearest.Parent.Name:gsub("SurfaceSpawns","")
-		if mineArea==""then
-			mineArea="Surface"
+		local pn=near.Parent.Name
+		if pn~="SurfaceSpawns"then
+			mineArea=pn:gsub("SurfaceSpawns","").."Spawn"
+		else
+			mineArea="SurfaceSpawn"
 		end
 	end)
 	if tog.anchor and cd.misc and anchorpos then
@@ -255,7 +266,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.mine=false
 		if hrp then
 			if tonumber(spl(screengui.TopInfoFrame.Depth.Text," ")[1])<depth then
-				for _,v in pairs(workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(1,10,1)).Position,(hrp.CFrame+Vector3.new(1,0,1)).Position),{workspace.Blocks},5))do
+				for _,v in pairs(workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(0,15,0)).Position,(hrp.CFrame+Vector3.new(0,2,0)).Position),{workspace.Blocks},1))do
 					if v:IsA"BasePart"and v.Parent then
 						Remote:FireServer("MineBlock",{{v.Parent}})
 						rs:Wait()
@@ -274,7 +285,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 								tog.vel=true
 								oreMining.selling=true
 								while getnum(inventory.Text,1)>=sA do
-									hrp.CFrame=CFrame.new(-38,13.8,22558)
+									hrp.CFrame=CFrame.new(-38,14,22558)
 									Remote:FireServer("SellItems",{{}})
 									rs:Wait()
 								end
@@ -301,7 +312,9 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				for _,v in pairs(parts2)do
 					if v:IsA"BasePart"and v.Parent then
 						if ignore[v.Parent.Name]~="ye"or not tog.ignore then
-							v.CFrame=hrp.CFrame-Vector3.new(0,3.1+v.Size.y/2,0)
+							if tog.tpbls then
+								v.CFrame=hrp.CFrame-Vector3.new(0,3.1+v.Size.y/2,0)
+							end
 							Remote:FireServer("MineBlock",{{v.Parent}})
 							rs:Wait()
 							nlb=true
@@ -326,7 +339,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 								tog.vel=true
 								oreMining.selling=true
 								while getnum(inventory.Text,1)>=sA do
-									hrp.CFrame=CFrame.new(-38,13.8,22558)
+									hrp.CFrame=CFrame.new(-38,14,22558)
 									Remote:FireServer("SellItems",{{}})
 									rs:Wait()
 								end
@@ -375,18 +388,23 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	if mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x>=0.995 and cd.collapse then
 		cd.collapse=false
 		notif("collapse alert",tostring(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x),15)
-		collapsed=true
-		repeat wait()until math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3<75
-		wait(.3)
+		repeat
+			wait()
+			collapsed=true
+		until math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3<75
 		Remote:FireServer("MoveTo",{{mineArea}})
+		notif(mineArea)
 		lowestY=17
 		lowestSavedY=10
+		wait(.3)
 		collapsed=false
 		cd.collapse=true
 	end
 	if tog.float then
 		pform.CanCollide=true
 		pform.CFrame=hrp.CFrame-Vector3.new(0,3.12451,0)
+	else
+		pform.CanCollide=false
 	end
 	if oreMining.tog and tog.esp and oreMining.status==0 and cd.ore and not oreMining.selling then
 		cd.ore=false
@@ -418,8 +436,8 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				Remote:FireServer("MineBlock",{{block.Parent}})
 				rs:Wait()
 				tweenTo(hrp,.01,block.CFrame)
-				pform.CanCollide=true
-				pform.CFrame=hrp.CFrame-Vector3.new(0,3.12451,0)
+				tog.float=true
+				saved["float"]:setStatus(true)
 			until#workspace:FindPartsInRegion3WithWhiteList(Region3.new(hrp.Position,hrp.Position),{workspace.Blocks},10)<1 or not oreMining.tog
 			c,bls=highlightedOres()
 		end
@@ -429,7 +447,8 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			wait(.5)
 		end
 		if f then
-			pform.CanCollide=false
+			tog.float=false
+			saved["float"]:setStatus(false)
 		end
 		tog.anchor=anc
 		tog.mine=mining
@@ -476,7 +495,7 @@ local UI=GUI:CreateWindow("Miners","...")
 local Main=UI:addPage("Main",3,true,1)
 local Anchor=UI:addPage("Anchor",3,false,1)
 local Pets=UI:addPage("Pet Farm",3,false,1)
-local Ores=UI:addPage("Ore ESP",18.5,false,1)
+local Ores=UI:addPage("Ore ESP",18.6,false,1)
 local Settings=UI:addPage("Settings",3,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
 local Test=UI:addPage("Testing",2,false,1)
@@ -487,6 +506,9 @@ Main:addDropdown("Farm Area",locs,#locs*.25,function(v)
 end)
 saved["mine"]=Main:addToggle("Auto Mine",tog.mine,function(v)
 	tog.mine=v
+end)
+Main:addToggle("TP Blocks",tog.tpbls,function(v)
+	tog.tpbls=v
 end)
 Main:addTextBox("Depth",depth,function(v)
 	if type(tonumber(v))=="number"and tonumber(v)>=1 and tonumber(v)<=5e3 then
@@ -529,7 +551,7 @@ Anchor:addButton("Set Anchor",function()
 	end
 	lowestY=hrp.CFrame.y
 end)
-Anchor:addToggle("Float",tog.float,function(v)
+saved["float"]=Anchor:addToggle("Float",tog.float,function(v)
 	tog.float=v
 end)
 Pets:addToggle("Farm Omega Egg",tog.egg,function(v)
@@ -548,7 +570,7 @@ Ores:addTextBox("IDs","",function(v)
 	end
 	for _,m in pairs(workspace.Blocks:GetChildren())do
 		local v=m:FindFirstChild"Part"or m:FindFirstChild"ColorPart"or m:FindFirstChild"Root"
-		if oreEsp[m.Name]then
+		if tog.esp and oreEsp[m.Name]then
 			esp(v)
 		end
 	end
@@ -575,7 +597,7 @@ end)
 Ores:addLabel("~ ~ ~ IDs ~ ~ ~")
 for i,v in pairs(oreIdList)do
 	Ores:addLabel(v,i)
-	wait(.01)
+	wait()
 end
 saved["mRadX"]=Settings:addSlider("Mine Radius X",2,10,function(v)
 	mineRange.x=tonumber(v)
@@ -638,6 +660,5 @@ cd.MouseClick:Connect(function()
 	hrp.CFrame=hrp.CFrame-Vector3.new(0,10,0)
 end)
 --[[
-add tp blocks toggle
 improve auto ore
 ]]
