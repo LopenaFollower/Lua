@@ -452,6 +452,8 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		end
 		tog.anchor=anc
 		tog.mine=mining
+		saved["anchor"]:setStatus(anc)
+		saved["mine"]:setStatus(mining)
 		wait(.5)
 		cd.ore=true
 	end
@@ -660,5 +662,5 @@ cd.MouseClick:Connect(function()
 	hrp.CFrame=hrp.CFrame-Vector3.new(0,10,0)
 end)
 --[[
-improve auto ore
+improve auto ore 
 ]]
