@@ -158,7 +158,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=304
+local Version=305
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -254,7 +254,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 	Yep.BackgroundTransparency=1
 	Yep.BorderColor3=Color3.fromRGB(20,20,20)
 	Yep.BorderSizePixel=0
-	Yep.Position=UDim2.new(.88499999,0,.0495263338,0)
+	Yep.Position=UDim2.new(.885,0,.0495263338,0)
 	Yep.Size=UDim2.new(0,38,0,22)
 	Yep.AutoButtonColor=false
 	Yep.Font=Enum.Font.SourceSans
@@ -343,7 +343,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 		Tab.Parent=TabContainer
 		Tab.BackgroundColor3=Color3.fromRGB(15,15,15)
 		Tab.BorderColor3=Color3.fromRGB(15,15,15)
-		Tab.Position=UDim2.new(-.0250000004,0,0,0)
+		Tab.Position=UDim2.new(-.025,0,0,0)
 		Tab.Size=UDim2.new(0,106,0,26)
 		Tab.AutoButtonColor=false
 		Tab.Font=Enum.Font.GothamSemibold
@@ -552,14 +552,14 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			ToggleFrame.Parent=ToggleButton
 			ToggleFrame.BackgroundColor3=Color3.fromRGB(5,5,5)
 			ToggleFrame.BorderColor3=Color3.fromRGB(5,5,5)
-			ToggleFrame.Position=UDim2.new(.27192983,0,.119999997,0)
+			ToggleFrame.Position=UDim2.new(.27192983,0,.12,0)
 			ToggleFrame.Size=UDim2.new(0,34,0,19)
 			ToggleFrameCorner.Name="ToggleFrameCorner"
 			ToggleFrameCorner.Parent=ToggleFrame
 			ToggleBall.Name="ToggleBall"
 			ToggleBall.Parent=ToggleFrame
 			ToggleBall.BackgroundColor3=Color3.fromRGB(255,255,255)
-			ToggleBall.Position=UDim2.new(.123000003,0,.158000007,0)
+			ToggleBall.Position=UDim2.new(.123,0,.158,0)
 			ToggleBall.Size=UDim2.new(0,14,0,12)
 			ToggleBallCorner.CornerRadius=UDim.new(0,100)
 			ToggleBallCorner.Name="ToggleBallCorner"
@@ -662,7 +662,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			SliderNumber.BackgroundTransparency=1
 			SliderNumber.BorderColor3=Color3.fromRGB(17,17,17)
 			SliderNumber.BorderSizePixel=0
-			SliderNumber.Position=UDim2.new(.88499999,0,.192000002,1)
+			SliderNumber.Position=UDim2.new(.885,0,.192,1)
 			SliderNumber.Size=UDim2.new(0,33,0,6)
 			SliderNumber.Font=Enum.Font.GothamSemibold
 			SliderNumber.Text=minvalue or 0
