@@ -1,5 +1,5 @@
 if game.PlaceId~=1417427737 then return else repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild"leaderstats"and pcall(function() game.Players.LocalPlayer.leaderstats:WaitForChild"Blocks Mined"end)and pcall(function()game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Coins:FindFirstChild"Amount"end)and game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Tokens.Amount.Text~="Loading..."end
-local ver=109
+local ver=110
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr.Humanoid
@@ -389,7 +389,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			chr:TranslateBy(hum.MoveDirection)
 		end
 	end
-	if mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x>=0.995 and cd.collapse then
+	if mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x>=0.9975 and cd.collapse then
 		cd.collapse=false
 		notif("collapse alert",tostring(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x),15)
 		repeat
