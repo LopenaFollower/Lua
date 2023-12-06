@@ -216,7 +216,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		else
 			mineArea="SurfaceSpawn"
 		end
-		screenGui.MainButtons.Surface.Visible=false
+		screengui.MainButtons.Surface.Visible=false
 	end)
 	if tog.anchor and cd.misc and anchorpos then
 		cd.misc=false
