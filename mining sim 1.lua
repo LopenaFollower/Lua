@@ -1,5 +1,5 @@
 if game.PlaceId~=1417427737 then return else repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild"leaderstats"and pcall(function() game.Players.LocalPlayer.leaderstats:WaitForChild"Blocks Mined"end)and pcall(function()game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Coins:FindFirstChild"Amount"end)and game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Tokens.Amount.Text~="Loading..."end
-local ver=116
+local ver=117
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr.Humanoid
@@ -226,12 +226,10 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				rubberbands=rubberbands+1
 			end
 			noVelocity()
-			tweenTo(hrp,.45,CFrame.new(hrp.Position.x,lowestY,hrp.Position.z))
-			lowestY=lowestY+10
+			tweenTo(hrp,.45,CFrame.new(hrp.Position.x,lowestY+10,hrp.Position.z))
 		end
 		if not collapsed and not tog.vel and(hrp.Position-Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)).magnitude>3 then--prevent wandering off
-			tweenTo(hrp,.45,CFrame.new(anchorpos.x,lowestY,anchorpos.z))
-			lowestY=lowestY+10
+			tweenTo(hrp,.45,CFrame.new(anchorpos.x,lowestY+10,anchorpos.z))
 			if cd.rb and not oreMining.tog then
 				rubberbands=rubberbands+1
 			end
