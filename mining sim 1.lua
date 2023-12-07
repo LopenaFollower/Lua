@@ -1,5 +1,5 @@
 if game.PlaceId~=1417427737 then return else repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild"leaderstats"and pcall(function() game.Players.LocalPlayer.leaderstats:WaitForChild"Blocks Mined"end)and pcall(function()game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Coins:FindFirstChild"Amount"end)and game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Tokens.Amount.Text~="Loading..."end
-local ver=113
+local ver=116
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr.Humanoid
@@ -226,10 +226,12 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				rubberbands=rubberbands+1
 			end
 			noVelocity()
-			tweenTo(hrp,.45,CFrame.new(hrp.Position.x,lowestY+5,hrp.Position.z))
+			tweenTo(hrp,.45,CFrame.new(hrp.Position.x,lowestY,hrp.Position.z))
+			lowestY=lowestY+10
 		end
-		if not collapsed and not tog.vel and(hrp.Position-Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)).magnitude>5 then--prevent wandering off
+		if not collapsed and not tog.vel and(hrp.Position-Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)).magnitude>3 then--prevent wandering off
 			tweenTo(hrp,.45,CFrame.new(anchorpos.x,lowestY,anchorpos.z))
+			lowestY=lowestY+10
 			if cd.rb and not oreMining.tog then
 				rubberbands=rubberbands+1
 			end
@@ -264,7 +266,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		cd.mine=false
 		if hrp then
 			if not anchorpos then
-				for _,v in pairs(workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(0,5,0)).Position,hrp.Position),{workspace.Blocks},15))do
+				for _,v in pairs(workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(0,3.2,0)).Position,hrp.Position),{workspace.Blocks},1))do
 					if v:IsA"BasePart"and v.Parent then
 						anchorpos={x=v.Position.x,z=v.Position.z}
 					end
@@ -284,7 +286,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 						if MAX~=nil then mx=MAX end
 						if am>=mx then
 							if chr and hrp then
-								local sL=hrp.Position
+								local sL=Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)
 								local sA=getnum(inventory.Text,1)
 								recordDepth(sL)
 								tog.vel=true
@@ -324,6 +326,11 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 							rs:Wait()
 							nlb=true
 							oreMining.selling=false
+							if tog.sell then
+								local am,mx=gI()
+								if MAX~=nil then mx=MAX end
+								if am>=mx then break end
+							end
 						end
 					end
 				end
@@ -338,7 +345,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 						if MAX~=nil then mx=MAX end
 						if am>=mx then
 							if chr and hrp then
-								local sL=hrp.Position
+								local sL=Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)
 								local sA=getnum(inventory.Text,1)
 								recordDepth(sL)
 								tog.vel=true
