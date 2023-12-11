@@ -1,5 +1,5 @@
 if game.PlaceId~=1417427737 then return else repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild"leaderstats"and pcall(function() game.Players.LocalPlayer.leaderstats:WaitForChild"Blocks Mined"end)and pcall(function()game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Coins:FindFirstChild"Amount"end)and game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Tokens.Amount.Text~="Loading..."end
-local ver=128
+local ver=133
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr.Humanoid
@@ -21,7 +21,7 @@ local tog={
 	float=false,
 	ignore=true,
 	esp=false,
-	clrbls=false
+	clrbls=true
 }
 local cd={
 	mine=true,
@@ -36,6 +36,7 @@ local cd={
 }
 local depth=200
 local mineArea="LavaSpawn"
+local gotoArea=""
 local mineRange={x=5,y=5}
 local lowestSavedY=15
 local lowestY=15
@@ -117,14 +118,14 @@ function spl(s,d)
 end
 function getnum(str,i)
 	str=(str:gsub("%s+","")):gsub(",","")
-	return tonumber(str:split("/")[i])
+	return tonumber(str:split"/"[i])
 end
 function gC()
-	return tonumber(plr.leaderstats.Coins.value:gsub(",",""):split(" ")[1])
+	return tonumber(plr.leaderstats.Coins.value:gsub(",",""):split" "[1])
 end
 function gI()
 	local Amount=(inventory.Text:gsub("%s+","")):gsub(",","")
-	local stringTable=Amount:split("/")
+	local stringTable=Amount:split"/"
 	local mx=tonumber(stringTable[2])
 	if MAX~=nil then mx=MAX end
 	return tonumber(stringTable[1]),mx
@@ -153,9 +154,9 @@ function esp(v)
 		a.Adornee=v
 		a.AlwaysOnTop=true
 		a.ZIndex=0
-		a.Size=v.Size*Vector3.new(.7,.7,.7)
+		a.Size=v.Size/Vector3.new(2,2,2)
 		a.Transparency=.25
-		a.Color=BrickColor.new("White")
+		a.Color=BrickColor.new"White"
 	end
 end
 function sellFunction()
@@ -181,7 +182,7 @@ function sellFunction()
 				while(hrp.Position-sL).magnitude>1 do
 					hrp.CFrame=CFrame.new(sL.x,sL.y,sL.z)
 					rs:Wait()
-					if os.time()-st>3.5 then break end
+					if os.time()-st>3 then break end
 				end
 				hrp.Anchored=false
 				tog.vel=false
@@ -207,19 +208,16 @@ function mineFunction()
 				recordDepth(hrp.Position,true)
 				workspace.Gravity=500
 			end
-			sellFunction()
 		end
 		workspace.Gravity=oldgrav
 	else
+		local r=25
 		local l1=workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(mineRange.x,mineRange.y,mineRange.x)).Position,(hrp.CFrame+Vector3.new(mineRange.x,mineRange.y,mineRange.x)).Position),{workspace.Blocks},100)
-		local l2=workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(10,1,10)).Position,(hrp.CFrame+Vector3.new(10,7,10)).Position),{workspace.Blocks},100)
-		if tog.ignore then
-			l2={}
-			for _,v in pairs(workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(10,1,10)).Position,(hrp.CFrame+Vector3.new(10,7,10)).Position),{workspace.Blocks},100))do
-				if v:IsA"BasePart"and v.Parent then
-					if ignore[v.Parent.Name]~="ye"then
-						table.insert(l2,v)
-					end
+		local l2={}
+		for _,v in pairs(workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(r,1,r)).Position,(hrp.CFrame+Vector3.new(r,r,r)).Position),{workspace.Blocks},150))do
+			if v:IsA"BasePart"and v.Parent and(v.Position-hrp.Position).magnitude<=20 then
+				if ignore[v.Parent.Name]~="ye"or not tog.ignore then
+					table.insert(l2,v)
 				end
 			end
 		end
@@ -264,6 +262,9 @@ function nearest(list,type)
 	end
 	return r
 end
+function moveTo(n)
+	hrp.CFrame=workspace.TeleportPoints[n].CFrame
+end
 local rubberbands=0
 binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
@@ -299,10 +300,12 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				end
 			end
 		end
-		local pn=near.Parent.Name
-		if pn~="SurfaceSpawns"then
-			mineArea=pn:gsub("SurfaceSpawns","").."Spawn"
+		local pn=near.Parent.Name:gsub("SurfaceSpawns","")
+		if pn~=""then
+			gotoArea=pn.."Sell"
+			mineArea=pn.."Spawn"
 		else
+			gotoArea="SellSpawn"
 			mineArea="SurfaceSpawn"
 		end
 		screengui.MainButtons.Surface.Visible=false
@@ -312,32 +315,26 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		tmp=hrp.Position
 		if hrp.CFrame.y<lowestY-1000 then
 			if not collapsed and cd.rb and not oreMining.tog then
-				rubberbands=rubberbands+1
+				rubberbands=rubberbands+5
 			end
 			noVelocity()
-			tweenTo(hrp,.45,CFrame.new(hrp.Position.x,lowestY+10,hrp.Position.z))
+			tweenTo(hrp,.45,CFrame.new(hrp.Position.x,lowestY+2.5,hrp.Position.z))
 		end
-		if not collapsed and not tog.vel and(hrp.Position-Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)).magnitude>3 then--prevent wandering off
-			tweenTo(hrp,.45,CFrame.new(anchorpos.x,lowestY+10,anchorpos.z))
+		if not collapsed and not tog.vel and(hrp.Position-Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)).magnitude>1 then--prevent wandering off
+			tweenTo(hrp,.45,CFrame.new(anchorpos.x,lowestY+2.5,anchorpos.z))
 			if cd.rb and not oreMining.tog then
 				rubberbands=rubberbands+1
 			end
 		end
-		if rubberbands>25 then
+		if rubberbands>10 then
 			rubberbands=0
-			tog.anchor=false
 			cd.rb=false
-			hrp.Anchored=true
-			wait(.3)
-			Remote:FireServer("MoveTo",{{mineArea}})
-			wait(.1)
-			Remote:FireServer("MoveTo",{{mineArea}})
-			wait(.3)
-			tweenTo(hrp,2.5,CFrame.new(anchorpos.x,15,anchorpos.z))
-			wait(2.5)
+			wait(5)
+			moveTo(gotoArea)
+			wait(1)
+			tweenTo(hrp,5,CFrame.new(anchorpos.x,12,anchorpos.z))
+			wait(5)
 			tweenTo(hrp,.1,CFrame.new(anchorpos.x,lowestY,anchorpos.z))
-			hrp.Anchored=false
-			tog.anchor=true
 			task.spawn(function()
 				wait(1)
 				cd.rb=true
@@ -391,13 +388,13 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		repeat
 			noVelocity()
 			wait(.01)
-		until math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3<95
-		Remote:FireServer("MoveTo",{{mineArea}})
+		until math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3<90
+		moveTo(gotoArea)
 		lowestY=17
 		lowestSavedY=10
 		wait(.3)
-		tweenTo(hrp,1,CFrame.new(anchorpos.x,lowestY,anchorpos.z))
-		wait(1)
+		tweenTo(hrp,10,CFrame.new(anchorpos.x,12,anchorpos.z))
+		wait(10)
 		collapsed=false
 		cd.collapse=true
 	end
@@ -441,12 +438,18 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				tog.float=true
 				saved["float"]:setStatus(true)
 			until#workspace:FindPartsInRegion3WithWhiteList(Region3.new(hrp.Position,hrp.Position),{workspace.Blocks},5)<1 or not oreMining.tog
+			for _,v in pairs(bls)do
+				if(v.Position-hrp.Position).magnitude<20 then
+					Remote:FireServer("MineBlock",{{v.Parent}})
+					wait()
+				end
+			end
 			c,bls=highlightedOres()
 		end
 		oreMining.status=true
 		if anc and f and anchorpos then
 			tweenTo(hrp,.45,CFrame.new(anchorpos.x,lowestY,anchorpos.z))
-			wait(.5)
+			wait(.45)
 		end
 		tog.float=flt
 		tog.anchor=anc
@@ -454,11 +457,11 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		saved["float"]:setStatus(flt)
 		saved["anchor"]:setStatus(anc)
 		saved["mine"]:setStatus(mining)
-		wait(.5)
+		wait(.1)
 		cd.ore=true
 	end
 end)
-binds.hatch=screengui.ChildAdded:Connect(function(v)
+binds.gui=screengui.ChildAdded:Connect(function(v)
 	if v.Name=="HatchedInfo"or v.Name=="BenefitNotif"or v.Name=="CrateSystem"or v.Name=="CollapsedCave"then
 		v.Visible=false
 		wait()
@@ -521,7 +524,7 @@ Main:addTextBox("Depth",depth,function(v)
 	if type(tonumber(v))=="number"and tonumber(v)>=1 and tonumber(v)<=5e3 then
 		depth=tonumber(v)
 	else
-		notif("invalid")
+		notif"invalid"
 	end
 end)
 Main:addToggle("Ignore Common Blocks",tog.ignore,function(v)
@@ -554,7 +557,7 @@ Anchor:addButton("Set Anchor",function()
 		end
 	end
 	if f then
-		notif("no anchor point found")
+		notif"no anchor point found"
 	end
 	lowestY=hrp.CFrame.y
 end)
@@ -625,20 +628,20 @@ Settings:addTextBox("Crate(Buy/Open) Cooldown",cd.crwt,function(v)
 	if tonumber(v)>=0 and tonumber(v)<=5 then
 		cd.crwt=tonumber(v)
 	else
-		notif("invalid")
+		notif"invalid"
 	end
 end)
 Settings:addTextBox("Crate Count",1,function(v)
 	if tonumber(v)>0 and tonumber(v)<=1e3 then
 		crateAmount=tonumber(v)
 	else
-		notif("invalid")
+		notif"invalid"
 	end
 end)
 Local:addButton("Rejoin",function()
-	plr:Kick("\nRejoining...")
+	plr:Kick"\nRejoining..."
 	wait()
-	game:GetService"TeleportService":Teleport(1417427737,plr)
+	game:GetService"TeleportService":Teleport(game.PlaceId,plr)
 end)
 Local:addToggle("Inf Jump",tog.infj,function(v)
 	tog.infj=v
@@ -662,6 +665,7 @@ Local:destroyGui(function()
 		end
 	end
 	pform:Destroy()
+	screengui.MainButtons.Surface.Visible=true
 end)
 notif("Mining Simulator","By 0x3b5",5)
 plr.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
@@ -671,5 +675,6 @@ cd.MouseClick:Connect(function()
 	hrp.CFrame=hrp.CFrame-Vector3.new(0,10,0)
 end)
 --[[
-fix digging down while blocks nearby
+50,14,9,125,30,92
+improve mining radius
 ]]
