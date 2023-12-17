@@ -1,4 +1,4 @@
-	if game.PlaceId~=1537690962 then
+if game.PlaceId~=1537690962 then
 	return
 end
 repeat
@@ -1239,7 +1239,7 @@ binds.ptcl=workspace.Particles.ChildAdded:Connect(function(v)
 		end
 	end
 end)
-binds.loop=game.RunService.Heartbeat:Connect(function()
+binds.loop=game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=game.Players.LocalPlayer.Character
