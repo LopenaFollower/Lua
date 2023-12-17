@@ -1,12 +1,12 @@
-if game.PlaceId~=1417427737 then return else repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild"leaderstats"and pcall(function() game.Players.LocalPlayer.leaderstats:WaitForChild"Blocks Mined"end)and pcall(function()game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Coins:FindFirstChild"Amount"end)and game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Tokens.Amount.Text~="Loading..."end
-local ver=133
+if game.PlaceId~=1417427737 then return else repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild"leaderstats"and pcall(function()game.Players.LocalPlayer.leaderstats:WaitForChild"Blocks Mined"end)and pcall(function()game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Coins:FindFirstChild"Amount"end)and game.Players.LocalPlayer.PlayerGui.ScreenGui.StatsFrame.Tokens.Amount.Text~="Loading..."end
+local ver=138
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr.Humanoid
 local hrp=chr.HumanoidRootPart
 local oldgrav=workspace.Gravity
 local mp,holder,anchorpos,pform,testing
-local MAX=7.5e4
+local MAX=6.5e4
 local tog={
 	mine=true,
 	sell=true,
@@ -19,7 +19,7 @@ local tog={
 	tpw=true,
 	egg=false,
 	float=false,
-	ignore=true,
+	ignore=false,
 	esp=false,
 	clrbls=true
 }
@@ -30,12 +30,12 @@ local cd={
 	crwt=1,
 	vel=true,
 	misc=true,
-	collapse=true,
+	rebirth=true,
 	rb=true,
 	ore=true
 }
-local depth=200
-local mineArea="LavaSpawn"
+local depth=70
+local mineArea=""
 local gotoArea=""
 local mineRange={x=5,y=5}
 local lowestSavedY=15
@@ -179,7 +179,7 @@ function sellFunction()
 				end
 				hrp.Anchored=true
 				local st=os.time()
-				while(hrp.Position-sL).magnitude>1 do
+				while(hrp.Position-sL).magnitude>1 and not collapsed do
 					hrp.CFrame=CFrame.new(sL.x,sL.y,sL.z)
 					rs:Wait()
 					if os.time()-st>3 then break end
@@ -187,6 +187,10 @@ function sellFunction()
 				hrp.Anchored=false
 				tog.vel=false
 				oreMining.selling=false
+				if tog.rebirth and gC()-1e6*(plr.leaderstats.Rebirths.value+1)>0 then
+					wait(.025)
+					Remote:FireServer("Rebirth",{{}})
+				end
 			end
 		end
 	end
@@ -206,12 +210,12 @@ function mineFunction()
 				Remote:FireServer("MineBlock",{{v.Parent}})
 				rs:Wait()
 				recordDepth(hrp.Position,true)
-				workspace.Gravity=500
+				workspace.Gravity=5000
 			end
 		end
 		workspace.Gravity=oldgrav
 	else
-		local r=25
+		local r=22
 		local l1=workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(mineRange.x,mineRange.y,mineRange.x)).Position,(hrp.CFrame+Vector3.new(mineRange.x,mineRange.y,mineRange.x)).Position),{workspace.Blocks},100)
 		local l2={}
 		for _,v in pairs(workspace:FindPartsInRegion3WithWhiteList(Region3.new((hrp.CFrame-Vector3.new(r,1,r)).Position,(hrp.CFrame+Vector3.new(r,r,r)).Position),{workspace.Blocks},150))do
@@ -310,17 +314,37 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		end
 		screengui.MainButtons.Surface.Visible=false
 	end)
+	if tog.rebirth and gC()-1e6*(plr.leaderstats.Rebirths.value+1)>0 and cd.rebirth then
+		cd.rebirth=false
+		Remote:FireServer("Rebirth",{{}})
+		Remote:FireServer("GroupBenefit",{{}})
+		wait(.2)
+		cd.rebirth=true
+	end
 	if tog.anchor and cd.misc and anchorpos then
 		cd.misc=false
 		tmp=hrp.Position
-		if hrp.CFrame.y<lowestY-1000 then
-			if not collapsed and cd.rb and not oreMining.tog then
+		if not collapsed and hrp.CFrame.y<lowestY-500 then
+			if cd.rb and not oreMining.tog then
 				rubberbands=rubberbands+5
 			end
 			noVelocity()
-			tweenTo(hrp,.45,CFrame.new(hrp.Position.x,lowestY+2.5,hrp.Position.z))
+			if #workspace:FindPartsInRegion3WithWhiteList(Region3.new(Vector3.new(anchorpos.x,tmp.y,anchorpos.z),Vector3.new(anchorpos.x,lowestY+30,anchorpos.z)),{workspace.Blocks},5)<1 then
+				print"none found"
+				lowestY=15
+				lowestSavedY=15
+				tweenTo(hrp,.1,CFrame.new(anchorpos.x,lowestY,anchorpos.z))
+				while(hrp.Position-Vector3.new(anchorpos.x,hrp.CFrame.y,anchorpos.z)).magnitude>1 do
+					chr:TranslateBy((Vector3.new(anchorpos.x,hrp.CFrame.y,anchorpos.z)-hrp.Position)*.05)
+					wait()
+				end
+				wait(1)
+			else
+				tweenTo(hrp,.45,CFrame.new(hrp.Position.x,lowestY+2.5,hrp.Position.z))
+			end
 		end
 		if not collapsed and not tog.vel and(hrp.Position-Vector3.new(anchorpos.x,hrp.Position.y,anchorpos.z)).magnitude>1 then--prevent wandering off
+			noVelocity()
 			tweenTo(hrp,.45,CFrame.new(anchorpos.x,lowestY+2.5,anchorpos.z))
 			if cd.rb and not oreMining.tog then
 				rubberbands=rubberbands+1
@@ -359,10 +383,6 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		rs:Wait()
 		cd.mine=true
 	end
-	if tog.rebirth and gC()-1e6*(plr.leaderstats.Rebirths.value+1)>0 then
-		Remote:FireServer("Rebirth",{{}})
-		Remote:FireServer("GroupBenefit",{{}})
-	end
 	if tog.opcrt and cd.crate1 then
 		cd.crate1=false
 		Remote:FireServer("SpinCrate",{{crateType}})
@@ -381,22 +401,6 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		else
 			chr:TranslateBy(hum.MoveDirection)
 		end
-	end
-	if collapsed and cd.collapse then
-		cd.collapse=false
-		notif("collapse alert",tostring(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x),15)
-		repeat
-			noVelocity()
-			wait(.01)
-		until math.round(mp.Progress.AbsoluteSize.x/mp.Decore.AbsoluteSize.x*1e5)/1e3<90
-		moveTo(gotoArea)
-		lowestY=17
-		lowestSavedY=10
-		wait(.3)
-		tweenTo(hrp,10,CFrame.new(anchorpos.x,12,anchorpos.z))
-		wait(10)
-		collapsed=false
-		cd.collapse=true
 	end
 	if tog.float then
 		pform.CanCollide=true
@@ -439,7 +443,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				saved["float"]:setStatus(true)
 			until#workspace:FindPartsInRegion3WithWhiteList(Region3.new(hrp.Position,hrp.Position),{workspace.Blocks},5)<1 or not oreMining.tog
 			for _,v in pairs(bls)do
-				if(v.Position-hrp.Position).magnitude<20 then
+				if(v.Position-hrp.Position).magnitude<=20 then
 					Remote:FireServer("MineBlock",{{v.Parent}})
 					wait()
 				end
@@ -462,27 +466,39 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	end
 end)
 binds.gui=screengui.ChildAdded:Connect(function(v)
+	if v.Name=="HatchedInfo"and tog.egg then
+		task.spawn(function()
+			wait(.4)
+			local did=false
+			while not did do
+				if holder and holder:FindFirstChild"Pet"and holder.Pet:FindFirstChild"Root"then
+					if not holder.Pet.Root:FindFirstChild"ProgressBar"then
+						Remote:FireServer("equipPet",{{{"Omega Egg","Omega Egg",0}}})
+						wait(.1)
+					else
+						did=true
+					end
+				end
+			end
+		end)
+	end
+	if v.Name=="CollapsedCave"then
+		collapsed=true
+		lowestY=15
+		lowestSavedY=15
+		notif("collapsed",15)
+		wait(3)
+		while(hrp.Position-Vector3.new(anchorpos.x,hrp.CFrame.y,anchorpos.z)).magnitude>1 do
+			chr:TranslateBy((Vector3.new(anchorpos.x,hrp.CFrame.y,anchorpos.z)-hrp.Position)*.05)
+			wait()
+		end
+		wait(1)
+		collapsed=false
+	end
 	if v.Name=="HatchedInfo"or v.Name=="BenefitNotif"or v.Name=="CrateSystem"or v.Name=="CollapsedCave"then
 		v.Visible=false
 		wait()
 		v:Destroy()
-	end
-	if v.Name=="HatchedInfo"and tog.egg then
-		wait(.4)
-		local did=false
-		while not did do
-			if holder and holder:FindFirstChild"Pet"and holder.Pet:FindFirstChild"Root"then
-				if not holder.Pet.Root:FindFirstChild"ProgressBar"then
-					Remote:FireServer("equipPet",{{{"Omega Egg","Omega Egg",0}}})
-					wait(.1)
-				else
-					did=true
-				end
-			end
-		end
-	end
-	if v.Name=="CollapsedCave"then
-		collapsed=true
 	end
 end)
 binds.bls=workspace.Blocks.ChildAdded:Connect(function(m)
@@ -503,8 +519,8 @@ local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollow
 local UI=GUI:CreateWindow("Miners",ver)
 local Main=UI:addPage("Main",3,true,1)
 local Anchor=UI:addPage("Anchor",3,false,1)
-local Pets=UI:addPage("Pet Farm",3,false,1)
-local Ores=UI:addPage("Ore ESP",18.6,false,1)
+local Pets=UI:addPage("Egg Farming",3,false,1)
+local Ores=UI:addPage("Ores",18.6,false,1)
 local Settings=UI:addPage("Settings",3,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
 local Test=UI:addPage("Testing",2,false,1)
@@ -521,7 +537,7 @@ Main:addToggle("Clear Nearby Blocks",tog.clrbls,function(v)
 	tog.clrbls=v
 end)
 Main:addTextBox("Depth",depth,function(v)
-	if type(tonumber(v))=="number"and tonumber(v)>=1 and tonumber(v)<=5e3 then
+	if type(tonumber(v))=="number"and tonumber(v)>=1 and tonumber(v)<=500 then
 		depth=tonumber(v)
 	else
 		notif"invalid"
@@ -667,7 +683,7 @@ Local:destroyGui(function()
 	pform:Destroy()
 	screengui.MainButtons.Surface.Visible=true
 end)
-notif("Mining Simulator","By 0x3b5",5)
+notif("Mining Simulator v."..ver,"By 0x3b5",5)
 plr.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
 repeat wait()until pform
 local cd=Instance.new("ClickDetector",pform)
@@ -676,5 +692,4 @@ cd.MouseClick:Connect(function()
 end)
 --[[
 50,14,9,125,30,92
-improve mining radius
 ]]
