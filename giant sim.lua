@@ -96,12 +96,10 @@ function press(button,enable)
 	for _,v in pairs(getconnections(button.Activated))do
 		if enable then v:Enable()end
 		v:Fire()
-		if enable then v:Disable()end
 	end
 	for _,v in pairs(getconnections(button.MouseButton1Down))do
 		if enable then v:Enable()end
 		v:Fire()
-		if enable then v:Disable()end
 	end
 end
 function findDescendant(p,n,t)
@@ -171,15 +169,6 @@ binds.main=RunService.Heartbeat:Connect(function()
 			end
 		end
 		wpnInventory=plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.WpnInvDataFrame.WpnSelectionPanel.WpnSelectionFrame
-		for _,v in pairs(wpnInventory:GetChildren())do
-			if v.EqpBrdr.Visible then
-				if v.ImageColor3.g>.9 then
-					vals.weapons.main=v
-				else
-					vals.weapons.offh=v
-				end
-			end
-		end
 		hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown,false)
 		hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,false)
 	end)
@@ -189,73 +178,7 @@ binds.main=RunService.Heartbeat:Connect(function()
 		wait()
 		cd.swing=true
 	end
-	if not tog.dungeon then
-		if tog.orbs and cd.orbs and vacant then
-			vacant=false
-			cd.orbs=false
-			local orbs={}
-			for _,v in pairs(orbsP:GetChildren())do
-				local pr=v:FindFirstChild"Prefab"
-				if pr then
-					table.insert(orbs,pr)
-				end
-			end
-			local c=#orbs
-			if c<1 then c=1 end
-			local orb=orbs[math.random(1,c)]
-			if orb then
-				hrp.CFrame=orb.Parent.CFrame
-			end
-			wait(.25)
-			vacant=true
-			cd.orbs=true
-		end
-		if tog.meteor and vacant then
-			vacant=false
-			cd.meteor=false
-			local meteor=workspace.Meteors:FindFirstChild"Meteor"
-			if meteor and(hrp.Position-meteor.Position).magnitude>20 and meteor.Health.value>0 then
-				hrp.CFrame=meteor.CFrame
-			end
-			wait(.1)
-			vacant=true
-			cd.meteor=true
-		end
-		if tog.event and cd.event and vacant then
-			vacant=false
-			cd.event=false
-			local trg={}
-			for _,v in pairs(workspace.Ephemeral.AdvCrate:GetChildren())do
-				local pr=v.TechBox:FindFirstChild"SnowMan"
-				if pr.Transparency==0 then
-					table.insert(trg,pr.Parent)
-				end
-			end
-			local snm=nearest(trg)
-			if snm then
-				if(hrp.Position-snm.Position).magnitude>5 then
-					hrp.CFrame=snm.CFrame
-				end
-			end
-			wait(.25)
-			vacant=true
-			cd.event=true
-		end
-		if tog.farmboss and vacant then
-			vacant=false
-			local boss=getboss()
-			local bossold=boss
-			while boss==bossold and boss~=nil and tog.farmboss do
-				hrp.CFrame=boss.CFrame
-				vacant=false
-				wait(.025)
-				noVelocity()
-				boss=getboss()
-			end
-			wait(.1)
-			vacant=true
-		end
-	elseif cd.dungeon then
+	if tog.dungeon and cd.dungeon then
 		cd.dungeon=false
 		while tostring(plr.TeamColor)~="Sea green"and not workspace.DungeonEntrance.Floor.BillboardGui.Closed.Visible do
 			if(hrp.Position-workspace.DungeonEntrance.Darkness.Position).magnitude>5 then
@@ -412,7 +335,9 @@ binds.main=RunService.Heartbeat:Connect(function()
 						while #getRoom().Enemies:GetChildren()>0 do
 							pcall(function()
 								local enems=getRoom().Enemies:GetChildren()
-								swing()
+								if not tog.swing then
+									swing()
+								end
 								hrp.CFrame=getRoot(enems[math.random(1,#enems)]).CFrame
 								noVelocity()
 								task.wait(.1)
@@ -445,15 +370,82 @@ binds.main=RunService.Heartbeat:Connect(function()
 							hrp.CFrame=chosenDoor.CFrame
 							repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
 							pop(vals.dungeon.route)
-							wait(.5)
+							wait(.3)
 							gotoRoom(strPos())
 						end)
+						wait(.25)
 					end
 				end
 			end
 			wait(1)
 		end
 		cd.dungeon=true
+	else
+		if tog.orbs and cd.orbs and vacant then
+			vacant=false
+			cd.orbs=false
+			local orbs={}
+			for _,v in pairs(orbsP:GetChildren())do
+				local pr=v:FindFirstChild"Prefab"
+				if pr then
+					table.insert(orbs,pr)
+				end
+			end
+			local c=#orbs
+			if c<1 then c=1 end
+			local orb=orbs[math.random(1,c)]
+			if orb then
+				hrp.CFrame=orb.Parent.CFrame
+			end
+			wait(.25)
+			vacant=true
+			cd.orbs=true
+		end
+		if tog.meteor and vacant then
+			vacant=false
+			cd.meteor=false
+			local meteor=workspace.Meteors:FindFirstChild"Meteor"
+			if meteor and(hrp.Position-meteor.Position).magnitude>20 and meteor.Health.value>0 then
+				hrp.CFrame=meteor.CFrame
+			end
+			wait(.1)
+			vacant=true
+			cd.meteor=true
+		end
+		if tog.event and cd.event and vacant then
+			vacant=false
+			cd.event=false
+			local trg={}
+			for _,v in pairs(workspace.Ephemeral.AdvCrate:GetChildren())do
+				local pr=v.TechBox:FindFirstChild"SnowMan"
+				if pr.Transparency==0 then
+					table.insert(trg,pr.Parent)
+				end
+			end
+			local snm=nearest(trg)
+			if snm then
+				if(hrp.Position-snm.Position).magnitude>5 then
+					hrp.CFrame=snm.CFrame
+				end
+			end
+			wait(.25)
+			vacant=true
+			cd.event=true
+		end
+		if tog.farmboss and vacant then
+			vacant=false
+			local boss=getboss()
+			local bossold=boss
+			while boss==bossold and boss~=nil and tog.farmboss do
+				hrp.CFrame=boss.CFrame
+				vacant=false
+				wait(.025)
+				noVelocity()
+				boss=getboss()
+			end
+			wait(.1)
+			vacant=true
+		end
 	end
 	if tog.tpwalk and chr and hum then
 		local d=RunService.Heartbeat:Wait()*10
@@ -503,6 +495,17 @@ binds.main=RunService.Heartbeat:Connect(function()
 	end
 	if cd.upgd and(tog.upwpn or tog.upskn)then
 		cd.upgd=false
+		for _,v in pairs(wpnInventory:GetChildren())do
+			pcall(function()
+			if v.EqpBrdr.Visible then
+				if v.EqpBrdr.ImageColor3.g==1 then
+					vals.weapons.main=v
+				else
+					vals.weapons.offh=v
+				end
+			end
+			end)
+		end
 		if tog.upwpn then
 			press(vals.weapons.main.SelectionButton,true)
 			press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.ButtonFrame.SUFrame.MaxButton)
@@ -646,4 +649,4 @@ Local:destroyGui(function()
 	for i,v in pairs(cd)do
 		cd[i]=false
 	end--press multi sell twice
-end)--tombs, weapon upgrade, waypoints, time attack, level threshold for rebirth
+end)--tombs, weapon upgrade, waypoints, time attack, level threshold for rebirth, quests
