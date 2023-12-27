@@ -469,13 +469,20 @@ binds.main=RunService.Heartbeat:Connect(function()
 			vacant=false
 			local boss=getboss()
 			local bossold=boss
+			local i=0
 			while boss==bossold and boss~=nil and tog.farmboss do
 				local inc=0
+				local pcf=hrp.CFrame
+				local bcf=boss.CFrame
 				if boss.Parent.Name=="Gnome"or boss.Parent.Name=="Penguin"then inc=-15 end
-				hrp.CFrame=boss.CFrame*CFrame.new(0,0,math.random(inc,1))
+				hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(inc,1))
+				if i%60==0 then
+					hrp.CFrame=bcf
+					noVelocity()
+				end
+				i=i+1
 				vacant=false
 				wait(.025)
-				noVelocity()
 				boss=getboss()
 			end
 			wait(.1)
