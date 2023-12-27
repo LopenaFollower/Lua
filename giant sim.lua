@@ -697,13 +697,7 @@ Local:addButton("Rejoin",function()
 	game:GetService"TeleportService":Teleport(game.placeId,plr)
 end)
 Local:destroyGui(function()
-	for _,v in pairs(binds)do
-		v:Disconnect()
-	end
-	for i,v in pairs(tog)do
-		tog[i]=false
-	end
-	for i,v in pairs(cd)do
-		cd[i]=false
-	end--
-end)--tombs, weapon upgrade, waypoints, time attack, level threshold for rebirth, quests
+	for _,v in pairs(binds)do v:Disconnect()end
+	for i,v in pairs(tog)do tog[i]=false end
+	for i,v in pairs(cd)do cd[i]=false end
+end)--waypoints, time attack, quests
