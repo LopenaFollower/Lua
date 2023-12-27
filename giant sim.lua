@@ -476,9 +476,10 @@ binds.main=RunService.Heartbeat:Connect(function()
 				local bcf=boss.CFrame
 				if boss.Parent.Name=="Gnome"or boss.Parent.Name=="Penguin"then inc=-15 end
 				hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(inc,1))
-				if i%60==0 then
+				if i>60 or(hrp.Position-boss.Position).magnitude>25 then
 					hrp.CFrame=bcf
 					noVelocity()
+					i=0
 				end
 				i=i+1
 				vacant=false
