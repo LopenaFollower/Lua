@@ -15,12 +15,13 @@ local tog={
 	tpwalk=false,
 	farmboss=false,
 	petcrate=false,
-	skillupgrade=false,
+	skillupgrade=true,
 	sellchest=true,
 	upwpn=false,
 	upskn=false,
 	rebirth=false,
-	dungeon=false
+	dungeon=false,
+	tomb=false
 }
 local cd={
 	swing=true,
@@ -32,7 +33,8 @@ local cd={
 	sellchest=true,
 	upgd=true,
 	rebirth=true,
-	dungeon=true
+	dungeon=true,
+	tomb=true
 }
 local vals={
 	tpws=nil,
@@ -178,208 +180,239 @@ binds.main=RunService.Heartbeat:Connect(function()
 		wait()
 		cd.swing=true
 	end
-	if tog.dungeon and cd.dungeon then
-		cd.dungeon=false
-		while tostring(plr.TeamColor)~="Sea green"and not workspace.DungeonEntrance.Floor.BillboardGui.Closed.Visible do
-			if(hrp.Position-workspace.DungeonEntrance.Darkness.Position).magnitude>5 then
-				vals.dungeon.route={"0,0"}
-				vals.dungeon.backup={"0,0"}
-			end
-			hrp.CFrame=workspace.DungeonEntrance.Darkness.CFrame*CFrame.new(0,5,0)
-			wait(2.5)
-		end
-		local plrDungeon=workspace.Dungeons:FindFirstChild(tostring(plr.Dungeon.Value))
-		function plrPos()
-			return plr.DungeonLocation and plr.DungeonLocation.value
-		end
-		function strPos()
-			return tostring(plrPos()):gsub(" ","")
-		end
-		if plrDungeon and plrPos() then
-			function XYZtoXY(c)
-				local t=c:split","
-				return t[1]..","..t[3]
-			end
-			function XYtoXYZ(c)
-				local t=c:split","
-				return t[1]..","..plrPos().y..","..t[2]
-			end
-			function direction(c)
-				local t=c:split","
-				local xy=t[1]:gsub("-0","0")..","..t[2]:gsub("-0","0")
-				local dirs={
-					["1,0"]="East",
-					["-1,0"]="West",
-					["0,1"]="North",
-					["0,-1"]="South"
-				}
-				return dirs[xy]
-			end
-			function coordinate(nsew)
-				local y=plrPos().y
-				local dirs={
-					["North"]=string.format("0,%s,1",y),
-					["South"]=string.format("0,%s,-1",y),
-					["East"]=string.format("1,%s,0",y),
-					["West"]=string.format("-1,%s,0",y)
-				}
-				return dirs[nsew]
-			end
-			function getRoom()
-				return plrDungeon:FindFirstChild("Room:"..strPos())
-			end
-			function visitedRoom(xyz)
-				local a="Room:"..xyz
-				return plrDungeon:FindFirstChild(a)and plrDungeon[a]:FindFirstChild"e"
-			end
-			function gotoRoom(xyz)
-				local c=plrDungeon:FindFirstChild("Room:"..xyz).Floor.floor_Plane.CFrame
-				hrp.CFrame=CFrame.new(c.x,c.y+10,c.z)
-				local w=Instance.new("Weld",plrDungeon:FindFirstChild("Room:"..xyz))
-				w.Name="e"
-			end
-			function roomsLeft()
-				local n=0
-				for _,v in pairs(plr.PlayerGui.DungeonMinimap.MapFrame:GetChildren())do
-					pcall(function()
-						if tostring(v.BackgroundColor)=="Silver flip/flop"then
-							n=n+1
-						end
-					end)
-				end
-				return n
-			end
-			function inverse(xy)
-				local t=xy:split","
-				return tonumber(t[1]*-1)..","..tonumber(t[2]*-1)
-			end
-			function recordPath(xy)
-				push(vals.dungeon.route,xy)
-				push(vals.dungeon.backup,xy)
-			end
-			function checkPath(xy)
-				return plrGui.DungeonMinimap.MapFrame:FindFirstChild(xy)and plrGui.DungeonMinimap.MapFrame:FindFirstChild(xy).Visible
-			end
-			function getPaths()
-				local ps,p={},plrPos()
-				for _,v in pairs(getRoom().Doors:GetChildren())do
-					if v:IsA"BasePart"then
-						push(ps,XYZtoXY(coordinate(v.Name)))
-					end
-				end
-				local fp={}
-				for i=1,#ps do
-					local sp=ps[i]:split","
-					local hf=(sp[1]/2)..","..(sp[2]/2)
-					local ar=(tonumber(sp[1])+p.x)..","..p.y..","..(tonumber(sp[2])+p.z)
-					if checkPath(hf)and not visitedRoom(ar)then
-						push(fp,ps[i])
-					end
-				end
-				return fp
-			end
-			function getRoot(i)
-				for _,v in pairs(i:GetDescendants())do
-					if v.Name==hrp.Name then
-						return v
-					end
-				end
-			end
-			function canMove()
-				local t=false
-				for _,v in pairs(getRoom().Doors:GetChildren())do
-					if v:IsA"BasePart"and tostring(v.BrickColor)=="Shamrock"then
-						t=true
-					end
-				end
-				return t
-			end
-			if roomsLeft()>0 then
-				local retrace=#getPaths()<1
-				if not retrace then
-					if XYZtoXY(strPos())=="0,0"then
-						gotoRoom(strPos())
-					end
-					local dirs=getPaths()
-					local cd=dirs[math.random(1,#dirs)]
-					local oldRoom=getRoom().Name
-					local chosenDoor=getRoom().Doors[direction(cd)]
-					hrp.CFrame=chosenDoor.CFrame
-					repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
-					wait(.3)
-					recordPath(cd)
-					if not getRoom().Doors:FindFirstChild"Down"then
-						gotoRoom(strPos())
-					end
-				end
-				local pass=true
-				if getRoom().Doors:FindFirstChild"Down"then
-					local fl=plrPos().y
-					gotoRoom(strPos())
-					repeat wait()until plrGui.NotificationsV2.Dialogs:FindFirstChild"Dialog"or tostring(plr.TeamColor)~="Sea green"or plrPos().y>fl
-					pcall(function()
-						press(plrGui.NotificationsV2.Dialogs.Dialog.Frame.Buttons.Okay)
-					end)
-					pass=false
-					retrace=false
-					repeat wait()until plrPos().y>fl or tostring(plr.TeamColor)~="Sea green"
+	if tog.dungeon then
+		if cd.dungeon then
+			cd.dungeon=false
+			while tostring(plr.TeamColor)~="Sea green"and not workspace.DungeonEntrance.Floor.BillboardGui.Closed.Visible do
+				if(hrp.Position-workspace.DungeonEntrance.Darkness.Position).magnitude>5 then
 					vals.dungeon.route={"0,0"}
 					vals.dungeon.backup={"0,0"}
-					wait(.5)
 				end
-				wait(.5)
-				if pass then
-					repeat wait()until getRoom()and(getRoom():FindFirstChild"Enemies"or getRoom():FindFirstChild"Chest")or tostring(plr.TeamColor)~="Sea green"or XYZtoXY(strPos())=="0,0"
-					wait(.25)
-					if getRoom():FindFirstChild"Enemies"and #getRoom().Enemies:GetChildren()>0 then
-						while #getRoom().Enemies:GetChildren()>0 do
-							pcall(function()
-								local enems=getRoom().Enemies:GetChildren()
-								if not tog.swing then
-									swing()
-								end
-								hrp.CFrame=getRoot(enems[math.random(1,#enems)]).CFrame
-								noVelocity()
-								task.wait(.1)
-							end)
-						end
-						repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
-					elseif getRoom():FindFirstChild"Chest"and getRoom().Chest:FindFirstChild"Base"and getRoom().Chest.Base:FindFirstChild"ProximityPrompt"then
-						local b=getRoom().Chest.Base
-						local st=os.time()
-						while b:FindFirstChild"ProximityPrompt"do
-							hrp.CFrame=b.CFrame*CFrame.new(0,5,0)
-							wait()
-							pcall(function()
-								fireproximityprompt(b.ProximityPrompt)
-							end)
-							if os.time()-st>2 then
-								b:FindFirstChild"ProximityPrompt":Destroy()
-								break
-							end
-						end
-						repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
-					elseif retrace and#getPaths()<1 then
-						if #vals.dungeon.route<1 then
-							vals.dungeon.route={table.unpack(vals.dungeon.backup)}
-						end
+				hrp.CFrame=workspace.DungeonEntrance.Darkness.CFrame*CFrame.new(0,5,0)
+				wait(2.5)
+			end
+			local plrDungeon=workspace.Dungeons:FindFirstChild(tostring(plr.Dungeon.Value))
+			function plrPos()
+				return plr.DungeonLocation and plr.DungeonLocation.value
+			end
+			function strPos()
+				return tostring(plrPos()):gsub(" ","")
+			end
+			if plrDungeon and plrPos() then
+				function XYZtoXY(c)
+					local t=c:split","
+					return t[1]..","..t[3]
+				end
+				function XYtoXYZ(c)
+					local t=c:split","
+					return t[1]..","..plrPos().y..","..t[2]
+				end
+				function direction(c)
+					local t=c:split","
+					local xy=t[1]:gsub("-0","0")..","..t[2]:gsub("-0","0")
+					local dirs={
+						["1,0"]="East",
+						["-1,0"]="West",
+						["0,1"]="North",
+						["0,-1"]="South"
+					}
+					return dirs[xy]
+				end
+				function coordinate(nsew)
+					local y=plrPos().y
+					local dirs={
+						["North"]=string.format("0,%s,1",y),
+						["South"]=string.format("0,%s,-1",y),
+						["East"]=string.format("1,%s,0",y),
+						["West"]=string.format("-1,%s,0",y)
+					}
+					return dirs[nsew]
+				end
+				function getRoom()
+					return plrDungeon:FindFirstChild("Room:"..strPos())
+				end
+				function visitedRoom(xyz)
+					local a="Room:"..xyz
+					return plrDungeon:FindFirstChild(a)and plrDungeon[a]:FindFirstChild"e"
+				end
+				function gotoRoom(xyz)
+					local c=plrDungeon:FindFirstChild("Room:"..xyz).Floor.floor_Plane.CFrame
+					hrp.CFrame=CFrame.new(c.x,c.y+10,c.z)
+					local w=Instance.new("Weld",plrDungeon:FindFirstChild("Room:"..xyz))
+					w.Name="e"
+				end
+				function roomsLeft()
+					local n=0
+					for _,v in pairs(plr.PlayerGui.DungeonMinimap.MapFrame:GetChildren())do
 						pcall(function()
-							local cd=inverse(vals.dungeon.route[#vals.dungeon.route])
-							local chosenDoor=getRoom().Doors[direction(cd)]
-							local oldRoom=getRoom().Name
-							hrp.CFrame=chosenDoor.CFrame
-							repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
-							pop(vals.dungeon.route)
-							wait(.3)
-							gotoRoom(strPos())
+							if tostring(v.BackgroundColor)=="Silver flip/flop"then
+								n=n+1
+							end
 						end)
-						wait(.25)
+					end
+					return n
+				end
+				function inverse(xy)
+					local t=xy:split","
+					return tonumber(t[1]*-1)..","..tonumber(t[2]*-1)
+				end
+				function recordPath(xy)
+					push(vals.dungeon.route,xy)
+					push(vals.dungeon.backup,xy)
+				end
+				function checkPath(xy)
+					return plrGui.DungeonMinimap.MapFrame:FindFirstChild(xy)and plrGui.DungeonMinimap.MapFrame:FindFirstChild(xy).Visible
+				end
+				function getPaths()
+					local ps,p={},plrPos()
+					for _,v in pairs(getRoom().Doors:GetChildren())do
+						if v:IsA"BasePart"then
+							push(ps,XYZtoXY(coordinate(v.Name)))
+						end
+					end
+					local fp={}
+					for i=1,#ps do
+						local sp=ps[i]:split","
+						local hf=(sp[1]/2)..","..(sp[2]/2)
+						local ar=(tonumber(sp[1])+p.x)..","..p.y..","..(tonumber(sp[2])+p.z)
+						if checkPath(hf)and not visitedRoom(ar)then
+							push(fp,ps[i])
+						end
+					end
+					return fp
+				end
+				function getRoot(i)
+					for _,v in pairs(i:GetDescendants())do
+						if v.Name==hrp.Name then
+							return v
+						end
 					end
 				end
+				function canMove()
+					local t=false
+					for _,v in pairs(getRoom().Doors:GetChildren())do
+						if v:IsA"BasePart"and tostring(v.BrickColor)=="Shamrock"then
+							t=true
+						end
+					end
+					return t
+				end
+				if roomsLeft()>0 then
+					local retrace=#getPaths()<1
+					if not retrace then
+						if XYZtoXY(strPos())=="0,0"then
+							gotoRoom(strPos())
+						end
+						local dirs=getPaths()
+						local cd=dirs[math.random(1,#dirs)]
+						local oldRoom=getRoom().Name
+						local chosenDoor=getRoom().Doors[direction(cd)]
+						hrp.CFrame=chosenDoor.CFrame
+						repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
+						wait(.3)
+						recordPath(cd)
+						if not getRoom().Doors:FindFirstChild"Down"then
+							gotoRoom(strPos())
+						end
+					end
+					local pass=true
+					if getRoom().Doors:FindFirstChild"Down"then
+						local fl=plrPos().y
+						gotoRoom(strPos())
+						repeat wait()until plrGui.NotificationsV2.Dialogs:FindFirstChild"Dialog"or tostring(plr.TeamColor)~="Sea green"or plrPos().y>fl
+						pcall(function()
+							press(plrGui.NotificationsV2.Dialogs.Dialog.Frame.Buttons.Okay)
+						end)
+						pass=false
+						retrace=false
+						repeat wait()until plrPos().y>fl or tostring(plr.TeamColor)~="Sea green"
+						vals.dungeon.route={"0,0"}
+						vals.dungeon.backup={"0,0"}
+						wait(.5)
+					end
+					wait(.5)
+					if pass then
+						repeat wait()until getRoom()and(getRoom():FindFirstChild"Enemies"or getRoom():FindFirstChild"Chest")or tostring(plr.TeamColor)~="Sea green"or XYZtoXY(strPos())=="0,0"
+						wait(.25)
+						if getRoom():FindFirstChild"Enemies"and #getRoom().Enemies:GetChildren()>0 then
+							while #getRoom().Enemies:GetChildren()>0 do
+								pcall(function()
+									local enems=getRoom().Enemies:GetChildren()
+									if not tog.swing then
+										swing()
+									end
+									hrp.CFrame=getRoot(enems[math.random(1,#enems)]).CFrame
+									noVelocity()
+								end)
+								task.wait(.1)
+							end
+							repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
+						elseif getRoom():FindFirstChild"Chest"and getRoom().Chest:FindFirstChild"Base"and getRoom().Chest.Base:FindFirstChild"ProximityPrompt"then
+							local b=getRoom().Chest.Base
+							local st=os.time()
+							while b:FindFirstChild"ProximityPrompt"do
+								hrp.CFrame=b.CFrame*CFrame.new(0,5,0)
+								wait()
+								pcall(function()
+									fireproximityprompt(b.ProximityPrompt)
+								end)
+								if os.time()-st>2 then
+									b:FindFirstChild"ProximityPrompt":Destroy()
+									break
+								end
+							end
+							repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
+						elseif retrace and#getPaths()<1 then
+							if #vals.dungeon.route<1 then
+								vals.dungeon.route={table.unpack(vals.dungeon.backup)}
+							end
+							pcall(function()
+								local cd=inverse(vals.dungeon.route[#vals.dungeon.route])
+								local chosenDoor=getRoom().Doors[direction(cd)]
+								local oldRoom=getRoom().Name
+								hrp.CFrame=chosenDoor.CFrame
+								repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
+								pop(vals.dungeon.route)
+								wait(.3)
+								gotoRoom(strPos())
+							end)
+							wait(.25)
+						end
+					end
+				end
+				wait(1)
+			end
+			cd.dungeon=true
+		end
+	elseif tog.tomb and plrGui.EgyptTombBoard.Frame.Title.Text=="Open Tombs:"then
+		if cd.tomb then
+			cd.tomb=false
+			local selected=nil
+			for _,v in pairs(workspace.Scene.Egypt.Egypt.Tomb.TombEntrances:GetChildren())do
+				if v:FindFirstChild"Door"and v.Door.Surface.SurfaceGui.Frame.Timer.Text=="OPEN"then
+					selected=v.Name
+					break
+				end
+			end
+			if selected then
+				if tog.tomb and(hrp.Position-Vector3.new(14458,-117,-539)).magnitude>250 and plrGui.EgyptTombBoard.Frame.Title.Text=="Open Tombs:"then
+					hrp.CFrame=Workspace.Scene.Egypt.Egypt.Tomb.TombEntrances[selected].DoorEntry.Trigger.CFrame
+					wait(.5)
+				end
+				local mp={["Easy"]="TombBoss",["Medium"]="TombBoss2",["Hard"]="TombBoss3"}
+				while tog.tomb and workspace.Scene.Egypt.Egypt.Tomb.Bosses:FindFirstChild(mp[selected])do
+					if not tog.swing then
+						swing()
+					end
+					hrp.CFrame=workspace.Scene.Egypt.Egypt.Tomb.Bosses[mp[selected]].HumanoidRootPart.CFrame
+					noVelocity()
+					task.wait()
+				end
+				repeat wait()until(hrp.Position-Vector3.new(14476,-34,-2234)).magnitude<3 or not tog.tomb
 			end
 			wait(1)
+			cd.tomb=true
 		end
-		cd.dungeon=true
 	else
 		if tog.orbs and cd.orbs and vacant then
 			vacant=false
@@ -437,7 +470,9 @@ binds.main=RunService.Heartbeat:Connect(function()
 			local boss=getboss()
 			local bossold=boss
 			while boss==bossold and boss~=nil and tog.farmboss do
-				hrp.CFrame=boss.CFrame
+				local inc=0
+				if boss.Parent.Name=="Gnome"or boss.Parent.Name=="Penguin"then inc=-15 end
+				hrp.CFrame=boss.CFrame*CFrame.new(0,0,math.random(inc,1))
 				vacant=false
 				wait(.025)
 				noVelocity()
@@ -589,6 +624,9 @@ end)
 Main:addToggle("Dungeon",tog.dungeon,function(v)
 	tog.dungeon=v
 end)
+Main:addToggle("Tombs",tog.tomb,function(v)
+	tog.tomb=v
+end)
 Crates:addDropdown("Type",{"Pet1","Pet2","Pet3","Pet4","Pet5","Pet6","Pet7","Pet8","Artifact1","Artifact2","Artifact3","Artifact4","Artifact5","Artifact6","Artifact7"},4,function(v)
 	vals.crateid=tostring(v)
 end)
@@ -648,5 +686,5 @@ Local:destroyGui(function()
 	end
 	for i,v in pairs(cd)do
 		cd[i]=false
-	end--press multi sell twice
+	end--
 end)--tombs, weapon upgrade, waypoints, time attack, level threshold for rebirth, quests
