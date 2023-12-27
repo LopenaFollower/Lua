@@ -38,6 +38,7 @@ local cd={
 }
 local vals={
 	tpws=nil,
+	minlvl=1e5,
 	boss={
 		borock=false,
 		robotron=false,
@@ -395,7 +396,7 @@ binds.main=RunService.Heartbeat:Connect(function()
 				end
 			end
 			if selected then
-				if tog.tomb and(hrp.Position-Vector3.new(14458,-117,-539)).magnitude>250 and plrGui.EgyptTombBoard.Frame.Title.Text=="Open Tombs:"then
+				if(hrp.Position-Vector3.new(14458,-117,-539)).magnitude>250 and plrGui.EgyptTombBoard.Frame.Title.Text=="Open Tombs:"then
 					hrp.CFrame=Workspace.Scene.Egypt.Egypt.Tomb.TombEntrances[selected].DoorEntry.Trigger.CFrame
 					wait(.5)
 				end
@@ -410,7 +411,7 @@ binds.main=RunService.Heartbeat:Connect(function()
 				end
 				repeat wait()until(hrp.Position-Vector3.new(14476,-34,-2234)).magnitude<3 or not tog.tomb
 			end
-			wait(1)
+			wait(5)
 			cd.tomb=true
 		end
 	else
@@ -471,10 +472,10 @@ binds.main=RunService.Heartbeat:Connect(function()
 			local bossold=boss
 			local i=0
 			while boss==bossold and boss~=nil and tog.farmboss do
-				local inc=0
+				local inc=1
 				local pcf=hrp.CFrame
 				local bcf=boss.CFrame
-				if boss.Parent.Name=="Gnome"or boss.Parent.Name=="Penguin"then inc=-15 end
+				if boss.Parent.Name=="Gnome"or boss.Parent.Name=="Penguin"then inc=-10 end
 				hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(inc,1))
 				if i>60 or(hrp.Position-boss.Position).magnitude>25 then
 					hrp.CFrame=bcf
@@ -573,8 +574,10 @@ binds.main=RunService.Heartbeat:Connect(function()
 	end
 	if tog.rebirth and cd.rebirth then
 		cd.rebirth=false
-		press(plrGui.RebirthGui.RebirthPrompt.ImageLabel.ConfirmBtn)
-		wait(.25)
+		if plr.leaderstats["⚡Level"].value>=vals.minlvl then
+			press(plrGui.RebirthGui.RebirthPrompt.ImageLabel.ConfirmBtn)
+			wait(.25)
+		end
 		cd.rebirth=true
 	end
 end)
@@ -596,29 +599,15 @@ binds.hatch=plrGui.HUD.Screen.ChildAdded:Connect(function(v)
 	v.Parent.PetCrateFrame.CrateImage.Visible=false
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("Giant","v0.28")
+local UI=GUI:CreateWindow("Giant","v0.83")
 local Main=UI:addPage("Main",3,true,1)
+local Rebirths=UI:addPage("Rebirthing",3,false,1)
 local Crates=UI:addPage("Crates",3,false,1)
-local Bosses=UI:addPage("Bosses",3,false,1)
+local Enemies=UI:addPage("Enemies",3,false,1)
 local Misc=UI:addPage("Miscellaneous",3,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
 Main:addToggle("Auto Swing",tog.swing,function(v)
 	tog.swing=v
-end)
-Main:addToggle("Collect Orbs",tog.orbs,function(v)
-	tog.orbs=v
-end)
-Main:addToggle("Mine Meteor",tog.meteor,function(v)
-	tog.meteor=v
-end)
-Main:addToggle("Farm Snowmen",tog.event,function(v)
-	tog.event=v
-end)
-Main:addToggle("Skill Upgrade",tog.skillupgrade,function(v)
-	tog.skillupgrade=v
-end)
-Main:addToggle("Sell Chests",tog.sellchest,function(v)
-	tog.sellchest=v
 end)
 Main:addToggle("Weapon Upgrade",tog.upwpn,function(v)
 	tog.upwpn=v
@@ -626,14 +615,28 @@ end)
 Main:addToggle("Skin Upgrade",tog.upskn,function(v)
 	tog.upskn=v
 end)
-Main:addToggle("Rebirth",tog.rebirth,function(v)
+Main:addToggle("Collect Orbs",tog.orbs,function(v)
+	tog.orbs=v
+end)
+Main:addToggle("Sell Chests",tog.sellchest,function(v)
+	tog.sellchest=v
+end)
+Main:addToggle("Mine Meteor",tog.meteor,function(v)
+	tog.meteor=v
+end)
+Main:addToggle("Farm Snowmen",tog.event,function(v)
+	tog.event=v
+end)
+Rebirths:addTextBox("Minimum Level",vals.minlvl,function(v)
+	if type(tonumber(v))=="number"and tonumber(v)>=100 then
+		vals.minlvl=tonumber(v)
+	end
+end)
+Rebirths:addToggle("Rebirth",tog.rebirth,function(v)
 	tog.rebirth=v
 end)
-Main:addToggle("Dungeon",tog.dungeon,function(v)
-	tog.dungeon=v
-end)
-Main:addToggle("Tombs",tog.tomb,function(v)
-	tog.tomb=v
+Rebirths:addToggle("Skill Upgrade",tog.skillupgrade,function(v)
+	tog.skillupgrade=v
 end)
 Crates:addDropdown("Type",{"Pet1","Pet2","Pet3","Pet4","Pet5","Pet6","Pet7","Pet8","Artifact1","Artifact2","Artifact3","Artifact4","Artifact5","Artifact6","Artifact7"},4,function(v)
 	vals.crateid=tostring(v)
@@ -641,28 +644,35 @@ end)
 Crates:addToggle("Start",tog.petcrate,function(v)
 	tog.petcrate=v
 end)
-Bosses:addToggle("Start",tog.farmboss,function(v)
+Enemies:addToggle("Tombs",tog.tomb,function(v)
+	tog.tomb=v
+end)
+Enemies:addToggle("Dungeon",tog.dungeon,function(v)
+	tog.dungeon=v
+end)
+Enemies:addLabel()
+Enemies:addToggle("Start NPC Farm",tog.farmboss,function(v)
 	tog.farmboss=v
 end)
-Bosses:addToggle("Borock",vals.boss.borock,function(v)
+Enemies:addToggle("Borock",vals.boss.borock,function(v)
 	vals.boss.borock=v
 end)
-Bosses:addToggle("Demon King",vals.boss.demonking,function(v)
+Enemies:addToggle("Demon King",vals.boss.demonking,function(v)
 	vals.boss.demonking=v
 end)
-Bosses:addToggle("Robotron",vals.boss.robotron,function(v)
+Enemies:addToggle("Robotron",vals.boss.robotron,function(v)
 	vals.boss.robotron=v
 end)
-Bosses:addToggle("Terminator",vals.boss.terminator,function(v)
+Enemies:addToggle("Terminator",vals.boss.terminator,function(v)
 	vals.boss.terminator=v
 end)
-Bosses:addToggle("Temple Guardian",vals.boss.templeguard,function(v)
+Enemies:addToggle("Temple Guardian",vals.boss.templeguard,function(v)
 	vals.boss.templeguard=v
 end)
-Bosses:addToggle("Gnomes",vals.boss.gnomes,function(v)
+Enemies:addToggle("Gnomes",vals.boss.gnomes,function(v)
 	vals.boss.gnomes=v
 end)
-Bosses:addToggle("Penguins",vals.boss.penguins,function(v)
+Enemies:addToggle("Penguins",vals.boss.penguins,function(v)
 	vals.boss.penguins=v
 end)
 Misc:addToggle("Ignore notifications",ignore.notifs,function(v)
@@ -670,11 +680,6 @@ Misc:addToggle("Ignore notifications",ignore.notifs,function(v)
 end)
 Misc:addToggle("Ignore Arena Notif",ignore.arena,function(v)
 	ignore.arena=v
-end)
-Local:addButton("Rejoin",function()
-	plr:Kick" "
-	task.wait()
-	game:GetService"TeleportService":Teleport(game.placeId,plr)
 end)
 Local:addToggle("Inf Jump",tog.infj,function(v)
 	tog.infj=v
@@ -684,6 +689,12 @@ Local:addToggle("tpwalk",tog.tpwalk,function(v)
 end)
 Local:addSlider("tpwalk speed",0,10,function(v)
 	vals.tpws=tonumber(v)
+end)
+Local:addLabel()
+Local:addButton("Rejoin",function()
+	plr:Kick" "
+	task.wait()
+	game:GetService"TeleportService":Teleport(game.placeId,plr)
 end)
 Local:destroyGui(function()
 	for _,v in pairs(binds)do
