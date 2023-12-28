@@ -78,6 +78,13 @@ local vals={
 		["HopsalotDefeatPenguins"]=true,
 		["HopsalotDefeatBorock"]=true,
 		["HopsalotDefeatEgyptBoss"]=true
+	},
+	rarity={
+		["74"]=0,
+		["5"]=1,
+		["66"]=2,
+		["87"]=3,
+		["100"]=4
 	}
 }
 local ignore={
@@ -88,6 +95,7 @@ plr.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
 local RunService=game:GetService"RunService"
 local aeroServices=game.ReplicatedStorage.Aero.AeroRemoteServices
 local wpnInventory=plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.WpnInvDataFrame.WpnSelectionPanel.WpnSelectionFrame
+local sknInventory=plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.SkinInventoryFrame
 function pop(tb)
 	local n=tb[#tb]
 	tb[#tb]=nil
@@ -419,10 +427,10 @@ binds.main=RunService.RenderStepped:Connect(function()
 				end
 			end
 			if selected then
-				if tog.tomb and(hrp.Position-Vector3.new(14458,-117,-539)).magnitude>250 and plrGui.EgyptTombBoard.Frame.Title.Text=="Open Tombs:"then
+				repeat
 					hrp.CFrame=Workspace.Scene.Egypt.Egypt.Tomb.TombEntrances[selected].DoorEntry.Trigger.CFrame
-					wait(.5)
-				end
+					wait(1)
+				until not((hrp.Position-Vector3.new(14458,-117,-539)).magnitude>250 and plrGui.EgyptTombBoard.Frame.Title.Text=="Open Tombs:")
 				local mp={["Easy"]="TombBoss",["Medium"]="TombBoss2",["Hard"]="TombBoss3"}
 				while tog.tomb and workspace.Scene.Egypt.Egypt.Tomb.Bosses:FindFirstChild(mp[selected])do
 					if not tog.swing then
@@ -459,6 +467,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 						end)
 					end
 				end)
+				wait(.25)
 			end
 			local cq=nil
 			for _,v in pairs(plr.Quests.InProgress:GetChildren())do
@@ -486,6 +495,18 @@ binds.main=RunService.RenderStepped:Connect(function()
 				end
 			end
 			if cq then
+				if cq=="HopsalotDefeatRobotron"then
+					farmboss"SlumBoss"
+					wait(.1)
+					for i=0,5 do
+						hrp.CFrame=hrp.CFrame*CFrame.new(5,0,0)
+						pcall(function()
+							press(plrGui.NotificationsV2.Dialogs.Conversation.Frame.Buttons.Okay)
+							press(plrGui.NotificationsV2.Dialogs.Conversation.ClickBackground)
+						end)
+						wait(.1)
+					end
+				end
 				while ongoing(cq)do
 					pcall(function()
 						press(plrGui.NotificationsV2.Dialogs.Conversation.Frame.Buttons.Okay)
@@ -496,7 +517,6 @@ binds.main=RunService.RenderStepped:Connect(function()
 							local pr=v:FindFirstChild"Prefab"
 							if pr and ongoing(cq)then
 								hrp.CFrame=v.CFrame
-								wait(.25)
 								break
 							end
 						end
@@ -508,7 +528,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 						end
 					elseif cq=="HopsalotGetCrates"then
 						for _,v in pairs(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.ChestSelectionPanel.ChestSelectionFrame:GetChildren())do
-							if v.Name=="ChestInventoryItem"and tonumber(v.ChestImage.AmountImg.AmountTxt.Text)>0 then
+							if ongoing(cq)and v.Name=="ChestInventoryItem"and tonumber(v.ChestImage.AmountImg.AmountTxt.Text)>0 then
 								press(v)
 								wait(.1)
 								press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.BuyFrame.BuyButton)
@@ -516,20 +536,25 @@ binds.main=RunService.RenderStepped:Connect(function()
 								press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.ChestInspectionFrame.OpenChestButton)
 							end
 						end
+						for _,v in pairs(sknInventory.SkinInvDataFrame.SkinSelectionPanel.SkinSelectionFrame:GetChildren())do
+							pcall(function()
+								if ongoing(cq)and vals.rarity[tostring(math.floor(v.TierBG.ImageColor3.r*100))]<3 then
+									press(v.SelectionButton,true)
+									wait(.05)
+									press(sknInventory.ButtonFrame.SUFrame.SellButton)
+									wait(.1)
+									press(plrGui.HUD.Screen.SellPrompt.ImageLabel.SellBtn)
+									wait(.05)
+								end
+							end)
+						end
 					elseif cq=="HopsalotArcticSeasonSnowflakes"then
 						local trg={}
 						for _,v in pairs(workspace.Ephemeral.AdvCrate:GetChildren())do
 							local pr=v.TechBox:FindFirstChild"SnowMan"
-							if pr.Transparency==0 then
-								table.insert(trg,v.TechBox)
-							end
-						end
-						if#trg>0 then
-							local snm=nearest(trg)
-							if snm then
-								if(hrp.Position-snm.Position).magnitude>5 then
-									hrp.CFrame=snm.CFrame
-								end
+							if pr.Transparency==0 and ongoing(cq)then
+								hrp.CFrame=v.TechBox.CFrame
+								break
 							end
 						end
 					elseif cq=="HopsalotDefeatBorock"then
@@ -557,26 +582,26 @@ binds.main=RunService.RenderStepped:Connect(function()
 							local boss=gnomes[#gnomes]:FindFirstChild"HumanoidRootPart"
 							local pcf=hrp.CFrame
 							local bcf=boss.CFrame
-							hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(-10,1))
-							if(hrp.Position-boss.Position).magnitude>10 then
-								hrp.CFrame=bcf
+							hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(-15,1))
+							if(hrp.Position-boss.Position).magnitude>15 then
+								hrp.CFrame=bcf*CFrame.new(0,0,math.random(-15,1))
 								noVelocity()
 							end
 						end
 					elseif cq=="HopsalotDefeatPenguins"then
 						local penguins=npcs.Penguins:GetChildren()
 						if#penguins>0 then
-							local boss=penguins[#penguins]:FindFirstChild"HumanoidRootPart"
+							local boss=penguins[1]:FindFirstChild"HumanoidRootPart"
 							local pcf=hrp.CFrame
 							local bcf=boss.CFrame
-							hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(-10,1))
-							if(hrp.Position-boss.Position).magnitude>10 then
-								hrp.CFrame=bcf
+							hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(-15,1))
+							if(hrp.Position-boss.Position).magnitude>15 then
+								hrp.CFrame=bcf*CFrame.new(0,0,math.random(-15,1))
 								noVelocity()
 							end
 						end
 					end
-					wait(.5)
+					wait(.1)
 				end
 			end
 		end
@@ -628,7 +653,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 			if#trg>0 then
 				local snm=nearest(trg)
 				if snm then
-					if(hrp.Position-snm.Position).magnitude>5 then
+					if(hrp.Position-snm.Position).magnitude>2 then
 						hrp.CFrame=snm.CFrame
 					end
 				end
@@ -736,7 +761,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 		press(plrGui.HUD.Screen.ConfirmPrompt.ImageLabel.ConfirmBtn)
 		wait(.2)
 		if tog.upskn then
-			press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.SkinInventoryFrame.ButtonFrame.SUFrame.MaxButton)
+			press(sknInventory.ButtonFrame.SUFrame.MaxButton)
 			plrGui.HUD.Screen.ConfirmPrompt.Visible=false
 		end
 		press(plrGui.HUD.Screen.ConfirmPrompt.ImageLabel.ConfirmBtn)
