@@ -21,7 +21,8 @@ local tog={
 	upskn=false,
 	rebirth=false,
 	dungeon=false,
-	tomb=false
+	tomb=false,
+	quest=false
 }
 local cd={
 	swing=true,
@@ -34,7 +35,8 @@ local cd={
 	upgd=true,
 	rebirth=true,
 	dungeon=true,
-	tomb=true
+	tomb=true,
+	quest=true
 }
 local vals={
 	tpws=nil,
@@ -57,6 +59,25 @@ local vals={
 	dungeon={
 		route={"0,0"},
 		backup={"0,0"}
+	},
+	qnpc={
+		hopsalot=false,
+		gingerbreadman=false,
+		lordent=false,
+		samurai=false
+	},
+	doablequests={
+		["Hopsalot10Orbs"]=true,
+		["HopsalotDefeatSkeleBoss"]=true,
+		["HopsalotArcticSeasonSnowflakes"]=true,
+		["HopsalotGetCrates"]=true,
+		["HopsalotDefeatRobotron"]=true,
+		["HopsalotDefeatTempleBoss"]=true,
+		["HopsalotDefeatGnomes"]=true,
+		["HopsalotMeteor"]=true,
+		["HopsalotDefeatPenguins"]=true,
+		["HopsalotDefeatBorock"]=true,
+		["HopsalotDefeatEgyptBoss"]=true
 	}
 }
 local ignore={
@@ -157,7 +178,7 @@ function getboss()
 	return t:FindFirstChild"HumanoidRootPart"
 end
 wait(.1)
-binds.main=RunService.Heartbeat:Connect(function()
+binds.main=RunService.RenderStepped:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=plr.Character
@@ -171,14 +192,16 @@ binds.main=RunService.Heartbeat:Connect(function()
 				end
 			end
 		end
-		wpnInventory=plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.WpnInvDataFrame.WpnSelectionPanel.WpnSelectionFrame
+		if not wpnInventory then
+			wpnInventory=plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.WpnInvDataFrame.WpnSelectionPanel.WpnSelectionFrame
+		end
 		hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown,false)
 		hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,false)
 	end)
 	if tog.swing and cd.swing then
 		cd.swing=false
 		swing()
-		wait()
+		wait(.01)
 		cd.swing=true
 	end
 	if tog.dungeon then
@@ -396,7 +419,7 @@ binds.main=RunService.Heartbeat:Connect(function()
 				end
 			end
 			if selected then
-				if(hrp.Position-Vector3.new(14458,-117,-539)).magnitude>250 and plrGui.EgyptTombBoard.Frame.Title.Text=="Open Tombs:"then
+				if tog.tomb and(hrp.Position-Vector3.new(14458,-117,-539)).magnitude>250 and plrGui.EgyptTombBoard.Frame.Title.Text=="Open Tombs:"then
 					hrp.CFrame=Workspace.Scene.Egypt.Egypt.Tomb.TombEntrances[selected].DoorEntry.Trigger.CFrame
 					wait(.5)
 				end
@@ -414,6 +437,151 @@ binds.main=RunService.Heartbeat:Connect(function()
 			wait(5)
 			cd.tomb=true
 		end
+	elseif tog.quest and cd.quest then
+		cd.quest=false
+		if vals.qnpc.hopsalot then
+			local hq=false
+			for _,v in pairs(vals.doablequests)do
+				if plr.Quests.InProgress:FindFirstChild(_)then
+					hq=true
+				end
+			end
+			if not hq then
+				hrp.CFrame=workspace["Sir Hopsalot"].HumanoidRootPart.CFrame
+				task.wait(.1)
+				task.spawn(function()
+					for i=0,25 do
+						fireproximityprompt(workspace["Sir Hopsalot"].HumanoidRootPart.QuestPromptObject.NewQuestPrompt)
+						pcall(function()
+							press(plrGui.NotificationsV2.Dialogs.Conversation.Frame.Buttons.Okay)
+							task.wait(.1)
+							press(plrGui.NotificationsV2.Dialogs.Conversation.ClickBackground)
+						end)
+					end
+				end)
+			end
+			local cq=nil
+			for _,v in pairs(plr.Quests.InProgress:GetChildren())do
+				if vals.doablequests[v.Name]then
+					cq=v.Name
+				end
+			end
+			function ongoing(qn)
+				return plr.Quests.InProgress:FindFirstChild(qn)
+			end
+			local npcs=workspace.NPC
+			function getst(n)
+				return npcs[n]:FindFirstChild(n)and findDescendant(npcs[n],"Health","TextLabel")and tonumber(findDescendant(npcs[n],"Health","TextLabel").Text)>0
+			end
+			function farmboss(n)
+				if getst(n)then
+					local boss=npcs[n][n]:FindFirstChild"HumanoidRootPart"
+					local pcf=hrp.CFrame
+					local bcf=boss.CFrame
+					hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,1)
+					if(hrp.Position-boss.Position).magnitude>30 then
+						hrp.CFrame=bcf
+						noVelocity()
+					end
+				end
+			end
+			if cq then
+				while ongoing(cq)do
+					pcall(function()
+						press(plrGui.NotificationsV2.Dialogs.Conversation.Frame.Buttons.Okay)
+						press(plrGui.NotificationsV2.Dialogs.Conversation.ClickBackground)
+					end)
+					if cq=="Hopsalot10Orbs"then
+						for _,v in pairs(orbsP:GetChildren())do
+							local pr=v:FindFirstChild"Prefab"
+							if pr and ongoing(cq)then
+								hrp.CFrame=v.CFrame
+								wait(.25)
+								break
+							end
+						end
+					elseif cq=="HopsalotMeteor"then
+						local meteor=workspace.Meteors:FindFirstChild"Meteor"
+						if meteor and(hrp.Position-meteor.Position).magnitude>20 and meteor.Health.value>0 then
+							hrp.CFrame=meteor.CFrame
+							wait(.25)
+						end
+					elseif cq=="HopsalotGetCrates"then
+						for _,v in pairs(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.ChestSelectionPanel.ChestSelectionFrame:GetChildren())do
+							if v.Name=="ChestInventoryItem"and tonumber(v.ChestImage.AmountImg.AmountTxt.Text)>0 then
+								press(v)
+								wait(.1)
+								press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.BuyFrame.BuyButton)
+								wait(.1)
+								press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.ChestInspectionFrame.OpenChestButton)
+							end
+						end
+					elseif cq=="HopsalotArcticSeasonSnowflakes"then
+						local trg={}
+						for _,v in pairs(workspace.Ephemeral.AdvCrate:GetChildren())do
+							local pr=v.TechBox:FindFirstChild"SnowMan"
+							if pr.Transparency==0 then
+								table.insert(trg,v.TechBox)
+							end
+						end
+						if#trg>0 then
+							local snm=nearest(trg)
+							if snm then
+								if(hrp.Position-snm.Position).magnitude>5 then
+									hrp.CFrame=snm.CFrame
+								end
+							end
+						end
+					elseif cq=="HopsalotDefeatBorock"then
+						if npcs.Boss:FindFirstChild"Borock"and plrGui.BossBoard.Frame.BossHealthFrame.Health.Text~="0"then
+							local boss=npcs.Boss.Borock:FindFirstChild"HumanoidRootPart"
+							local pcf=hrp.CFrame
+							local bcf=boss.CFrame
+							hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,1)
+							if(hrp.Position-boss.Position).magnitude>30 then
+								hrp.CFrame=bcf
+								noVelocity()
+							end
+						end
+					elseif cq=="HopsalotDefeatRobotron"then
+						farmboss"SlumBoss"
+					elseif cq=="HopsalotDefeatTempleBoss"then
+						farmboss"DemonKing"
+					elseif cq=="HopsalotDefeatSkeleBoss"then
+						farmboss"SkeleBoss"
+					elseif cq=="HopsalotDefeatEgyptBoss"then
+						farmboss"EgyptBoss"
+					elseif cq=="HopsalotDefeatGnomes"then
+						local gnomes=npcs.Gnomes:GetChildren()
+						if#gnomes>0 then
+							local boss=gnomes[#gnomes]:FindFirstChild"HumanoidRootPart"
+							local pcf=hrp.CFrame
+							local bcf=boss.CFrame
+							hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(-10,1))
+							if(hrp.Position-boss.Position).magnitude>10 then
+								hrp.CFrame=bcf
+								noVelocity()
+							end
+						end
+					elseif cq=="HopsalotDefeatPenguins"then
+						local penguins=npcs.Penguins:GetChildren()
+						if#penguins>0 then
+							local boss=penguins[#penguins]:FindFirstChild"HumanoidRootPart"
+							local pcf=hrp.CFrame
+							local bcf=boss.CFrame
+							hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(-10,1))
+							if(hrp.Position-boss.Position).magnitude>10 then
+								hrp.CFrame=bcf
+								noVelocity()
+							end
+						end
+					end
+					wait(.5)
+				end
+			end
+		end
+		wait(1)
+		cd.quest=true
 	else
 		if tog.orbs and cd.orbs and vacant then
 			vacant=false
@@ -426,10 +594,11 @@ binds.main=RunService.Heartbeat:Connect(function()
 				end
 			end
 			local c=#orbs
-			if c<1 then c=1 end
-			local orb=orbs[math.random(1,c)]
-			if orb then
-				hrp.CFrame=orb.Parent.CFrame
+			if c>0 then
+				local orb=orbs[math.random(1,c)]
+				if orb then
+					hrp.CFrame=orb.Parent.CFrame
+				end
 			end
 			wait(.25)
 			vacant=true
@@ -442,7 +611,7 @@ binds.main=RunService.Heartbeat:Connect(function()
 			if meteor and(hrp.Position-meteor.Position).magnitude>20 and meteor.Health.value>0 then
 				hrp.CFrame=meteor.CFrame
 			end
-			wait(.1)
+			wait(.5)
 			vacant=true
 			cd.meteor=true
 		end
@@ -453,13 +622,15 @@ binds.main=RunService.Heartbeat:Connect(function()
 			for _,v in pairs(workspace.Ephemeral.AdvCrate:GetChildren())do
 				local pr=v.TechBox:FindFirstChild"SnowMan"
 				if pr.Transparency==0 then
-					table.insert(trg,pr.Parent)
+					table.insert(trg,v.TechBox)
 				end
 			end
-			local snm=nearest(trg)
-			if snm then
-				if(hrp.Position-snm.Position).magnitude>5 then
-					hrp.CFrame=snm.CFrame
+			if#trg>0 then
+				local snm=nearest(trg)
+				if snm then
+					if(hrp.Position-snm.Position).magnitude>5 then
+						hrp.CFrame=snm.CFrame
+					end
 				end
 			end
 			wait(.25)
@@ -525,7 +696,7 @@ binds.main=RunService.Heartbeat:Connect(function()
 	if tog.sellchest and cd.sellchest then
 		cd.sellchest=false
 		for _,v in pairs(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.ChestSelectionPanel.ChestSelectionFrame:GetChildren())do
-			if v.Name=="ChestInventoryItem"then
+			if v.Name=="ChestInventoryItem"and tonumber(v.ChestImage.AmountImg.AmountTxt.Text)>0 then
 				press(v)
 				wait(.1)
 				press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.SellFrame.SellButton)
@@ -604,6 +775,7 @@ local Main=UI:addPage("Main",3,true,1)
 local Rebirths=UI:addPage("Rebirthing",3,false,1)
 local Crates=UI:addPage("Crates",3,false,1)
 local Enemies=UI:addPage("Enemies",3,false,1)
+local Quests=UI:addPage("Quests",3,false,1)
 local Misc=UI:addPage("Miscellaneous",3,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
 Main:addToggle("Auto Swing",tog.swing,function(v)
@@ -675,6 +847,24 @@ end)
 Enemies:addToggle("Penguins",vals.boss.penguins,function(v)
 	vals.boss.penguins=v
 end)
+Quests:addToggle("Sir Hopsalot",vals.qnpc.hopsalot,function(v)
+	vals.qnpc.hopsalot=v
+	tog.quest=vals.qnpc.hopsalot or vals.qnpc.gingerbreadman or vals.qnpc.lordent or vals.qnpc.samurai
+end)
+--[[not done yet
+Quests:addToggle("Lord Ent",vals.qnpc.lordent,function(v)
+	vals.qnpc.lordent=v
+	tog.quest=vals.qnpc.hopsalot or vals.qnpc.gingerbreadman or vals.qnpc.lordent or vals.qnpc.samurai
+end)
+Quests:addToggle("Gingerbread Man",vals.qnpc.gingerbreadman,function(v)
+	vals.qnpc.gingerbreadman=v
+	tog.quest=vals.qnpc.hopsalot or vals.qnpc.gingerbreadman or vals.qnpc.lordent or vals.qnpc.samurai
+end)
+Quests:addToggle("Samurai",vals.qnpc.samurai,function(v)
+	vals.qnpc.samurai=v
+	tog.quest=vals.qnpc.hopsalot or vals.qnpc.gingerbreadman or vals.qnpc.lordent or vals.qnpc.samurai
+end)
+]]
 Misc:addToggle("Ignore notifications",ignore.notifs,function(v)
 	ignore.notifs=v
 end)
@@ -700,4 +890,4 @@ Local:destroyGui(function()
 	for _,v in pairs(binds)do v:Disconnect()end
 	for i,v in pairs(tog)do tog[i]=false end
 	for i,v in pairs(cd)do cd[i]=false end
-end)--waypoints, time attack, quests
+end)--quests, waypoints, time attack, arena farming
