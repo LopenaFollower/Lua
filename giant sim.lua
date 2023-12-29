@@ -22,7 +22,8 @@ local tog={
 	rebirth=false,
 	dungeon=false,
 	tomb=false,
-	quest=false
+	quest=false,
+	timeattack=false
 }
 local cd={
 	swing=true,
@@ -57,6 +58,8 @@ local vals={
 		offh=nil
 	},
 	dungeon={
+		blacklist={},
+		visited={},
 		route={"0,0"},
 		backup={"0,0"}
 	},
@@ -96,6 +99,12 @@ local RunService=game:GetService"RunService"
 local aeroServices=game.ReplicatedStorage.Aero.AeroRemoteServices
 local wpnInventory=plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.WpnInvDataFrame.WpnSelectionPanel.WpnSelectionFrame
 local sknInventory=plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.SkinInventoryFrame
+function parse(a)
+	return game.HttpService:JSONDecode(a)
+end
+function stringify(a)
+	return game.HttpService:JSONEncode(a)
+end
 function pop(tb)
 	local n=tb[#tb]
 	tb[#tb]=nil
@@ -104,12 +113,23 @@ end
 function push(tb,v)
 	table.insert(tb,v)
 end
+function isnumber(s)
+	return tonumber(s)~=nil or s=="inf"
+end
 function noVelocity()
 	pcall(function()
 		hrp.AssemblyAngularVelocity=Vector3.new(0,0,0)
 		hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
 		hrp.Velocity=Vector3.new(0,0,0)
 	end)
+end
+function notif(ti,tx,d)
+	if not isnumber(d)then d=1 end
+	game.StarterGui:SetCore("SendNotification",{
+		Title=ti or"";
+		Text=tx or"";
+		Duration=tonumber(d)or 1;
+	})
 end
 function esp(v)
 	if not v:FindFirstChild"highlight"then
@@ -219,6 +239,8 @@ binds.main=RunService.RenderStepped:Connect(function()
 				if(hrp.Position-workspace.DungeonEntrance.Darkness.Position).magnitude>5 then
 					vals.dungeon.route={"0,0"}
 					vals.dungeon.backup={"0,0"}
+					vals.dungeon.blacklist={}
+					vals.dungeon.visited={}
 				end
 				hrp.CFrame=workspace.DungeonEntrance.Darkness.CFrame*CFrame.new(0,5,0)
 				wait(2.5)
@@ -230,7 +252,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 			function strPos()
 				return tostring(plrPos()):gsub(" ","")
 			end
-			if plrDungeon and plrPos() then
+			if plrDungeon and plrPos()then
 				function XYZtoXY(c)
 					local t=c:split","
 					return t[1]..","..t[3]
@@ -260,18 +282,38 @@ binds.main=RunService.RenderStepped:Connect(function()
 					}
 					return dirs[nsew]
 				end
+				function getRoom2()
+					local r={}
+					for _,v in pairs(plrDungeon:GetChildren())do
+						pcall(function()
+							if v.Floor.floor_Plane then
+								push(r,v.Floor.floor_Plane)
+							end
+						end)
+					end
+					return nearest(r).Parent.Parent
+				end
 				function getRoom()
-					return plrDungeon:FindFirstChild("Room:"..strPos())
+				--	return plrDungeon:FindFirstChild("Room:"..strPos())
+					return getRoom2()
+				end
+				function blacklistRoom(r)
+					vals.dungeon.blacklist[r]=true
+				end
+				function isRoomBlacklisted(r)--Room:xyz
+					return vals.dungeon.blacklist[r]
 				end
 				function visitedRoom(xyz)
-					local a="Room:"..xyz
-					return plrDungeon:FindFirstChild(a)and plrDungeon[a]:FindFirstChild"e"
+					return plrDungeon:FindFirstChild("Room:"..xyz)and vals.dungeon.visited[xyz]
 				end
 				function gotoRoom(xyz)
 					local c=plrDungeon:FindFirstChild("Room:"..xyz).Floor.floor_Plane.CFrame
 					hrp.CFrame=CFrame.new(c.x,c.y+10,c.z)
-					local w=Instance.new("Weld",plrDungeon:FindFirstChild("Room:"..xyz))
-					w.Name="e"
+					wait()
+					hrp.CFrame=CFrame.new(c.x,c.y+10,c.z)
+					wait()
+					hrp.CFrame=CFrame.new(c.x,c.y+10,c.z)
+					vals.dungeon.visited[xyz]=true
 				end
 				function roomsLeft()
 					local n=0
@@ -295,7 +337,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 				function checkPath(xy)
 					return plrGui.DungeonMinimap.MapFrame:FindFirstChild(xy)and plrGui.DungeonMinimap.MapFrame:FindFirstChild(xy).Visible
 				end
-				function getPaths()
+				function getPaths(ignvs)
 					local ps,p={},plrPos()
 					for _,v in pairs(getRoom().Doors:GetChildren())do
 						if v:IsA"BasePart"then
@@ -307,15 +349,54 @@ binds.main=RunService.RenderStepped:Connect(function()
 						local sp=ps[i]:split","
 						local hf=(sp[1]/2)..","..(sp[2]/2)
 						local ar=(tonumber(sp[1])+p.x)..","..p.y..","..(tonumber(sp[2])+p.z)
-						if checkPath(hf)and not visitedRoom(ar)then
+						if checkPath(hf)and not visitedRoom(ar)and not isRoomBlacklisted("Room:"..ar)then
 							push(fp,ps[i])
+						end
+					end
+					if ignvs then
+						for i=1,#ps do
+							local sp=ps[i]:split","
+							local hf=(sp[1]/2)..","..(sp[2]/2)
+							local ar=(tonumber(sp[1])+p.x)..","..p.y..","..(tonumber(sp[2])+p.z)
+							if not isRoomBlacklisted("Room:"..ar)then
+								push(fp,ps[i])
+							end
 						end
 					end
 					return fp
 				end
+				function choosePath()
+					local paths=getPaths()--add a marker on the gui to show if visited/blacklisted
+					local p=plrPos()--fix picking visited room over new room
+					for i=1,#paths do
+						local sp=paths[i]:split","
+						local ar=(tonumber(sp[1])+p.x)..","..p.y..","..(tonumber(sp[2])+p.z)
+						if not visitedRoom(ar)and not isRoomBlacklisted("Room:"..ar)then
+							notif("good path",ar)
+							return paths[i]
+						end
+					end
+					for i=1,#paths do
+						local sp=paths[i]:split","
+						local ar=(tonumber(sp[1])+p.x)..","..p.y..","..(tonumber(sp[2])+p.z)
+						if not isRoomBlacklisted("Room:"..ar)then
+							notif"meh path"
+							return paths[i]
+						end
+					end
+					notif"hopeless"
+					return paths[math.random(1,#paths)]
+				end
 				function getRoot(i)
 					for _,v in pairs(i:GetDescendants())do
 						if v.Name==hrp.Name then
+							return v
+						end
+					end
+				end
+				function getPart(i)
+					for _,v in pairs(i:GetDescendants())do
+						if v:IsA"BasePart"then
 							return v
 						end
 					end
@@ -330,86 +411,96 @@ binds.main=RunService.RenderStepped:Connect(function()
 					return t
 				end
 				if roomsLeft()>0 then
-					local retrace=#getPaths()<1
-					if not retrace then
-						if XYZtoXY(strPos())=="0,0"then
+					local paths=getPaths()
+					local pc=#paths
+					local prc=true
+					if pc>0 then
+						if XYZtoXY(strPos())=="0,0"and pc==1 then
+							blacklistRoom(getRoom().Name)
 							gotoRoom(strPos())
 						end
-						local dirs=getPaths()
-						local cd=dirs[math.random(1,#dirs)]
+						local cd=choosePath()
 						local oldRoom=getRoom().Name
 						local chosenDoor=getRoom().Doors[direction(cd)]
-						hrp.CFrame=chosenDoor.CFrame
+						repeat
+							hum.WalkToPoint=chosenDoor.Position
+							wait(.1)
+						until(chosenDoor.Position-hrp.Position).magnitude<10 or tostring(plr.TeamColor)~="Sea green"or getRoom().Name~=oldRoom
 						repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
-						wait(.3)
-						recordPath(cd)
-						if not getRoom().Doors:FindFirstChild"Down"then
-							gotoRoom(strPos())
-						end
-					end
-					local pass=true
-					if getRoom().Doors:FindFirstChild"Down"then
-						local fl=plrPos().y
-						gotoRoom(strPos())
-						repeat wait()until plrGui.NotificationsV2.Dialogs:FindFirstChild"Dialog"or tostring(plr.TeamColor)~="Sea green"or plrPos().y>fl
-						pcall(function()
-							press(plrGui.NotificationsV2.Dialogs.Dialog.Frame.Buttons.Okay)
-						end)
-						pass=false
-						retrace=false
-						repeat wait()until plrPos().y>fl or tostring(plr.TeamColor)~="Sea green"
-						vals.dungeon.route={"0,0"}
-						vals.dungeon.backup={"0,0"}
-						wait(.5)
-					end
-					wait(.5)
-					if pass then
-						repeat wait()until getRoom()and(getRoom():FindFirstChild"Enemies"or getRoom():FindFirstChild"Chest")or tostring(plr.TeamColor)~="Sea green"or XYZtoXY(strPos())=="0,0"
 						wait(.25)
-						if getRoom():FindFirstChild"Enemies"and #getRoom().Enemies:GetChildren()>0 then
-							while #getRoom().Enemies:GetChildren()>0 do
-								pcall(function()
-									local enems=getRoom().Enemies:GetChildren()
-									if not tog.swing then
-										swing()
-									end
-									hrp.CFrame=getRoot(enems[math.random(1,#enems)]).CFrame
-									noVelocity()
-								end)
-								task.wait(.1)
-							end
-							repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
-						elseif getRoom():FindFirstChild"Chest"and getRoom().Chest:FindFirstChild"Base"and getRoom().Chest.Base:FindFirstChild"ProximityPrompt"then
-							local b=getRoom().Chest.Base
-							local st=os.time()
-							while b:FindFirstChild"ProximityPrompt"do
-								hrp.CFrame=b.CFrame*CFrame.new(0,5,0)
-								wait()
-								pcall(function()
-									fireproximityprompt(b.ProximityPrompt)
-								end)
-								if os.time()-st>2 then
-									b:FindFirstChild"ProximityPrompt":Destroy()
-									break
-								end
-							end
-							repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
-						elseif retrace and#getPaths()<1 then
-							if #vals.dungeon.route<1 then
-								vals.dungeon.route={table.unpack(vals.dungeon.backup)}
-							end
+						recordPath(cd)
+						gotoRoom(getRoom().Name:gsub("Room:",""))
+						if getRoom().Doors:FindFirstChild"Down"then
+							prc=false
+							local fl=plrPos().y
+							wait(.1)
+							hrp.CFrame=getPart(getRoom().Doors.Down).CFrame+Vector3.new(0,7,0)
+							repeat wait()until plrGui.NotificationsV2.Dialogs:FindFirstChild"Dialog"or tostring(plr.TeamColor)~="Sea green"or plrPos().y>fl
 							pcall(function()
-								local cd=inverse(vals.dungeon.route[#vals.dungeon.route])
-								local chosenDoor=getRoom().Doors[direction(cd)]
-								local oldRoom=getRoom().Name
-								hrp.CFrame=chosenDoor.CFrame
-								repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
-								pop(vals.dungeon.route)
-								wait(.3)
-								gotoRoom(strPos())
+								press(plrGui.NotificationsV2.Dialogs.Dialog.Frame.Buttons.Okay)
 							end)
-							wait(.25)
+							repeat wait()until plrPos().y>fl or tostring(plr.TeamColor)~="Sea green"
+							vals.dungeon.route={"0,0"}
+							vals.dungeon.backup={"0,0"}
+							vals.dungeon.blacklist={}
+							vals.dungeon.visited={}
 						end
+						if prc then
+							repeat wait()until getRoom()and(getRoom():FindFirstChild"Enemies"or getRoom():FindFirstChild"Chest")or tostring(plr.TeamColor)~="Sea green"or XYZtoXY(strPos())=="0,0"
+							wait(.5)
+							if getRoom():FindFirstChild"Enemies"and#getRoom().Enemies:GetChildren()>0 then
+								while getRoom():FindFirstChild"Enemies"and#getRoom().Enemies:GetChildren()>0 do
+									pcall(function()
+										local enems=getRoom().Enemies:GetChildren()
+										if not tog.swing then
+											swing()
+										end
+										local ec=getRoot(enems[#enems])
+										if(hrp.Position-Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z)).magnitude>3 then
+											chr:TranslateBy((Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z)-hrp.Position)*.15)
+											wait()
+											hrp.CFrame=CFrame.lookAt(hrp.Position,Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z))
+										end
+										hrp.CFrame=
+										noVelocity()
+									end)
+									task.wait()
+								end
+								wait(.15)
+								repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
+								gotoRoom(getRoom().Name:gsub("Room:",""))
+							elseif getRoom():FindFirstChild"Chest"and getRoom().Chest:FindFirstChild"Base"and getRoom().Chest.Base:FindFirstChild"ProximityPrompt"then
+								local b=getRoom().Chest.Base
+								local st=os.time()
+								while b:FindFirstChild"ProximityPrompt"do
+									hrp.CFrame=b.CFrame*CFrame.new(0,5,0)
+									wait()
+									pcall(function()
+										fireproximityprompt(b.ProximityPrompt)
+									end)
+									if os.time()-st>2 then
+										b:FindFirstChild"ProximityPrompt":Destroy()
+										break
+									end
+								end
+								repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
+							end
+						end
+					else
+						blacklistRoom(getRoom().Name)
+						local pts=getPaths(true)
+						notif"Retracing"
+						local p=#pts
+						local cd=pts[math.random(1,p)]
+						local oldRoom=getRoom().Name
+						local chosenDoor=getRoom().Doors[direction(cd)]
+						repeat
+							hum.WalkToPoint=chosenDoor.Position
+							wait(.1)
+						until(chosenDoor.Position-hrp.Position).magnitude<10 or tostring(plr.TeamColor)~="Sea green"or getRoom().Name~=oldRoom
+						repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
+						wait(.25)
+						gotoRoom(strPos())
 					end
 				end
 				wait(1)
@@ -442,7 +533,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 				end
 				repeat wait()until(hrp.Position-Vector3.new(14476,-34,-2234)).magnitude<3 or not tog.tomb
 			end
-			wait(5)
+			wait(3)
 			cd.tomb=true
 		end
 	elseif tog.quest and cd.quest then
@@ -484,21 +575,23 @@ binds.main=RunService.RenderStepped:Connect(function()
 			end
 			function farmboss(n)
 				if getst(n)then
-					local boss=npcs[n][n]:FindFirstChild"HumanoidRootPart"
-					local pcf=hrp.CFrame
-					local bcf=boss.CFrame
-					hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,1)
-					if(hrp.Position-boss.Position).magnitude>30 then
-						hrp.CFrame=bcf
-						noVelocity()
-					end
+					pcall(function()
+						local boss=npcs[n][n]:FindFirstChild"HumanoidRootPart"
+						local pcf=hrp.CFrame
+						local bcf=boss.CFrame
+						hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,1)
+						if(hrp.Position-boss.Position).magnitude>30 then
+							hrp.CFrame=bcf
+							noVelocity()
+						end
+					end)
 				end
 			end
 			if cq then
 				if cq=="HopsalotDefeatRobotron"then
 					farmboss"SlumBoss"
 					wait(.1)
-					for i=0,5 do
+					for i=0,10 do
 						hrp.CFrame=hrp.CFrame*CFrame.new(5,0,0)
 						pcall(function()
 							press(plrGui.NotificationsV2.Dialogs.Conversation.Frame.Buttons.Okay)
@@ -551,18 +644,18 @@ binds.main=RunService.RenderStepped:Connect(function()
 					elseif cq=="HopsalotArcticSeasonSnowflakes"then
 						local trg={}
 						for _,v in pairs(workspace.Ephemeral.AdvCrate:GetChildren())do
-							local pr=v.TechBox:FindFirstChild"SnowMan"
-							if pr.Transparency==0 and ongoing(cq)then
-								hrp.CFrame=v.TechBox.CFrame
+							local pr=v.TechBox
+							if pr.SnowMan.Transparency==0 and ongoing(cq)and(hrp.Position-pr.Position).magnitude>4 then
+								hrp.CFrame=pr.CFrame*CFrame.new(0,0,2)
+								wait(.15)
 								break
 							end
 						end
 					elseif cq=="HopsalotDefeatBorock"then
 						if npcs.Boss:FindFirstChild"Borock"and plrGui.BossBoard.Frame.BossHealthFrame.Health.Text~="0"then
 							local boss=npcs.Boss.Borock:FindFirstChild"HumanoidRootPart"
-							local pcf=hrp.CFrame
 							local bcf=boss.CFrame
-							hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,1)
+							hrp.CFrame=(bcf-Vector3.new(0,bcf.y-hrp.CFrame.y,0))*CFrame.new(0,0,1)
 							if(hrp.Position-boss.Position).magnitude>30 then
 								hrp.CFrame=bcf
 								noVelocity()
@@ -579,26 +672,29 @@ binds.main=RunService.RenderStepped:Connect(function()
 					elseif cq=="HopsalotDefeatGnomes"then
 						local gnomes=npcs.Gnomes:GetChildren()
 						if#gnomes>0 then
-							local boss=gnomes[#gnomes]:FindFirstChild"HumanoidRootPart"
-							local pcf=hrp.CFrame
-							local bcf=boss.CFrame
-							hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(-15,1))
-							if(hrp.Position-boss.Position).magnitude>15 then
-								hrp.CFrame=bcf*CFrame.new(0,0,math.random(-15,1))
-								noVelocity()
-							end
+							pcall(function()
+								local boss=gnomes[#gnomes].HumanoidRootPart
+								local bcf=boss.CFrame
+								hrp.CFrame=(bcf-Vector3.new(0,bcf.y-hrp.CFrame.y,0))*CFrame.new(0,0,math.random(-15,1))
+								if(hrp.Position-boss.Position).magnitude>15 then
+									hrp.CFrame=bcf*CFrame.new(0,0,math.random(-15,1))
+									noVelocity()
+								end
+							end)
 						end
 					elseif cq=="HopsalotDefeatPenguins"then
 						local penguins=npcs.Penguins:GetChildren()
 						if#penguins>0 then
-							local boss=penguins[1]:FindFirstChild"HumanoidRootPart"
-							local pcf=hrp.CFrame
-							local bcf=boss.CFrame
-							hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(-15,1))
-							if(hrp.Position-boss.Position).magnitude>15 then
-								hrp.CFrame=bcf*CFrame.new(0,0,math.random(-15,1))
-								noVelocity()
-							end
+							pcall(function()
+								local boss=penguins[#penguins].HumanoidRootPart
+								local pcf=hrp.CFrame
+								local bcf=boss.CFrame
+								hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(-15,1))
+								if(hrp.Position-boss.Position).magnitude>15 then
+									hrp.CFrame=bcf*CFrame.new(0,0,math.random(-15,1))
+									noVelocity()
+								end
+							end)
 						end
 					end
 					wait(.1)
@@ -611,18 +707,10 @@ binds.main=RunService.RenderStepped:Connect(function()
 		if tog.orbs and cd.orbs and vacant then
 			vacant=false
 			cd.orbs=false
-			local orbs={}
 			for _,v in pairs(orbsP:GetChildren())do
-				local pr=v:FindFirstChild"Prefab"
-				if pr then
-					table.insert(orbs,pr)
-				end
-			end
-			local c=#orbs
-			if c>0 then
-				local orb=orbs[math.random(1,c)]
-				if orb then
-					hrp.CFrame=orb.Parent.CFrame
+				if v:FindFirstChild"Prefab"then
+					hrp.CFrame=v.CFrame
+					break
 				end
 			end
 			wait(.25)
@@ -643,22 +731,17 @@ binds.main=RunService.RenderStepped:Connect(function()
 		if tog.event and cd.event and vacant then
 			vacant=false
 			cd.event=false
-			local trg={}
 			for _,v in pairs(workspace.Ephemeral.AdvCrate:GetChildren())do
-				local pr=v.TechBox:FindFirstChild"SnowMan"
-				if pr.Transparency==0 then
-					table.insert(trg,v.TechBox)
-				end
-			end
-			if#trg>0 then
-				local snm=nearest(trg)
-				if snm then
-					if(hrp.Position-snm.Position).magnitude>2 then
-						hrp.CFrame=snm.CFrame
+				local pr=v.TechBox
+				vacant=false
+				if pr.SnowMan.Transparency==0 then
+					if(hrp.Position-pr.Position).magnitude>3 then
+						hrp.CFrame=pr.CFrame*CFrame.new(0,0,2)
+						break
 					end
 				end
 			end
-			wait(.25)
+			wait(.2)
 			vacant=true
 			cd.event=true
 		end
@@ -666,19 +749,15 @@ binds.main=RunService.RenderStepped:Connect(function()
 			vacant=false
 			local boss=getboss()
 			local bossold=boss
-			local i=0
 			while boss==bossold and boss~=nil and tog.farmboss do
-				local inc=1
-				local pcf=hrp.CFrame
+				local inc=2
 				local bcf=boss.CFrame
 				if boss.Parent.Name=="Gnome"or boss.Parent.Name=="Penguin"then inc=-10 end
-				hrp.CFrame=(bcf-Vector3.new(0,bcf.y-pcf.y,0))*CFrame.new(0,0,math.random(inc,1))
-				if i>60 or(hrp.Position-boss.Position).magnitude>25 then
+				hrp.CFrame=(bcf-Vector3.new(0,bcf.y-hrp.CFrame.y,0))*CFrame.new(0,0,math.random(inc,2))
+				if(hrp.Position-boss.Position).magnitude>25 then
 					hrp.CFrame=bcf
 					noVelocity()
-					i=0
 				end
-				i=i+1
 				vacant=false
 				wait(.025)
 				boss=getboss()
