@@ -713,7 +713,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 					break
 				end
 			end
-			wait(.25)
+			wait(.175)
 			vacant=true
 			cd.orbs=true
 		end
@@ -741,7 +741,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 					end
 				end
 			end
-			wait(.2)
+			wait(.25)
 			vacant=true
 			cd.event=true
 		end
