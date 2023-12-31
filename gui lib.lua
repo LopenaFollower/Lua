@@ -408,7 +408,8 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 		end)
 		local PageElements={}
 		local destroyButton=true
-		function PageElements:rename(name)
+		function PageElements:rename(n)
+			local name=tostring(n)
 			if name:len()>0 then
 				Tab.Text=name
 			end
