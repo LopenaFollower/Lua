@@ -42,6 +42,9 @@
 -- * elementspacing (number)
 --  - The padding between elements.
 --
+-- Methods:
+-- Page:rename(string)
+--
 --PageElements:addLabel(labelname,labelinfo)
 -- * Creates a Label
 -- Parameters:
@@ -158,7 +161,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=305
+local Version=307
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -405,6 +408,11 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 		end)
 		local PageElements={}
 		local destroyButton=true
+		function PageElements:rename(name)
+			if name:len()>0 then
+				Tab.Text=name
+			end
+		end
 		function PageElements:addLabel(labelname,labelinfo)
 			local LabelHolder=Instance.new"Frame"
 			local LabelHolderCorner=Instance.new"UICorner"
