@@ -161,7 +161,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=307
+local Version=308
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -467,6 +467,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 		end
 		function PageElements:addButton(buttonname,callback)
 			local ButtonHolder=Instance.new"Frame"
+			local ButtonTitle=Instance.new"TextLabel"
 			local Button=Instance.new"TextButton"
 			local ButtonCorner=Instance.new"UICorner"
 			local ButtonHolderCorner=Instance.new"UICorner"
@@ -478,19 +479,31 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			ButtonHolder.BorderSizePixel=0
 			ButtonHolder.Position=UDim2.new(.0167785231,0,0,0)
 			ButtonHolder.Size=UDim2.new(0,288,0,26)
+			ButtonTitle.Name="ButtonName"
+			ButtonTitle.Parent=ButtonHolder
+			ButtonTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
+			ButtonTitle.BackgroundTransparency=1
+			ButtonTitle.BorderColor3=Color3.fromRGB(17,17,17)
+			ButtonTitle.BorderSizePixel=0
+			ButtonTitle.Position=UDim2.new(.024305556,0,0,0)
+			ButtonTitle.Size=UDim2.new(0,195,0,24)
+			ButtonTitle.Font=Enum.Font.GothamSemibold
+			ButtonTitle.Text=buttonname or""
+			ButtonTitle.TextColor3=Color3.fromRGB(255,255,255)
+			ButtonTitle.TextSize=11
+			ButtonTitle.TextXAlignment=Enum.TextXAlignment.Left
 			Button.Name="Button"
 			Button.Parent=ButtonHolder
 			Button.BackgroundColor3=Color3.fromRGB(17,17,17)
 			Button.BackgroundTransparency=1
 			Button.BorderColor3=Color3.fromRGB(17,17,17)
-			Button.BorderSizePixel=0
-			Button.Size=UDim2.new(0,288,0,26)
+			Button.Position=UDim2.new(.802083313,0,1.17375305e-06,0)
+			Button.Size=UDim2.new(0,57,0,25)
 			Button.AutoButtonColor=false
-			Button.Font=Enum.Font.GothamSemibold
-			Button.Text=buttonname or"nil"
+			Button.Font=Enum.Font.SourceSans
+			Button.Text="btn"
 			Button.TextColor3=Color3.fromRGB(255,255,255)
-			Button.TextSize=11
-			ButtonCorner.CornerRadius=UDim.new(0,5)
+			Button.TextSize=14
 			ButtonCorner.Name="ButtonCorner"
 			ButtonCorner.Parent=Button
 			ButtonHolderCorner.CornerRadius=UDim.new(0,5)
