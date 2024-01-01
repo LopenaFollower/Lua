@@ -161,7 +161,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=308
+local Version=309
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -479,7 +479,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			ButtonHolder.BorderSizePixel=0
 			ButtonHolder.Position=UDim2.new(.0167785231,0,0,0)
 			ButtonHolder.Size=UDim2.new(0,288,0,26)
-			ButtonTitle.Name="ButtonName"
+			ButtonTitle.Name="ButtonTitle"
 			ButtonTitle.Parent=ButtonHolder
 			ButtonTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
 			ButtonTitle.BackgroundTransparency=1
@@ -494,11 +494,11 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			ButtonTitle.TextXAlignment=Enum.TextXAlignment.Left
 			Button.Name="Button"
 			Button.Parent=ButtonHolder
-			Button.BackgroundColor3=Color3.fromRGB(17,17,17)
-			Button.BackgroundTransparency=1
+			Button.BackgroundColor3=Color3.fromRGB(5,5,5)
+			Button.BackgroundTransparency=0
 			Button.BorderColor3=Color3.fromRGB(17,17,17)
-			Button.Position=UDim2.new(.802083313,0,1.17375305e-06,0)
-			Button.Size=UDim2.new(0,57,0,25)
+			Button.Position=UDim2.new(.8534,0,1.17375305e-06,0)
+			Button.Size=UDim2.new(0,34,0,19)
 			Button.AutoButtonColor=false
 			Button.Font=Enum.Font.SourceSans
 			Button.Text="btn"
@@ -588,16 +588,8 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			ToggleBallCorner.Parent=ToggleBall
 			local function check()
 				if ToggleEnabled then
-					ToggleHolder.BackgroundColor3=Color3.fromRGB(16,16,16)
-					ToggleBall:TweenPosition(UDim2.new(.455,0,.158,0),"Out","Linear",.1)
-					wait(.05)
-					ToggleHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
 					ToggleBall:TweenPosition(UDim2.new(.455,0,.158,0),"Out","Linear",.1)
 				else
-					ToggleHolder.BackgroundColor3=Color3.fromRGB(16,16,16)
-					ToggleBall:TweenPosition(UDim2.new(.123,0,.158,0),"Out","Linear",.1)
-					wait(.05)
-					ToggleHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
 					ToggleBall:TweenPosition(UDim2.new(.123,0,.158,0),"Out","Linear",.1)
 				end
 				pcall(callback,ToggleEnabled)
