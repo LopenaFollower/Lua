@@ -161,7 +161,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=309.5
+local Version=310
 local CoreGui=game.CoreGui
 local UserInputService=game:GetService"UserInputService"
 if CoreGui:FindFirstChild"fu8rj82n"then
@@ -1030,46 +1030,6 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 		function PageElements:destroyGui(callback)
 			if destroyButton then
 				destroyButton=false
-				--[[
-				local ButtonHolder=Instance.new"Frame"
-				local Button=Instance.new"TextButton"
-				local ButtonCorner=Instance.new"UICorner"
-				local ButtonHolderCorner=Instance.new"UICorner"
-				local callback=callback or function()end
-				ButtonHolder.Name="ButtonHolder"
-				ButtonHolder.Parent=Home
-				ButtonHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-				ButtonHolder.BorderColor3=Color3.fromRGB(17,17,17)
-				ButtonHolder.BorderSizePixel=0
-				ButtonHolder.Position=UDim2.new(.0167785231,0,0,0)
-				ButtonHolder.Size=UDim2.new(0,288,0,26)
-				Button.Name="Button"
-				Button.Parent=ButtonHolder
-				Button.BackgroundColor3=Color3.fromRGB(17,17,17)
-				Button.BackgroundTransparency=1
-				Button.BorderColor3=Color3.fromRGB(17,17,17)
-				Button.BorderSizePixel=0
-				Button.Size=UDim2.new(0,288,0,26)
-				Button.AutoButtonColor=false
-				Button.Font=Enum.Font.GothamSemibold
-				Button.Text="Destroy Gui"
-				Button.TextColor3=Color3.fromRGB(255,255,255)
-				Button.TextSize=11
-				ButtonCorner.CornerRadius=UDim.new(0,5)
-				ButtonCorner.Name="ButtonCorner"
-				ButtonCorner.Parent=Button
-				ButtonHolderCorner.CornerRadius=UDim.new(0,5)
-				ButtonHolderCorner.Name="ButtonHolderCorner"
-				ButtonHolderCorner.Parent=ButtonHolder
-				Button.MouseButton1Down:Connect(function()
-					Button.TextSize=9
-					wait(.1)
-					Button.TextSize=11
-					pcall(callback)
-					wait(.1)
-					fu8rj82n:Destroy()
-				end)
-				]]
 				PageElements:addButton("Destroy Gui",function()
 					pcall(callback)
 					fu8rj82n:Destroy()
