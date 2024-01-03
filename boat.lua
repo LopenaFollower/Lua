@@ -3,13 +3,15 @@ local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr and chr:FindFirstChildWhichIsA"Humanoid"
 local hrp=chr.HumanoidRootPart
-local farm_speed=23
-local goal=8425
-local gold=0
+local gold=tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)
+local totaltime=os.time()
+local timer=os.time()
+local routinegold=0
 local binds={}
+local farm_speed=450
 local toggle={
-	farm=false,
-	die=false,
+	farm=true,
+	mode=0,
 	delete=false,
 	infj=false
 }
@@ -17,7 +19,7 @@ local autobuy={
 	item=nil,
 	s=false,
 	check=false,
-	min=nil,
+	min=100405,
 	cd=true
 }
 local delete={
@@ -108,6 +110,10 @@ local delete={
 	["StoneRod"]=true,
 	["Flag"]=true,
 	["ParachuteBlock"]=true,
+	["SticksOfTNT"]=true,
+	["CameraDome"]=true,
+	["CornerWedge"]=true,
+	["CornerWedge"]=true,
 	["CornerWedge"]=true,
 	["CornerWedge"]=true,
 	["CornerWedge"]=true,
@@ -165,54 +171,44 @@ local items={
 	"TitaniumBlock",
 	"ObsidianBlock"
 }
-binds.chat=plr.PlayerGui.GainedGoldGui.SlideDownFrame.ChildAdded:Connect(function(v)
-	if v.Name=="GainClone"then
-		if not v:FindFirstChildWhichIsA"TextLabel".Text:find"+"then return end
-		gold=gold+tonumber(string.match(v:FindFirstChildWhichIsA"TextLabel".Text,"%d+"))
-	end
-end)
+if not workspace:FindFirstChild"conveyor"then
+	local p=Instance.new("Part",workspace)
+	p.Name="conveyor"
+	p.Size=Vector3.new(1,0,5)
+	p.Transparency=.95
+	p.Anchored=true
+	p.CFrame=hrp.CFrame-Vector3.new(0,3,0)
+	p.Velocity=p.CFrame:vectorToWorldSpace(Vector3.new(0,0,farm_speed))
+end
+function noVelocity()
+	pcall(function()
+		hrp.AssemblyAngularVelocity=Vector3.new(0,0,0)
+		hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
+		hrp.Velocity=Vector3.new(0,0,0)
+	end)
+end
+local conveyor=workspace:FindFirstChild"conveyor"
 binds.jump=game.UserInputService.JumpRequest:connect(function()
 	if toggle.infj and hum then
 		hum:ChangeState"Jumping"
 	end
 end)
-workspace.ChildAdded:Connect(function()
-	wait(.2)
-	for _,v2 in pairs(workspace:GetChildren())do
-		if toggle.delete and delete[v2.Name]and v2:IsA"Model"then
-			v2:Destroy()
-		end
-	end
-	binds.chat:Disconnect()
-	pcall(function()
-		binds.chat=plr.PlayerGui.GainedGoldGui.SlideDownFrame.ChildAdded:Connect(function(v)
-			if v.Name=="GainClone"then
-				if not v:FindFirstChildWhichIsA"TextLabel".Text:find"+"then return end
-				gold=gold+tonumber(string.match(v:FindFirstChildWhichIsA"TextLabel".Text,"%d+"))
-			end
-		end)
-	end)
-	binds.jump:Disconnect()
-	pcall(function()
-		binds.jump=game.UserInputService.JumpRequest:connect(function()
-			if toggle.infj and hum then
-				hum:ChangeState"Jumping"
-			end
-		end)
-	end)
+binds.added=workspace.ChildAdded:Connect(function()
+	wait(.01)
 	if toggle.delete then
-		for _,i in pairs(workspace.BoatStages.NormalStages:GetChildren())do
-			if i.Name~="TheEnd"then
-				i:Destroy()
+		for _,v2 in pairs(workspace:GetChildren())do
+			if delete[v2.Name]and v2:IsA"Model"then
+				v2:Destroy()
 			end
+		end
+		for _,i in pairs(workspace.BoatStages.NormalStages:GetChildren())do
+			if i.Name~="TheEnd"then i:Destroy()end
 		end
 		for _,i in pairs(workspace.BoatStages.OtherStages:GetChildren())do
 			i:Destroy()
 		end
 		for _,i in pairs(workspace.BoatStages.NormalStages.TheEnd:GetChildren())do
-			if i.Name~="GoldenChest"then
-				i:Destroy()
-			end
+			if i.Name~="GoldenChest"then i:Destroy()end
 			for _,v in pairs(i:GetChildren())do
 				if v.Name:find"DisplayPrizes"or v.Name=="LightPart"then
 					v:Destroy()
@@ -233,38 +229,48 @@ workspace.ChildAdded:Connect(function()
 		end
 	end
 end)
-game:GetService"RunService".Heartbeat:Connect(function()
+local yVal=40
+binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=plr.Character
-		hum=chr and chr:FindFirstChildWhichIsA"Humanoid"
+		hum=chr:FindFirstChildWhichIsA"Humanoid"
 		hrp=chr.HumanoidRootPart
-		workspace[plr.Name].HumanoidRootPart.GroupLabel.TextLabel.Text="Session Earnings: "..gold
+		local cgold=tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)
+		workspace[plr.Name].HumanoidRootPart.GroupLabel.TextLabel.Text="Time: "..(os.time()-totaltime).."s/"..(os.time()-timer).."s\nGold: "..(cgold-gold).."/"..(cgold-routinegold).."\nDist: "..math.round((hrp.Position-Vector3.new(-56,-359,9496)).magnitude)
+		conveyor=workspace:FindFirstChild"conveyor"
+		conveyor.Velocity=conveyor.CFrame:vectorToWorldSpace(Vector3.new(0,0,farm_speed))
+		workspace.CurrentCamera.CameraSubject=chr
 	end)
-	if hrp.CFrame.z<(goal-1000)then
-		workspace.ClaimRiverResultsGold:FireServer()
-	end
 	if toggle.farm then
-		if hrp.CFrame.z<1000 then
-			hrp.CFrame=CFrame.new(-56,30,1000)
-			game.TweenService:Create(hrp,TweenInfo.new(farm_speed,Enum.EasingStyle.Linear),{CFrame=CFrame.new(-56,30,goal+10)}):Play()
+		local goal=8325
+		local zm=1050
+		if toggle.mode==1 then goal=2165 end
+		if hrp.CFrame.z<goal-1100 and toggle.mode~=1 then
+			workspace.ClaimRiverResultsGold:FireServer()
 		end
-		hrp.Velocity=Vector3.new(0,0,0)
-		hrp.AssemblyAngularVelocity=Vector3.new(0,0,0)
-		hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
-		if hrp.Position.z>goal and hrp.Position.z<9490 then
-			hrp.CFrame=CFrame.new(-56,-360,9496)
-			if toggle.die and hum then
-				hum.Health=0
-				workspace.CurrentCamera.CameraSubject=chr
+		if hrp.CFrame.z<zm then
+			hrp.CFrame=CFrame.new(-56,yVal,zm)
+			timer=os.time()
+			routinegold=tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)
+		end
+		if hrp.CFrame.z>=zm and hrp.Position.z<goal then
+			conveyor.CFrame=CFrame.new(-56,yVal-2,hrp.CFrame.z)
+			hrp.CFrame=CFrame.new(-56,hrp.CFrame.y,hrp.CFrame.z)
+			if hrp.CFrame.y<yVal-2 then
+				hrp.CFrame=CFrame.new(-56,yVal,hrp.CFrame.z)
 			end
-			wait(1)
+		end
+		if hrp.Position.z>goal and hrp.Position.z<9495 then
+			if toggle.mode~=2 then
+				hrp.CFrame=CFrame.new(-56,-359,9496)
+				noVelocity()
+			elseif hum then hum.Health=0 end
+			wait(.3)
+			noVelocity()
 			workspace.ClaimRiverResultsGold:FireServer()
 			wait(15)
-			if hrp.Position.z>goal and hum then
-				hum.Health=0
-				workspace.CurrentCamera.CameraSubject=chr
-			end
+			if hrp.Position.z>goal and hum then hum.Health=0 end
 		end
 	end
 	if autobuy.s and autobuy.item~=nil and autobuy.cd then
@@ -273,57 +279,62 @@ game:GetService"RunService".Heartbeat:Connect(function()
 			if plr.PlayerGui:FindFirstChild"ItemGained"then
 				plr.PlayerGui:FindFirstChild"ItemGained":Destroy()
 			end
-			if autobuy.check and type(autobuy.min)=="number"and tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)>autobuy.min then
-				workspace:WaitForChild("ItemBoughtFromShop"):InvokeServer(autobuy.item,1)
-			elseif not autobuy.check then
-				workspace:WaitForChild("ItemBoughtFromShop"):InvokeServer(autobuy.item,1)
+			if(type(autobuy.min)=="number"and(autobuy.check and tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)>autobuy.min))or not autobuy.check then
+				workspace:WaitForChild"ItemBoughtFromShop":InvokeServer(autobuy.item,1)
 			end
 		end)
 		wait(.25)
 		autobuy.cd=true
 	end
 end)
+binds.light=game:GetService("Lighting").Changed:Connect(function()
+	if hum and toggle.mode<1 and(hrp.Position-Vector3.new(-56,-359,9496)).magnitude<5 then
+		hum.Health=0
+	end
+end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
 local UI=GUI:CreateWindow("BABFB","...")
-local Main=UI:addPage("Main",3,true,1)
-local Shop=UI:addPage("Shop",3,false,1)
-local Teleport=UI:addPage("Teleport",3,false,1)
-local Local=UI:addPage("Local Player",3,false,1)
-Main:addToggle("Start",nil,function(v)
+local Main=UI:addPage("Main",1,true,1)
+local Shop=UI:addPage("Shop",1,false,1)
+local Teleport=UI:addPage("Teleport",2,false,1)
+local Local=UI:addPage("Local Player",1,false,1)
+Main:addToggle("Start",toggle.farm,function(v)
 	toggle.farm=v
 end)
-Main:addDropdown("Mode",{"normal","die at last stage"},.5,function(v)
-	if v=="normal"then
-		toggle.die=false
-	end
-	if v=="die at last stage"then
-		toggle.die=true
+Main:addDropdown("Mode",{"full routine","gold blocks","gold"},.75,function(v)
+	if v=="full routine"then--415
+		toggle.mode=0
+	elseif v=="gold blocks"then--idk
+		toggle.mode=1
+	elseif v=="gold"then--450
+		toggle.mode=2
 	end
 end)
-Main:addTextBox("Speed",23,function(val)
-	farm_speed=tonumber(val)
+Main:addTextBox("Speed",farm_speed,function(v)
+	farm_speed=tonumber(v)
+	conveyor.Velocity=conveyor.CFrame:vectorToWorldSpace(Vector3.new(0,0,farm_speed))
 end)
-Main:addToggle("Anti Lag",nil,function(v)
+Main:addToggle("Lag Reduction",toggle.delete,function(v)
 	toggle.delete=v
 end)
 Shop:addDropdown("Shop Items",items,#items*.25,function(v)
 	autobuy.item=v
 end)
-Shop:addLabel("will spend all ur gold")
-Shop:addToggle("Auto Buy",nil,function(v)
+Shop:addLabel("proceed with caution")
+Shop:addToggle("Auto Buy",autobuy.s,function(v)
 	autobuy.s=v
 end)
-Shop:addToggle("Check gold",nil,function(v)
+Shop:addToggle("Check gold",autobuy.check,function(v)
 	autobuy.check=v
 	autobuy.cd=true
 end)
-Shop:addTextBox("buy when gold is over",1000,function(v)
+Shop:addTextBox("Min Balance",100405,function(v)
 	autobuy.min=tonumber(v)
 	autobuy.cd=true
 end)
 Shop:addButton("Buy once",function()
 	if autobuy.item~=nil then
-		workspace:WaitForChild("ItemBoughtFromShop"):InvokeServer(autobuy.item,1)
+		workspace:WaitForChild"ItemBoughtFromShop":InvokeServer(autobuy.item,1)
 	end
 end)
 Teleport:addButton("Black Team",function()
@@ -348,7 +359,7 @@ Teleport:addButton("Magenta Team",function()
 	hrp.CFrame=workspace:FindFirstChild"MagentaTeam".Baseplate.CFrame+Vector3.new(0,10,0)
 end)
 Teleport:addButton("Waterfall",function()
-	hrp.CFrame=CFrame.new(335,-10,1155)
+	hrp.CFrame=CFrame.new(181,-12,1161)
 end)
 Local:addTextBox("WalkSpeed",hum.WalkSpeed,function(v)
 	hum.WalkSpeed=tonumber(v)
@@ -362,3 +373,13 @@ end)
 Local:addToggle("Inf Jump",false,function(v)
 	toggle.infj=v
 end)
+Local:addButton("Rejoin",function()
+	plr:Kick" "
+	task.wait()
+	game:GetService"TeleportService":Teleport(game.placeId,plr)
+end)
+Local:destroyGui(function()
+	for i,v in pairs(binds)do v:Disconnect()end
+	for i,v in pairs(toggle)do toggle[i]=false end
+	conveyor:Destroy()--3600/sc*ge=income
+end)--game.Players.LocalPlayer.PlayerGui.BuildGui.InventoryFrame.ScrollingFrame.Size=UDim2.new(0,430,0,220)
