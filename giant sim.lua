@@ -5,7 +5,7 @@ local hum=chr.Humanoid
 local hrp=chr.HumanoidRootPart
 local binds={}
 local vacant=true
-local orbsP
+local orbsP,plrHealth
 local plrGui=plr.PlayerGui
 local tog={
 	swing=true,
@@ -59,9 +59,7 @@ local vals={
 	},
 	dungeon={
 		blacklist={},
-		visited={},
-		route={"0,0"},
-		backup={"0,0"}
+		visited={}
 	},
 	qnpc={
 		hopsalot=false,
@@ -138,7 +136,7 @@ function esp(v)
 		a.Adornee=v
 		a.AlwaysOnTop=true
 		a.ZIndex=0
-		a.Size=v.Size/Vector3.new(1.5,1.5,1.5)
+		a.Size=v.Size
 		a.Transparency=.25
 		a.Color=BrickColor.new"White"
 		table.insert(vals.esplist,a)
@@ -206,7 +204,7 @@ function getboss()
 	return t:FindFirstChild"HumanoidRootPart"
 end
 wait(.1)
-binds.main=RunService.RenderStepped:Connect(function()
+binds.main=RunService.Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=plr.Character
@@ -223,6 +221,8 @@ binds.main=RunService.RenderStepped:Connect(function()
 		if not wpnInventory then
 			wpnInventory=plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.WpnInvDataFrame.WpnSelectionPanel.WpnSelectionFrame
 		end
+		local hpbar=game.Players.LocalPlayer.PlayerGui.HUD.LeftHUD.Frame.PortraitFG.StatusBarBG.HealthBG
+		plrHealth=math.round(hpbar.HealthBar.AbsoluteSize.x/hpbar.AbsoluteSize.x*100)
 		hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown,false)
 		hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,false)
 	end)
@@ -237,8 +237,6 @@ binds.main=RunService.RenderStepped:Connect(function()
 			cd.dungeon=false
 			while tostring(plr.TeamColor)~="Sea green"and not workspace.DungeonEntrance.Floor.BillboardGui.Closed.Visible do
 				if(hrp.Position-workspace.DungeonEntrance.Darkness.Position).magnitude>5 then
-					vals.dungeon.route={"0,0"}
-					vals.dungeon.backup={"0,0"}
 					vals.dungeon.blacklist={}
 					vals.dungeon.visited={}
 				end
@@ -282,7 +280,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 					}
 					return dirs[nsew]
 				end
-				function getRoom2()
+				function getRoom() 
 					local r={}
 					for _,v in pairs(plrDungeon:GetChildren())do
 						pcall(function()
@@ -293,31 +291,62 @@ binds.main=RunService.RenderStepped:Connect(function()
 					end
 					return nearest(r).Parent.Parent
 				end
-				function getRoom()
-				--	return plrDungeon:FindFirstChild("Room:"..strPos())
-					return getRoom2()
+				function getRoomPos()
+					return getRoom().Name:gsub("Room:","")
+				end
+				function labelRoom(xy,c)
+					local t=xy:split","
+					local cur=getRoomPos():split","
+					local we=t[1]-cur[1]
+					local sn=t[2]-cur[3]
+					if plrGui.DungeonMinimap.MapFrame:FindFirstChild(we..","..sn)then
+						local bl=Instance.new"Frame"
+						local bc=Instance.new"UICorner"
+						bl.Name="Lbl"
+						bl.Parent=plrGui.DungeonMinimap.MapFrame[we..","..sn]
+						bl.BackgroundColor=BrickColor.new(c)
+						bl.Position=UDim2.new(0,0,0,0)
+						bl.Size=UDim2.new(0,12,0,12)
+						bc.CornerRadius=UDim.new(0,100)
+						bc.Name="rounded"
+						bc.Parent=bl
+					end
+				end
+				function refresh()
+					for _,v in pairs(plrGui.DungeonMinimap.MapFrame:GetDescendants())do
+						if v.Name=="Lbl"then
+							v:Destroy()
+						end
+					end
+					for i,v in pairs(vals.dungeon.visited)do
+						labelRoom(i,"White")
+					end
+					for i,v in pairs(vals.dungeon.blacklist)do
+						labelRoom(i,"Black")
+					end
 				end
 				function blacklistRoom(r)
-					vals.dungeon.blacklist[r]=true
+					local xy=XYZtoXY(r:gsub("Room:",""))
+					vals.dungeon.blacklist[xy]=true
+					refresh()
 				end
-				function isRoomBlacklisted(r)--Room:xyz
-					return vals.dungeon.blacklist[r]
+				function isRoomBlacklisted(r)--xy
+					return vals.dungeon.blacklist[XYZtoXY(r)]
 				end
 				function visitedRoom(xyz)
-					return plrDungeon:FindFirstChild("Room:"..xyz)and vals.dungeon.visited[xyz]
+					return plrDungeon:FindFirstChild("Room:"..xyz)and vals.dungeon.visited[XYZtoXY(xyz)]
 				end
 				function gotoRoom(xyz)
 					local c=plrDungeon:FindFirstChild("Room:"..xyz).Floor.floor_Plane.CFrame
 					hrp.CFrame=CFrame.new(c.x,c.y+10,c.z)
 					wait()
 					hrp.CFrame=CFrame.new(c.x,c.y+10,c.z)
-					wait()
-					hrp.CFrame=CFrame.new(c.x,c.y+10,c.z)
-					vals.dungeon.visited[xyz]=true
+					vals.dungeon.visited[XYZtoXY(xyz)]=true
+					refresh()
 				end
 				function roomsLeft()
 					local n=0
-					for _,v in pairs(plr.PlayerGui.DungeonMinimap.MapFrame:GetChildren())do
+					for _,v in pairs(plrGui.DungeonMinimap.MapFrame:GetChildren())do
 						pcall(function()
 							if tostring(v.BackgroundColor)=="Silver flip/flop"then
 								n=n+1
@@ -325,14 +354,6 @@ binds.main=RunService.RenderStepped:Connect(function()
 						end)
 					end
 					return n
-				end
-				function inverse(xy)
-					local t=xy:split","
-					return tonumber(t[1]*-1)..","..tonumber(t[2]*-1)
-				end
-				function recordPath(xy)
-					push(vals.dungeon.route,xy)
-					push(vals.dungeon.backup,xy)
 				end
 				function checkPath(xy)
 					return plrGui.DungeonMinimap.MapFrame:FindFirstChild(xy)and plrGui.DungeonMinimap.MapFrame:FindFirstChild(xy).Visible
@@ -349,7 +370,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 						local sp=ps[i]:split","
 						local hf=(sp[1]/2)..","..(sp[2]/2)
 						local ar=(tonumber(sp[1])+p.x)..","..p.y..","..(tonumber(sp[2])+p.z)
-						if checkPath(hf)and not visitedRoom(ar)and not isRoomBlacklisted("Room:"..ar)then
+						if checkPath(hf)and not visitedRoom(ar)and not isRoomBlacklisted(ar)then
 							push(fp,ps[i])
 						end
 					end
@@ -358,7 +379,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 							local sp=ps[i]:split","
 							local hf=(sp[1]/2)..","..(sp[2]/2)
 							local ar=(tonumber(sp[1])+p.x)..","..p.y..","..(tonumber(sp[2])+p.z)
-							if not isRoomBlacklisted("Room:"..ar)then
+							if not isRoomBlacklisted(ar)then
 								push(fp,ps[i])
 							end
 						end
@@ -366,20 +387,19 @@ binds.main=RunService.RenderStepped:Connect(function()
 					return fp
 				end
 				function choosePath()
-					local paths=getPaths()--add a marker on the gui to show if visited/blacklisted
+					local paths=getPaths()
 					local p=plrPos()--fix picking visited room over new room
 					for i=1,#paths do
 						local sp=paths[i]:split","
 						local ar=(tonumber(sp[1])+p.x)..","..p.y..","..(tonumber(sp[2])+p.z)
-						if not visitedRoom(ar)and not isRoomBlacklisted("Room:"..ar)then
-							notif("good path",ar)
+						if not visitedRoom(ar)and not isRoomBlacklisted(ar)then
 							return paths[i]
 						end
 					end
 					for i=1,#paths do
 						local sp=paths[i]:split","
 						local ar=(tonumber(sp[1])+p.x)..","..p.y..","..(tonumber(sp[2])+p.z)
-						if not isRoomBlacklisted("Room:"..ar)then
+						if not isRoomBlacklisted(ar)then
 							notif"meh path"
 							return paths[i]
 						end
@@ -415,8 +435,10 @@ binds.main=RunService.RenderStepped:Connect(function()
 					local pc=#paths
 					local prc=true
 					if pc>0 then
-						if XYZtoXY(strPos())=="0,0"and pc==1 then
-							blacklistRoom(getRoom().Name)
+						if XYZtoXY(strPos())=="0,0"then
+							if pc<2 then
+								blacklistRoom(getRoom().Name)
+							end
 							gotoRoom(strPos())
 						end
 						local cd=choosePath()
@@ -428,7 +450,6 @@ binds.main=RunService.RenderStepped:Connect(function()
 						until(chosenDoor.Position-hrp.Position).magnitude<10 or tostring(plr.TeamColor)~="Sea green"or getRoom().Name~=oldRoom
 						repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
 						wait(.25)
-						recordPath(cd)
 						gotoRoom(getRoom().Name:gsub("Room:",""))
 						if getRoom().Doors:FindFirstChild"Down"then
 							prc=false
@@ -440,10 +461,13 @@ binds.main=RunService.RenderStepped:Connect(function()
 								press(plrGui.NotificationsV2.Dialogs.Dialog.Frame.Buttons.Okay)
 							end)
 							repeat wait()until plrPos().y>fl or tostring(plr.TeamColor)~="Sea green"
-							vals.dungeon.route={"0,0"}
-							vals.dungeon.backup={"0,0"}
 							vals.dungeon.blacklist={}
 							vals.dungeon.visited={}
+							for _,v in pairs(plrGui.DungeonMinimap.MapFrame:GetDescendants())do
+								if v.Name=="Lbl"then
+									v:Destroy()
+								end
+							end
 						end
 						if prc then
 							repeat wait()until getRoom()and(getRoom():FindFirstChild"Enemies"or getRoom():FindFirstChild"Chest")or tostring(plr.TeamColor)~="Sea green"or XYZtoXY(strPos())=="0,0"
@@ -456,8 +480,8 @@ binds.main=RunService.RenderStepped:Connect(function()
 											swing()
 										end
 										local ec=getRoot(enems[#enems])
-										if(hrp.Position-Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z)).magnitude>3 then
-											chr:TranslateBy((Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z)-hrp.Position)*.15)
+										if(hrp.Position-Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z)).magnitude>1 then
+											chr:TranslateBy((Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z)-hrp.Position)*.25)
 											wait()
 											hrp.CFrame=CFrame.lookAt(hrp.Position,Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z))
 										end
@@ -489,7 +513,6 @@ binds.main=RunService.RenderStepped:Connect(function()
 					else
 						blacklistRoom(getRoom().Name)
 						local pts=getPaths(true)
-						notif"Retracing"
 						local p=#pts
 						local cd=pts[math.random(1,p)]
 						local oldRoom=getRoom().Name
@@ -523,11 +546,20 @@ binds.main=RunService.RenderStepped:Connect(function()
 					wait(1)
 				until not((hrp.Position-Vector3.new(14458,-117,-539)).magnitude>250 and plrGui.EgyptTombBoard.Frame.Title.Text=="Open Tombs:")
 				local mp={["Easy"]="TombBoss",["Medium"]="TombBoss2",["Hard"]="TombBoss3"}
+				local i=0
 				while tog.tomb and workspace.Scene.Egypt.Egypt.Tomb.Bosses:FindFirstChild(mp[selected])do
 					if not tog.swing then
 						swing()
 					end
-					hrp.CFrame=workspace.Scene.Egypt.Egypt.Tomb.Bosses[mp[selected]].HumanoidRootPart.CFrame
+					local off=0
+					if plrHealth<60 then
+						i=i+1
+						off=50*(-1)^math.floor(i/3)
+					else
+						i=0
+						off=0
+					end
+					hrp.CFrame=workspace.Scene.Egypt.Egypt.Tomb.Bosses[mp[selected]].HumanoidRootPart.CFrame+Vector3.new(0,0,off)
 					noVelocity()
 					task.wait()
 				end
@@ -540,26 +572,23 @@ binds.main=RunService.RenderStepped:Connect(function()
 		cd.quest=false
 		if vals.qnpc.hopsalot then
 			local hq=false
-			for _,v in pairs(vals.doablequests)do
-				if plr.Quests.InProgress:FindFirstChild(_)then
-					hq=true
+			while not hq do
+				for _,v in pairs(vals.doablequests)do
+					if plr.Quests.InProgress:FindFirstChild(_)then
+						hq=true
+						break
+					end
 				end
-			end
-			if not hq then
 				hrp.CFrame=workspace["Sir Hopsalot"].HumanoidRootPart.CFrame
 				task.wait(.1)
-				task.spawn(function()
-					for i=0,25 do
-						fireproximityprompt(workspace["Sir Hopsalot"].HumanoidRootPart.QuestPromptObject.NewQuestPrompt)
-						pcall(function()
-							press(plrGui.NotificationsV2.Dialogs.Conversation.Frame.Buttons.Okay)
-							task.wait(.1)
-							press(plrGui.NotificationsV2.Dialogs.Conversation.ClickBackground)
-						end)
-					end
+				fireproximityprompt(workspace["Sir Hopsalot"].HumanoidRootPart.QuestPromptObject.NewQuestPrompt)
+				pcall(function()
+					press(plrGui.NotificationsV2.Dialogs.Conversation.Frame.Buttons.Okay)
+					task.wait(.1)
+					press(plrGui.NotificationsV2.Dialogs.Conversation.ClickBackground)
 				end)
-				wait(.25)
 			end
+			wait(.15)
 			local cq=nil
 			for _,v in pairs(plr.Quests.InProgress:GetChildren())do
 				if vals.doablequests[v.Name]then
@@ -591,8 +620,8 @@ binds.main=RunService.RenderStepped:Connect(function()
 				if cq=="HopsalotDefeatRobotron"then
 					farmboss"SlumBoss"
 					wait(.1)
-					for i=0,10 do
-						hrp.CFrame=hrp.CFrame*CFrame.new(5,0,0)
+					for i=0,3 do
+						hrp.CFrame=hrp.CFrame*CFrame.new(7,0,0)
 						pcall(function()
 							press(plrGui.NotificationsV2.Dialogs.Conversation.Frame.Buttons.Okay)
 							press(plrGui.NotificationsV2.Dialogs.Conversation.ClickBackground)
@@ -623,9 +652,9 @@ binds.main=RunService.RenderStepped:Connect(function()
 						for _,v in pairs(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.ChestSelectionPanel.ChestSelectionFrame:GetChildren())do
 							if ongoing(cq)and v.Name=="ChestInventoryItem"and tonumber(v.ChestImage.AmountImg.AmountTxt.Text)>0 then
 								press(v)
-								wait(.1)
+								wait()
 								press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.BuyFrame.BuyButton)
-								wait(.1)
+								wait()
 								press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.ChestInspectionFrame.OpenChestButton)
 							end
 						end
@@ -713,7 +742,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 					break
 				end
 			end
-			wait(.175)
+			wait(.25)
 			vacant=true
 			cd.orbs=true
 		end
@@ -736,12 +765,12 @@ binds.main=RunService.RenderStepped:Connect(function()
 				vacant=false
 				if pr.SnowMan.Transparency==0 then
 					if(hrp.Position-pr.Position).magnitude>3 then
-						hrp.CFrame=pr.CFrame*CFrame.new(0,0,2)
+						hrp.CFrame=pr.CFrame*CFrame.new(0,0,1.5)
 						break
 					end
 				end
 			end
-			wait(.25)
+			wait(.2)
 			vacant=true
 			cd.event=true
 		end
@@ -786,6 +815,7 @@ binds.main=RunService.RenderStepped:Connect(function()
 			fireproximityprompt(workspace.ArtifactCrates[vals.crateid].Mesh.ProximityAttachment.ProximityPrompt)
 			wait(.1)
 		end)
+		wait()
 		cd.petcrate=true
 	end
 	if tog.skillupgrade and cd.skillupgrade then
@@ -799,16 +829,18 @@ binds.main=RunService.RenderStepped:Connect(function()
 	end
 	if tog.sellchest and cd.sellchest then
 		cd.sellchest=false
-		for _,v in pairs(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.ChestSelectionPanel.ChestSelectionFrame:GetChildren())do
-			if v.Name=="ChestInventoryItem"and tonumber(v.ChestImage.AmountImg.AmountTxt.Text)>0 then
-				press(v)
-				wait(.1)
-				press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.SellFrame.SellButton)
-				plrGui.HUD.Screen.SellPrompt.Visible=false
-				wait(.1)
-				press(plrGui.HUD.Screen.SellPrompt.ImageLabel.SellBtn)
+		task.spawn(function()
+			for _,v in pairs(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.ChestSelectionPanel.ChestSelectionFrame:GetChildren())do
+				if v.Name=="ChestInventoryItem"and tonumber(v.ChestImage.AmountImg.AmountTxt.Text)>0 then
+					press(v)
+					wait(.25)
+					press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.ChestInventoryFrame.SellFrame.SellButton)
+					plrGui.HUD.Screen.SellPrompt.Visible=false
+					wait()
+					press(plrGui.HUD.Screen.SellPrompt.ImageLabel.SellBtn)
+				end
 			end
-		end
+		end)
 		wait(1)
 		cd.sellchest=true
 	end
@@ -825,34 +857,40 @@ binds.main=RunService.RenderStepped:Connect(function()
 			end
 			end)
 		end
-		if tog.upwpn then
-			press(vals.weapons.main.SelectionButton,true)
-			press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.ButtonFrame.SUFrame.MaxButton)
-			plrGui.HUD.Screen.ConfirmPrompt.Visible=false
-		end
-		press(plrGui.HUD.Screen.ConfirmPrompt.ImageLabel.ConfirmBtn)
-		wait(.2)
-		if tog.upwpn then
-			press(vals.weapons.offh.SelectionButton,true)
-			press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.ButtonFrame.SUFrame.MaxButton)
-			plrGui.HUD.Screen.ConfirmPrompt.Visible=false
-		end
-		press(plrGui.HUD.Screen.ConfirmPrompt.ImageLabel.ConfirmBtn)
-		wait(.2)
-		if tog.upskn then
-			press(sknInventory.ButtonFrame.SUFrame.MaxButton)
-			plrGui.HUD.Screen.ConfirmPrompt.Visible=false
-		end
-		press(plrGui.HUD.Screen.ConfirmPrompt.ImageLabel.ConfirmBtn)
+		pcall(function()
+			if tog.upwpn then
+				press(vals.weapons.main.SelectionButton,true)
+				press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.ButtonFrame.SUFrame.MaxButton)
+				plrGui.HUD.Screen.ConfirmPrompt.Visible=false
+				press(plrGui.HUD.Screen.ConfirmPrompt.ImageLabel.ConfirmBtn)
+				wait(.2)
+				press(vals.weapons.offh.SelectionButton,true)
+				press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.ButtonFrame.SUFrame.MaxButton)
+				plrGui.HUD.Screen.ConfirmPrompt.Visible=false
+			end
+			press(plrGui.HUD.Screen.ConfirmPrompt.ImageLabel.ConfirmBtn)
+			wait(.2)
+			if tog.upskn then
+				press(sknInventory.ButtonFrame.SUFrame.MaxButton)
+				plrGui.HUD.Screen.ConfirmPrompt.Visible=false
+			end
+			press(plrGui.HUD.Screen.ConfirmPrompt.ImageLabel.ConfirmBtn)
+		end)
 		wait(.2)
 		cd.upgd=true
 	end
 	if tog.rebirth and cd.rebirth then
 		cd.rebirth=false
-		if plr.leaderstats["⚡Level"].value>=vals.minlvl then
+		if isnumber(vals.minlvl)and(plr.leaderstats["⚡Level"].value>=vals.minlvl or vals.minlvl==100)then
 			press(plrGui.RebirthGui.RebirthPrompt.ImageLabel.ConfirmBtn)
-			wait(.25)
 		end
+		pcall(function()
+			press(wpnInventory.demon_ice.SelectionButton,true)
+			press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.ButtonFrame.EquipButton)
+			press(plrGui.Inventory.Main.InventoryBG.InventoryClipFrame.InventoryMainFrame.WpnInventoryFrame.ButtonFrame.SUFrame.MaxButton)
+			wait()
+			press(plrGui.HUD.Screen.ConfirmPrompt.ImageLabel.ConfirmBtn)
+		end)
 		cd.rebirth=true
 	end
 end)
@@ -955,7 +993,6 @@ Quests:addToggle("Sir Hopsalot",vals.qnpc.hopsalot,function(v)
 	vals.qnpc.hopsalot=v
 	tog.quest=vals.qnpc.hopsalot or vals.qnpc.gingerbreadman or vals.qnpc.lordent or vals.qnpc.samurai
 end)
---[[not done yet
 Quests:addToggle("Lord Ent",vals.qnpc.lordent,function(v)
 	vals.qnpc.lordent=v
 	tog.quest=vals.qnpc.hopsalot or vals.qnpc.gingerbreadman or vals.qnpc.lordent or vals.qnpc.samurai
@@ -968,7 +1005,6 @@ Quests:addToggle("Samurai",vals.qnpc.samurai,function(v)
 	vals.qnpc.samurai=v
 	tog.quest=vals.qnpc.hopsalot or vals.qnpc.gingerbreadman or vals.qnpc.lordent or vals.qnpc.samurai
 end)
-]]
 Misc:addToggle("Ignore notifications",ignore.notifs,function(v)
 	ignore.notifs=v
 end)
@@ -993,5 +1029,5 @@ end)
 Local:destroyGui(function()
 	for _,v in pairs(binds)do v:Disconnect()end
 	for i,v in pairs(tog)do tog[i]=false end
-	for i,v in pairs(cd)do cd[i]=false end
+	for i,v in pairs(cd)do cd[i]=false end--p=game.Players.LocalPlayer.PlayerGui.HUD.LeftHUD.Frame.PortraitFG.StatusBarBG.HealthBG.HealthBar
 end)--quests, waypoints, time attack, arena farming
