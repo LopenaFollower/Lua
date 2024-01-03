@@ -430,104 +430,102 @@ binds.main=RunService.Heartbeat:Connect(function()
 					end
 					return t
 				end
-				if roomsLeft()>0 then
-					local paths=getPaths()
-					local pc=#paths
-					local prc=true
-					if pc>0 then
-						if XYZtoXY(strPos())=="0,0"then
-							if pc<2 then
-								blacklistRoom(getRoom().Name)
-							end
-							gotoRoom(strPos())
+				local paths=getPaths()
+				local pc=#paths
+				local prc=true
+				if pc>0 then
+					if XYZtoXY(strPos())=="0,0"then
+						if pc<2 then
+							blacklistRoom(getRoom().Name)
 						end
-						local cd=choosePath()
-						local oldRoom=getRoom().Name
-						local chosenDoor=getRoom().Doors[direction(cd)]
-						repeat
-							hum.WalkToPoint=chosenDoor.Position
-							wait(.1)
-						until(chosenDoor.Position-hrp.Position).magnitude<10 or tostring(plr.TeamColor)~="Sea green"or getRoom().Name~=oldRoom
-						repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
-						wait(.25)
-						gotoRoom(getRoom().Name:gsub("Room:",""))
-						if getRoom().Doors:FindFirstChild"Down"then
-							prc=false
-							local fl=plrPos().y
-							wait(.1)
-							hrp.CFrame=getPart(getRoom().Doors.Down).CFrame+Vector3.new(0,7,0)
-							repeat wait()until plrGui.NotificationsV2.Dialogs:FindFirstChild"Dialog"or tostring(plr.TeamColor)~="Sea green"or plrPos().y>fl
-							pcall(function()
-								press(plrGui.NotificationsV2.Dialogs.Dialog.Frame.Buttons.Okay)
-							end)
-							repeat wait()until plrPos().y>fl or tostring(plr.TeamColor)~="Sea green"
-							vals.dungeon.blacklist={}
-							vals.dungeon.visited={}
-							for _,v in pairs(plrGui.DungeonMinimap.MapFrame:GetDescendants())do
-								if v.Name=="Lbl"then
-									v:Destroy()
-								end
-							end
-						end
-						if prc then
-							repeat wait()until getRoom()and(getRoom():FindFirstChild"Enemies"or getRoom():FindFirstChild"Chest")or tostring(plr.TeamColor)~="Sea green"or XYZtoXY(strPos())=="0,0"
-							wait(.5)
-							if getRoom():FindFirstChild"Enemies"and#getRoom().Enemies:GetChildren()>0 then
-								while getRoom():FindFirstChild"Enemies"and#getRoom().Enemies:GetChildren()>0 do
-									pcall(function()
-										local enems=getRoom().Enemies:GetChildren()
-										if not tog.swing then
-											swing()
-										end
-										local ec=getRoot(enems[#enems])
-										if(hrp.Position-Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z)).magnitude>1 then
-											chr:TranslateBy((Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z)-hrp.Position)*.25)
-											wait()
-											hrp.CFrame=CFrame.lookAt(hrp.Position,Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z))
-										end
-										hrp.CFrame=
-										noVelocity()
-									end)
-									task.wait()
-								end
-								wait(.15)
-								repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
-								gotoRoom(getRoom().Name:gsub("Room:",""))
-							elseif getRoom():FindFirstChild"Chest"and getRoom().Chest:FindFirstChild"Base"and getRoom().Chest.Base:FindFirstChild"ProximityPrompt"then
-								local b=getRoom().Chest.Base
-								local st=os.time()
-								while b:FindFirstChild"ProximityPrompt"do
-									hrp.CFrame=b.CFrame*CFrame.new(0,5,0)
-									wait()
-									pcall(function()
-										fireproximityprompt(b.ProximityPrompt)
-									end)
-									if os.time()-st>2 then
-										b:FindFirstChild"ProximityPrompt":Destroy()
-										break
-									end
-								end
-								repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
-							end
-						end
-					else
-						blacklistRoom(getRoom().Name)
-						local pts=getPaths(true)
-						local p=#pts
-						local cd=pts[math.random(1,p)]
-						local oldRoom=getRoom().Name
-						local chosenDoor=getRoom().Doors[direction(cd)]
-						repeat
-							hum.WalkToPoint=chosenDoor.Position
-							wait(.1)
-						until(chosenDoor.Position-hrp.Position).magnitude<10 or tostring(plr.TeamColor)~="Sea green"or getRoom().Name~=oldRoom
-						repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
-						wait(.25)
 						gotoRoom(strPos())
 					end
+					local cd=choosePath()
+					local oldRoom=getRoom().Name
+					local chosenDoor=getRoom().Doors[direction(cd)]
+					repeat
+						hum.WalkToPoint=chosenDoor.Position
+						wait(.1)
+					until(chosenDoor.Position-hrp.Position).magnitude<10 or tostring(plr.TeamColor)~="Sea green"or getRoom().Name~=oldRoom
+					repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
+					wait(.25)
+					gotoRoom(getRoom().Name:gsub("Room:",""))
+					if getRoom().Doors:FindFirstChild"Down"then
+						prc=false
+						local fl=plrPos().y
+						wait(.1)
+						hrp.CFrame=getPart(getRoom().Doors.Down).CFrame+Vector3.new(0,7,0)
+						repeat wait()until plrGui.NotificationsV2.Dialogs:FindFirstChild"Dialog"or tostring(plr.TeamColor)~="Sea green"or plrPos().y>fl
+						pcall(function()
+							press(plrGui.NotificationsV2.Dialogs.Dialog.Frame.Buttons.Okay)
+						end)
+						repeat wait()until plrPos().y>fl or tostring(plr.TeamColor)~="Sea green"
+						vals.dungeon.blacklist={}
+						vals.dungeon.visited={}
+						for _,v in pairs(plrGui.DungeonMinimap.MapFrame:GetDescendants())do
+							if v.Name=="Lbl"then
+								v:Destroy()
+							end
+						end
+					end
+					if prc then
+						repeat wait()until getRoom()and(getRoom():FindFirstChild"Enemies"or getRoom():FindFirstChild"Chest")or tostring(plr.TeamColor)~="Sea green"or XYZtoXY(strPos())=="0,0"
+						wait(.25)
+						if getRoom():FindFirstChild"Enemies"and#getRoom().Enemies:GetChildren()>0 then
+							while getRoom():FindFirstChild"Enemies"and#getRoom().Enemies:GetChildren()>0 do
+								pcall(function()
+									local enems=getRoom().Enemies:GetChildren()
+									if not tog.swing then
+										swing()
+									end
+									local ec=getRoot(enems[#enems])
+									if(hrp.Position-Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z)).magnitude>1 then
+										chr:TranslateBy((Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z)-hrp.Position)*.25)
+										wait()
+										hrp.CFrame=CFrame.lookAt(hrp.Position,Vector3.new(ec.Position.x,hrp.CFrame.y,ec.Position.z))
+									end
+									hrp.CFrame=
+									noVelocity()
+								end)
+								task.wait()
+							end
+							wait(.15)
+							repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
+							gotoRoom(getRoom().Name:gsub("Room:",""))
+						elseif getRoom():FindFirstChild"Chest"and getRoom().Chest:FindFirstChild"Base"and getRoom().Chest.Base:FindFirstChild"ProximityPrompt"then
+							local b=getRoom().Chest.Base
+							local st=os.time()
+							while b:FindFirstChild"ProximityPrompt"do
+								hrp.CFrame=b.CFrame*CFrame.new(0,5,0)
+								wait()
+								pcall(function()
+									fireproximityprompt(b.ProximityPrompt)
+								end)
+								if os.time()-st>2 then
+									b:FindFirstChild"ProximityPrompt":Destroy()
+									break
+								end
+							end
+							repeat wait(.25)until canMove()or tostring(plr.TeamColor)~="Sea green"
+						end
+					end
+				else
+					blacklistRoom(getRoom().Name)
+					local pts=getPaths(true)
+					local p=#pts
+					local cd=pts[math.random(1,p)]
+					local oldRoom=getRoom().Name
+					local chosenDoor=getRoom().Doors[direction(cd)]
+					repeat
+						hum.WalkToPoint=chosenDoor.Position
+						wait(.1)
+					until(chosenDoor.Position-hrp.Position).magnitude<10 or tostring(plr.TeamColor)~="Sea green"or getRoom().Name~=oldRoom
+					repeat wait(.1)until getRoom().Name~=oldRoom or tostring(plr.TeamColor)~="Sea green"
+					wait(.25)
+					gotoRoom(strPos())
 				end
-				wait(1)
 			end
+			wait(.5)
 			cd.dungeon=true
 		end
 	elseif tog.tomb and plrGui.EgyptTombBoard.Frame.Title.Text=="Open Tombs:"then
