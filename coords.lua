@@ -27,11 +27,11 @@ function pickupgrade()
 			end
 		end
 	end
-	if not mc then
+	if not mc and#btns>0 then
 		press(btns[math.random(1,3)].UnlockButton)
 	end
 end
-local i=1
+local i=2
 local coords={
 	CFrame.new(-427.9,15,3.2),
 	CFrame.new(-15921.3,2585.2,4013.3),
@@ -54,11 +54,13 @@ local coords={
 	CFrame.new(-16327.36,2644,3875.1),
 	CFrame.new(-16437.65,2598,3950.44)
 }
+hrp.CFrame=coords[1]
+wait(1)
 while i<#coords+1 do
 	hrp.CFrame=coords[i]
 	if i==9 or i==17 or i==20 then
 		wait(.1)
-		pickupgrade()
+		task.spawn(pickupgrade)
 	end
 	i=i+1
 	wait(.4)
