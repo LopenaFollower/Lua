@@ -1,5 +1,9 @@
 local plr=game.Players.LocalPlayer
 local hrp=plr.Character.HumanoidRootPart
+local descs={
+	["Allows you to get more coins in the Path Of Fortune"]=true,
+	["Upgrade a random piece of gear you own!"]=true
+}
 function press(button,enable)
 	for _,v in pairs(getconnections(button.Activated))do
 		if enable then v:Enable()end
@@ -11,90 +15,52 @@ function press(button,enable)
 	end
 end
 function pickupgrade()
-	wait(.25)
 	local mc=false
 	local btns={}
 	for _,v in pairs(plr.PlayerGui.POFUpgrade.Window.Content:GetChildren())do
 		if v.Name=="ItemTemplate"then
 			table.insert(btns,v)
-			if v.Content.Description.Text=="Allows you to get more coins in the Path Of Fortune"then
+			local desc=v.Content.Description.Text
+			if descs[desc]then
 				press(v.UnlockButton)
 				mc=true
 			end
 		end
 	end
 	if not mc then
-		press(btns[1].UnlockButton)
+		press(btns[math.random(1,3)].UnlockButton)
 	end
 end
-wait(.25)hrp.CFrame=CFrame.new(-427.9,15,3.2)
-wait(.25)hrp.CFrame=CFrame.new(-15921.3,2585.2,4013.3)
-wait(.25)hrp.CFrame=CFrame.new(-15918.25,2587.9,3868.8)
-wait(.25)hrp.CFrame=CFrame.new(-15917.9,2589,3803.4)
-wait(.25)hrp.CFrame=CFrame.new(-16016,2604.2,3787.4)
-wait(.25)hrp.CFrame=CFrame.new(-15997.3,2604.3,3826.25)
-wait(.25)hrp.CFrame=CFrame.new(-15996.25,2620.7,3866.4)
-wait(.25)hrp.CFrame=CFrame.new(-15995.9,2633.4,3896.2)
-wait(.25)hrp.CFrame=CFrame.new(-15987,2644,3981.5)pickupgrade()
-wait(1)hrp.CFrame=CFrame.new(-16109.2,2644,3958.4)
-wait(.25)hrp.CFrame=CFrame.new(-16145.2,2644,3970)
-wait(.25)hrp.CFrame=CFrame.new(-16255.8,2643.6,3936.9)
-wait(.25)hrp.CFrame=CFrame.new(-16224,2644,3923.25)
-wait(.25)hrp.CFrame=CFrame.new(-16202,2644,3886.2)
-wait(.25)hrp.CFrame=CFrame.new(-16181.818359375, 2644.940673828125, 3837.33203125)
-wait(.25)hrp.CFrame=CFrame.new(-16206.7509765625, 2644.292236328125, 3766.81591796875)
-wait(.25)hrp.CFrame=CFrame.new(-16242.4287109375, 2644.237548828125, 3779.306640625)pickupgrade()
-wait(1)hrp.CFrame=CFrame.new(-16330.0654296875, 2643.736083984375, 3853.5517578125)
-wait(.25)hrp.CFrame=CFrame.new(-16327.3583984375, 2643.575927734375, 3875.09912109375)
-wait(.25)hrp.CFrame=CFrame.new(-16437.646484375, 2597.971435546875, 3950.44189453125)pickupgrade()
-wait(1)hrp.CFrame=CFrame.new(-16509.3984375, 2592.849365234375, 3943.2552587890625)
-wait(.25)hrp.CFrame=CFrame.new(-16563.5546875, 2589.591552734375, 3953.21630859375)
-wait(.25)hrp.CFrame=CFrame.new(-16549.33984375, 2588.64453125, 3900.38623046875)pickupgrade()
-wait(1)hrp.CFrame=CFrame.new(-16604.87109375, 2587.259521484375, 3956.0205078125)
-wait(.25)hrp.CFrame=CFrame.new(-16651.2593359375, 2587.612060546875, 3954.424560546875)
-wait(.25)hrp.CFrame=CFrame.new(-16747.53125, 2590.61474609375, 3925.40185546875)
-wait(.25)hrp.CFrame=CFrame.new(-16718.328125, 2588.64794921875, 4005.868408203125)pickupgrade()
-wait(1)hrp.CFrame=CFrame.new(-16797.453125, 2594.379638671875, 3830.588134765625)
-wait(.25)hrp.CFrame=CFrame.new(-16771.4453125, 2594.25650390625, 3801.531494140625)
-wait(.25)hrp.CFrame=CFrame.new(-16787.33984375, 2593.898681640625, 3766.0458984375)
-wait(.25)hrp.CFrame=CFrame.new(-16856.86328125, 2599.253134765625, 3763.257919921875)
-wait(.25)hrp.CFrame=CFrame.new(-16875.267578125, 2607.21142578125, 3740.51708984375)
-wait(.25)hrp.CFrame=CFrame.new(-16921.2585546875, 2612.857421875, 3763.78955078125)
-wait(.25)hrp.CFrame=CFrame.new(-16948.359375, 2612.9931640625, 3782.077880859375)pickupgrade()
-wait(1)hrp.CFrame=CFrame.new(-16922.252890625, 2613.091552734375, 3795.2581640625)
-wait(.25)hrp.CFrame=CFrame.new(-16922.654296875, 2677.768310546875, 3869.53125)
-wait(.25)hrp.CFrame=CFrame.new(-16922.396484375, 2648.88134765625, 3910.911865234375)
-wait(.25)hrp.CFrame=CFrame.new(-16935.423828125, 2630.416748046875, 3929.218505859375)
-wait(.25)hrp.CFrame=CFrame.new(-16913.73046875, 2613.34814453125, 3946.886962890625)
-wait(.25)hrp.CFrame=CFrame.new(-16922.0078125, 2602.2577978515625, 3991.257626953125)
-wait(.25)hrp.CFrame=CFrame.new(-16929.724609375, 2611.467041015625, 4009.916748046875)
-wait(.25)hrp.CFrame=CFrame.new(-16908.05078125, 2630.810791015625, 4028.239990234375)
-wait(.25)hrp.CFrame=CFrame.new(-16932.587890625, 2647.53662109375, 4044.259384765625)
-wait(.25)hrp.CFrame=CFrame.new(-16905.908203125, 2659.89453125, 4056.8603515625)
-wait(.25)hrp.CFrame=CFrame.new(-16991.626953125, 2624.303466796875, 4080.642578125)
-wait(.25)hrp.CFrame=CFrame.new(-16974.78515625, 2646.691162109375, 4037.81103515625)
-wait(.25)hrp.CFrame=CFrame.new(-16983.95703125, 2660.55908203125, 4008.210693359375)
-wait(.25)hrp.CFrame=CFrame.new(-16989.28515625, 2644.60986328125, 3946.8486328125)
-wait(.25)hrp.CFrame=CFrame.new(-16989.869140625, 2631.959716796875, 3898.259091796875)
-wait(.25)hrp.CFrame=CFrame.new(-17094.0390625, 2627.788818359375, 3925.2545751953125)pickupgrade()
-wait(1)hrp.CFrame=CFrame.new(-17200.056640625, 2627.788818359375, 3768.730712890625)
-wait(.25)hrp.CFrame=CFrame.new(-17256.576171875, 2627.788818359375, 3828.2571630859375)
-wait(.25)hrp.CFrame=CFrame.new(-17230.83203125, 2627.788818359375, 3861.3916015625)
-wait(.25)hrp.CFrame=CFrame.new(-17317.30078125, 2626.911376953125, 3828.963623046875)pickupgrade()
-wait(1)hrp.CFrame=CFrame.new(-17302.32421875, 2626.741455078125, 3851.861572265625)
-wait(.25)hrp.CFrame=CFrame.new(-17301.654296875, 2626.546142578125, 3878.072021484375)
-wait(.25)hrp.CFrame=CFrame.new(-17301.484375, 2626.338623046875, 3905.96044921875)
-wait(.25)hrp.CFrame=CFrame.new(-17217.86328125, 2627.788818359375, 3981.350341796875)
-wait(.25)hrp.CFrame=CFrame.new(-17299.60546875, 2627.788818359375, 3973.53955078125)
-wait(.25)hrp.CFrame=CFrame.new(-17328.8359375, 2627.788818359375, 3973.23583984375)
-wait(.25)hrp.CFrame=CFrame.new(-17301.45703125, 2627.788818359375, 4038.9453125)
-wait(.25)hrp.CFrame=CFrame.new(-17242.033203125, 2627.788818359375, 4038.37451171875)
-wait(.25)hrp.CFrame=CFrame.new(-17490.328125, 2613.500732421875, 4098.76806640625)pickupgrade()
-wait(1)hrp.CFrame=CFrame.new(-17470.869140625, 2612.61376953125, 4046.327392578125)
-wait(.25)hrp.CFrame=CFrame.new(-17477.705078125, 2608.525146484375, 3964.57568359375)
-wait(.25)hrp.CFrame=CFrame.new(-17470.501953125, 2611.43310546875, 3921.605224609375)
-wait(.25)hrp.CFrame=CFrame.new(-17469.369140625, 2611.225830078125, 3840.907470703125)
-wait(.25)hrp.CFrame=CFrame.new(-17475.416015625, 2610.239990234375, 3796.427001953125)
-wait(.25)hrp.CFrame=CFrame.new(-17470.220703125, 2610.533203125, 3801.253671875)
-wait(.25)hrp.CFrame=CFrame.new(-17452.546875, 2608.41357421875, 3741.407958984375)
-wait(.25)hrp.CFrame=CFrame.new(-17811.66796875, 2620, 4107.31884765625)
+local i=1
+local coords={
+	CFrame.new(-427.9,15,3.2),
+	CFrame.new(-15921.3,2585.2,4013.3),
+	CFrame.new(-15918.25,2587.9,3868.8),
+	CFrame.new(-15917.9,2589,3803.4),
+	CFrame.new(-16016,2604.2,3787.4),
+	CFrame.new(-15997.3,2604.3,3826.25),
+	CFrame.new(-15996.25,2620.7,3866.4),
+	CFrame.new(-15995.9,2633.4,3896.2),
+	CFrame.new(-15987,2644,3981.5),
+	CFrame.new(-16109.2,2644,3958.4),
+	CFrame.new(-16145.2,2644,3970),
+	CFrame.new(-16255.8,2643.6,3936.9),
+	CFrame.new(-16224,2644,3923.25),
+	CFrame.new(-16202,2644,3886.2),
+	CFrame.new(-16181.8,2645,3837.3),
+	CFrame.new(-16206.75,2644.29,3766.82),
+	CFrame.new(-16242.43,2644.24,3779.3),
+	CFrame.new(-16330.1,2644,3853.6),
+	CFrame.new(-16327.36,2644,3875.1),
+	CFrame.new(-16437.65,2598,3950.44)
+}
+while i<#coords+1 do
+	hrp.CFrame=coords[i]
+	if i==9 or i==17 or i==20 then
+		wait(.1)
+		pickupgrade()
+	end
+	i=i+1
+	wait(.4)
+end
+hrp.CFrame=CFrame.new(-15995.9,2560,3896.2)
