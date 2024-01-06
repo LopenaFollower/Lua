@@ -124,7 +124,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			end
 			if(type(autobuy.min)=="number"and(autobuy.check and tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)>autobuy.min))or not autobuy.check then
 				local itm=autobuy.item
-				if itm=="random"then itm=items[math.random(2,#items)]end
+				if itm=="Random"then itm=items[math.random(2,#items)]end
 				workspace:WaitForChild"ItemBoughtFromShop":InvokeServer(itm,1)
 			end
 		end)
