@@ -16,17 +16,9 @@ local autobuy={
 	item=nil,
 	s=false,
 	check=false,
-	min=100405,
+	min=1070000,
 	cd=true
 }
-function notif(ti,tx,d)
-	if not isnumber(d)then d=1 end
-	game.StarterGui:SetCore("SendNotification",{
-		Title=ti or"";
-		Text=tx or"";
-		Duration=tonumber(d)or 1;
-	})
-end
 function secToTime(s)
 	local hr=math.floor(s/3600)s=s%3600
 	local min=math.floor(s/60)s=s%60
@@ -124,17 +116,17 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 			end
 			if(type(autobuy.min)=="number"and(autobuy.check and tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)>autobuy.min))or not autobuy.check then
 				local itm=autobuy.item
-				if itm=="Random"then itm=items[math.random(2,#items)]end
+				if itm=="random"then itm=items[math.random(2,#items)]end
 				workspace:WaitForChild"ItemBoughtFromShop":InvokeServer(itm,1)
 			end
 		end)
-		wait(.25)
+		wait(.1)
 		autobuy.cd=true
 	end
 	pcall(function()
 		local t=os.time()-totaltime
 		local g=cgold-gold
-		if math.round(3600/t*g)>highestgph then highestgph=math.round(3600/t*g) end
+		if math.round(3600/t*g)>highestgph then highestgph=math.round(3600/t*g)end
 		pstats.time:updateInfo(secToTime(t))
 		pstats.gold:updateInfo(g)
 		pstats.perh:updateInfo(math.round(3600/t*g).."/gph")
@@ -177,7 +169,7 @@ binds.light=game:GetService"Lighting".Changed:Connect(function()
 	end
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("BABFB","...")
+local UI=GUI:CreateWindow("BABFB","best auto farm")
 local Main=UI:addPage("Main",1,true,1)
 local Shop=UI:addPage("Shop",1,false,1)
 local Teleport=UI:addPage("Teleport",2,false,1)
@@ -208,7 +200,7 @@ Shop:addToggle("Check gold",autobuy.check,function(v)
 	autobuy.check=v
 	autobuy.cd=true
 end)
-Shop:addTextBox("Min Balance",1070000,function(v)
+Shop:addTextBox("Min Balance",autobuy.min,function(v)
 	autobuy.min=tonumber(v)
 	autobuy.cd=true
 end)
