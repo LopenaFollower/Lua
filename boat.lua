@@ -174,7 +174,7 @@ binds.light=game:GetService"Lighting".Changed:Connect(function()
 		game.TweenService:Create(hrp,TweenInfo.new(14.25,Enum.EasingStyle.Linear),{CFrame=CFrame.new(-56,53,8385)}):Play()
 		wait(.5)
 		task.spawn(function()
-			while rp.CFrame.z>1950 do
+			while hrp.CFrame.z>1950 do
 				task.wait()
 				noVelocity()
 				workspace.ClaimRiverResultsGold:FireServer()
