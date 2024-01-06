@@ -132,7 +132,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
 		local t=os.time()-totaltime
 		local g=cgold-gold
-		if g>highestgph then highestgph=g end
+		if math.round(3600/t*g)>highestgph then highestgph=math.round(3600/t*g) end
 		pstats.time:updateInfo(secToTime(t))
 		pstats.gold:updateInfo(g)
 		pstats.perh:updateInfo(math.round(3600/t*g).."/gph")
