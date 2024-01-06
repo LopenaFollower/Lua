@@ -4,14 +4,11 @@ local chr=plr.Character
 local hum=chr and chr:FindFirstChildWhichIsA"Humanoid"
 local hrp=chr.HumanoidRootPart
 local gold=tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)
-local totaltime=os.time()
-local timer=os.time()
-local routinegold=0
+local totaltime,cgold,highestgph
 local binds={}
-local farm_speed=450
+local pstats={}
 local toggle={
-	farm=true,
-	mode=0,
+	farm=false,
 	delete=false,
 	infj=false
 }
@@ -22,163 +19,42 @@ local autobuy={
 	min=100405,
 	cd=true
 }
-local delete={
-	["TitaniumBlock"]=true,
-	["SwitchBig"]=true,
-	["SonicJetTurbine"]=true,
-	["BalloonBlock"]=true,
-	["MarbleBlock"]=true,
-	["ObsidianBlock"]=true,
-	["FabricBlock"]=true,
-	["NeonBlock"]=true,
-	["ConcreteBlock"]=true,
-	["CarSeat"]=true,
-	["MetalBlock"]=true,
-	["WoodBlock"]=true,
-	["Piston"]=true,
-	["BackWheel"]=true,
-	["Trees"]=true,
-	["Thruster"]=true,
-	["Seat"]=true,
-	["Steel I-Beam"]=true,
-	["Glue"]=true,
-	["Hinge"]=true,
-	["RustedBlock"]=true,
-	["GlassBlock"]=true,
-	["MetalRod"]=true,
-	["Truss"]=true,
-	["WoodDoor"]=true,
-	["TreasureSmall"]=true,
-	["WoodRod"]=true,
-	["CoalBlock"]=true,
-	["Window"]=true,
-	["RustedRod"]=true,
-	["Lamp"]=true,
-	["StoneBlock"]=true,
-	["TreasureMedium"]=true,
-	["TreasureLarge"]=true,
-	["Torch"]=true,
-	["GrassBlock"]=true,
-	["Mast"]=true,
-	["Switch"]=true,
-	["Camera"]=true,
-	["WoodTrapDoor"]=true,
-	["Throne"]=true,
-	["PlasticBlock"]=true,
-	["CandyBlue"]=true,
-	["IceBlock"]=true,
-	["Wedge"]=true,
-	["JetPack"]=true,
-	["BoatMotor"]=true,
-	["ConcreteRod"]=true,
-	["Motor"]=true,
-	["SandBlock"]=true,
-	["Cake"]=true,
-	["Chair"]=true,
-	["TNT"]=true,
-	["SpringFlowers"]=true,
-	["Egg"]=true,
-	["BrickBlock"]=true,
-	["Servo"]=true,
-	["TitaniumRod"]=true,
-	["PilotSeat"]=true,
-	["JetPackEaster"]=true,
-	["UltraThruster"]=true,
-	["Portal"]=true,
-	["GoldBlock"]=true,
-	["SandUnderWater"]=true,
-	["Harpoon"]=true,
-	["ShieldGenerator"]=true,
-	["FrontWheel"]=true,
-	["Step"]=true,
-	["Trophy1st"]=true,
-	["Helm"]=true,
-	["LightBulb"]=true,
-	["Trophy2nd"]=true,
-	["Sign"]=true,
-	["Cannon"]=true,
-	["JetTurbine"]=true,
-	["Button"]=true,
-	["LockedDoor"]=true,
-	["Trophy3rd"]=true,
-	["MarbleRod"]=true,
-	["Delay"]=true,
-	["Spring"]=true,
-	["SpikeTrap"]=true,
-	["MiniGun"]=true,
-	["CornerWedge"]=true,
-	["StoneRod"]=true,
-	["Flag"]=true,
-	["ParachuteBlock"]=true,
-	["SticksOfTNT"]=true,
-	["CameraDome"]=true,
-	["CornerWedge"]=true,
-	["CornerWedge"]=true,
-	["CornerWedge"]=true,
-	["CornerWedge"]=true,
-	["CornerWedge"]=true,
-	["CornerWedge"]=true,
-	["CornerWedge"]=true,
-}
-local items={
-	"Common Chest",
-	"Uncommon Chest",
-	"Rare Chest",
-	"Epic Chest",
-	"Legendary Chest",
-	"Sign",
-	"BoatMotor",
-	"Car Parts",
-	"Balloons",
-	"JetPacks",
-	"Plane Parts",
-	"Parachutes",
-	"Shield Generators",
-	"Harpoon",
-	"Note",
-	"HingeBlocks",
-	"Delay",
-	"Pistons",
-	"Locked Doors",
-	"Magnets",
-	"PVP Pack",
-	"LegacyCarPack",
-	"Switch",
-	"Button",
-	"LightBulb",
-	"Camera",
-	"CameraDome",
-	"SpikeTrap",
-	"Cannon",
-	"MiniGun",
-	"CannonTurret",
-	"WoodBlock",
-	"SmootWoodBlock",
-	"GlassBlock",
-	"StoneBlock",
-	"FabricBlock",
-	"PlasticBlock",
-	"GrassBlock",
-	"SandBlock",
-	"RustedBlock",
-	"BouncyBlock",
-	"MetalBlock",
-	"ConcreteBlock",
-	"IceBlock",
-	"CoalBlock",
-	"BrickBlock",
-	"MarbleBlock",
-	"TitaniumBlock",
-	"ObsidianBlock"
-}
+function notif(ti,tx,d)
+	if not isnumber(d)then d=1 end
+	game.StarterGui:SetCore("SendNotification",{
+		Title=ti or"";
+		Text=tx or"";
+		Duration=tonumber(d)or 1;
+	})
+end
+function secToTime(s)
+	local hr=math.floor(s/3600)s=s%3600
+	local min=math.floor(s/60)s=s%60
+	function pad(n)
+		local s="00"..tostring(n)
+		local l=s:len()
+		return string.sub(s,l-1,l)
+	end
+	return pad(hr)..":"..pad(min)..":"..pad(s)
+end
+local delete={["TitaniumBlock"]=true,["SwitchBig"]=true,["SonicJetTurbine"]=true,["BalloonBlock"]=true,["MarbleBlock"]=true,["ObsidianBlock"]=true,["FabricBlock"]=true,["NeonBlock"]=true,["ConcreteBlock"]=true,["CarSeat"]=true,["MetalBlock"]=true,["WoodBlock"]=true,["Piston"]=true,["BackWheel"]=true,["Trees"]=true,["Thruster"]=true,["Seat"]=true,["Steel I-Beam"]=true,["Glue"]=true,["Hinge"]=true,["RustedBlock"]=true,["GlassBlock"]=true,["MetalRod"]=true,["Truss"]=true,["WoodDoor"]=true,["TreasureSmall"]=true,["WoodRod"]=true,["CoalBlock"]=true,["Window"]=true,["RustedRod"]=true,["Lamp"]=true,["StoneBlock"]=true,["TreasureMedium"]=true,["TreasureLarge"]=true,["Torch"]=true,["GrassBlock"]=true,["Mast"]=true,["Switch"]=true,["Camera"]=true,["WoodTrapDoor"]=true,["Throne"]=true,["PlasticBlock"]=true,["CandyBlue"]=true,["IceBlock"]=true,["Wedge"]=true,["JetPack"]=true,["BoatMotor"]=true,["ConcreteRod"]=true,["Motor"]=true,["SandBlock"]=true,["Cake"]=true,["Chair"]=true,["TNT"]=true,["SpringFlowers"]=true,["Egg"]=true,["BrickBlock"]=true,["Servo"]=true,["TitaniumRod"]=true,["PilotSeat"]=true,["JetPackEaster"]=true,["UltraThruster"]=true,["Portal"]=true,["GoldBlock"]=true,["SandUnderWater"]=true,["Harpoon"]=true,["ShieldGenerator"]=true,["FrontWheel"]=true,["Step"]=true,["Trophy1st"]=true,["Helm"]=true,["LightBulb"]=true,["Trophy2nd"]=true,["Sign"]=true,["Cannon"]=true,["JetTurbine"]=true,["Button"]=true,["LockedDoor"]=true,["Trophy3rd"]=true,["MarbleRod"]=true,["Delay"]=true,["Spring"]=true,["SpikeTrap"]=true,["MiniGun"]=true,["CornerWedge"]=true,["StoneRod"]=true,["Flag"]=true,["ParachuteBlock"]=true,["SticksOfTNT"]=true,["CameraDome"]=true,["CornerWedge"]=true,["CornerWedge"]=true,["CornerWedge"]=true,["CornerWedge"]=true,["CornerWedge"]=true,["CornerWedge"]=true,["CornerWedge"]=true}
+local items={"Common Chest","Uncommon Chest","Rare Chest","Epic Chest","Legendary Chest","Sign","BoatMotor","Car Parts","Balloons","JetPacks","Plane Parts","Parachutes","Shield Generators","Harpoon","Note","HingeBlocks","Delay","Pistons","Locked Doors","Magnets","PVP Pack","LegacyCarPack","Switch","Button","LightBulb","Camera","CameraDome","SpikeTrap","Cannon","MiniGun","CannonTurret","WoodBlock","SmootWoodBlock","GlassBlock","StoneBlock","FabricBlock","PlasticBlock","GrassBlock","SandBlock","RustedBlock","BouncyBlock","MetalBlock","ConcreteBlock","IceBlock","CoalBlock","BrickBlock","MarbleBlock","TitaniumBlock","ObsidianBlock"}
 if not workspace:FindFirstChild"conveyor"then
 	local p=Instance.new("Part",workspace)
 	p.Name="conveyor"
-	p.Size=Vector3.new(1,0,5)
-	p.Transparency=.95
+	p.Size=Vector3.new(1,0,150)
+	p.Transparency=1
 	p.Anchored=true
-	p.CFrame=hrp.CFrame-Vector3.new(0,3,0)
-	p.Velocity=p.CFrame:vectorToWorldSpace(Vector3.new(0,0,farm_speed))
+	p.CFrame=CFrame.new(-56,50,1390)
+	p.Orientation=Vector3.new(20,0,0)
+	p.Velocity=p.CFrame:vectorToWorldSpace(Vector3.new(0,0,10))
+end
+if not workspace:FindFirstChild"pf1"then
+	local p=Instance.new("Part",workspace)
+	p.Name="pf1"
+	p.Size=Vector3.new(1,0,1)
+	p.Anchored=true
+	p.CFrame=CFrame.new(-56,-363,9488)
 end
 function noVelocity()
 	pcall(function()
@@ -187,22 +63,24 @@ function noVelocity()
 		hrp.Velocity=Vector3.new(0,0,0)
 	end)
 end
-local conveyor=workspace:FindFirstChild"conveyor"
-binds.jump=game.UserInputService.JumpRequest:connect(function()
-	if toggle.infj and hum then
-		hum:ChangeState"Jumping"
-	end
-end)
 binds.added=workspace.ChildAdded:Connect(function()
 	wait(.01)
 	if toggle.delete then
-		for _,v2 in pairs(workspace:GetChildren())do
-			if delete[v2.Name]and v2:IsA"Model"then
-				v2:Destroy()
+		for _,v in pairs(workspace:GetChildren())do
+			if delete[v.Name]and v:IsA"Model"then
+				v:Destroy()
 			end
 		end
-		for _,i in pairs(workspace.BoatStages.NormalStages:GetChildren())do
-			if i.Name~="TheEnd"then i:Destroy()end
+		for _,v in pairs(workspace.BoatStages.NormalStages:GetChildren())do
+			if v.Name~="TheEnd"then
+				for _,i in pairs(v:GetChildren())do
+					if i.Name~="DarknessPart"then
+						i:Destroy()
+					else
+						i.CastShadow=false
+					end
+				end
+			end
 		end
 		for _,i in pairs(workspace.BoatStages.OtherStages:GetChildren())do
 			i:Destroy()
@@ -229,50 +107,15 @@ binds.added=workspace.ChildAdded:Connect(function()
 		end
 	end
 end)
-local yVal=40
 binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=plr.Character
 		hum=chr:FindFirstChildWhichIsA"Humanoid"
 		hrp=chr.HumanoidRootPart
-		local cgold=tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)
-		workspace[plr.Name].HumanoidRootPart.GroupLabel.TextLabel.Text="Time: "..(os.time()-totaltime).."s/"..(os.time()-timer).."s\nGold: "..(cgold-gold).."/"..(cgold-routinegold).."\nDist: "..math.round((hrp.Position-Vector3.new(-56,-359,9496)).magnitude)
-		conveyor=workspace:FindFirstChild"conveyor"
-		conveyor.Velocity=conveyor.CFrame:vectorToWorldSpace(Vector3.new(0,0,farm_speed))
+		cgold=tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)
 		workspace.CurrentCamera.CameraSubject=chr
 	end)
-	if toggle.farm then
-		local goal=8325
-		local zm=1050
-		if toggle.mode==1 then goal=2165 end
-		if hrp.CFrame.z<goal-1100 and toggle.mode~=1 then
-			workspace.ClaimRiverResultsGold:FireServer()
-		end
-		if hrp.CFrame.z<zm then
-			hrp.CFrame=CFrame.new(-56,yVal,zm)
-			timer=os.time()
-			routinegold=tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)
-		end
-		if hrp.CFrame.z>=zm and hrp.Position.z<goal then
-			conveyor.CFrame=CFrame.new(-56,yVal-2,hrp.CFrame.z)
-			hrp.CFrame=CFrame.new(-56,hrp.CFrame.y,hrp.CFrame.z)
-			if hrp.CFrame.y<yVal-2 then
-				hrp.CFrame=CFrame.new(-56,yVal,hrp.CFrame.z)
-			end
-		end
-		if hrp.Position.z>goal and hrp.Position.z<9495 then
-			if toggle.mode~=2 then
-				hrp.CFrame=CFrame.new(-56,-359,9496)
-				noVelocity()
-			elseif hum then hum.Health=0 end
-			wait(.3)
-			noVelocity()
-			workspace.ClaimRiverResultsGold:FireServer()
-			wait(15)
-			if hrp.Position.z>goal and hum then hum.Health=0 end
-		end
-	end
 	if autobuy.s and autobuy.item~=nil and autobuy.cd then
 		autobuy.cd=false
 		pcall(function()
@@ -286,10 +129,52 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 		wait(.25)
 		autobuy.cd=true
 	end
+	pcall(function()
+		local t=os.time()-totaltime
+		local g=cgold-gold
+		if g>highestgph then highestgph=g end
+		pstats.time:updateInfo(secToTime(t))
+		pstats.gold:updateInfo(g)
+		pstats.perh:updateInfo(math.round(3600/t*g).."/gph")
+		pstats.hgph:updateInfo(highestgph.."/gph")
+	end)
 end)
-binds.light=game:GetService("Lighting").Changed:Connect(function()
-	if hum and toggle.mode<1 and(hrp.Position-Vector3.new(-56,-359,9496)).magnitude<5 then
-		hum.Health=0
+binds.jump=game.UserInputService.JumpRequest:connect(function()
+	if toggle.infj and hum then
+		hum:ChangeState"Jumping"
+	end
+end)
+binds.rspwn=plr.CharacterAdded:Connect(function(v)
+	repeat task.wait(.25)until v:FindFirstChild"HumanoidRootPart"or not toggle.farm
+	if toggle.farm then
+		if not totaltime then totaltime=os.time()end
+		chr=v
+		hrp=v:FindFirstChild"HumanoidRootPart"
+		hum=v:FindFirstChild"Humanoid"
+		hrp.CFrame=CFrame.new(-56,53,1390)
+		workspace.ClaimRiverResultsGold:FireServer()
+		repeat task.wait()until hrp.CFrame.z>=1451
+		hrp.CFrame=CFrame.new(-56,-358,9488)
+		noVelocity()
+		wait(2.5)
+		if(hrp.Position-CFrame.new(-56,-358,9488)).magnitude<5 then
+			hum.Health=0
+		end
+	end
+end)
+binds.light=game:GetService"Lighting".Changed:Connect(function()
+	if toggle.farm and hum and(hrp.Position-Vector3.new(-56,-360,9488)).magnitude<5 then
+		hrp.CFrame=CFrame.new(-56,53,1960)
+		hum:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+		game.TweenService:Create(hrp,TweenInfo.new(14.25,Enum.EasingStyle.Linear),{CFrame=CFrame.new(-56,53,8385)}):Play()
+		wait(.5)
+		task.spawn(function()
+			while hrp.CFrame.z<7500 and hrp.CFrame.z>1950 do
+				task.wait()
+				noVelocity()
+				workspace.ClaimRiverResultsGold:FireServer()
+			end
+		end)
 	end
 end)
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
@@ -297,22 +182,17 @@ local UI=GUI:CreateWindow("BABFB","...")
 local Main=UI:addPage("Main",1,true,1)
 local Shop=UI:addPage("Shop",1,false,1)
 local Teleport=UI:addPage("Teleport",2,false,1)
+local Stats=UI:addPage("Statistics",1,false,1)
 local Local=UI:addPage("Local Player",1,false,1)
 Main:addToggle("Start",toggle.farm,function(v)
 	toggle.farm=v
-end)
-Main:addDropdown("Mode",{"full routine","gold blocks","gold"},.75,function(v)
-	if v=="full routine"then--415
-		toggle.mode=0
-	elseif v=="gold blocks"then--idk
-		toggle.mode=1
-	elseif v=="gold"then--450
-		toggle.mode=2
+	if toggle.farm and hrp.CFrame.z<1200 then
+		workspace.ClaimRiverResultsGold:FireServer()
+		if not totaltime then totaltime=os.time()end
+		hrp.CFrame=CFrame.new(-56,53,1390)
+		repeat task.wait()until hrp.CFrame.z>=1452
+		hrp.CFrame=CFrame.new(-56,-358,9488)
 	end
-end)
-Main:addTextBox("Speed",farm_speed,function(v)
-	farm_speed=tonumber(v)
-	conveyor.Velocity=conveyor.CFrame:vectorToWorldSpace(Vector3.new(0,0,farm_speed))
 end)
 Main:addToggle("Lag Reduction",toggle.delete,function(v)
 	toggle.delete=v
@@ -361,6 +241,10 @@ end)
 Teleport:addButton("Waterfall",function()
 	hrp.CFrame=CFrame.new(181,-12,1161)
 end)
+pstats.time=Stats:addLabel("Elapsed","00:00:00")
+pstats.gold=Stats:addLabel("Session Gold","0")
+pstats.perh=Stats:addLabel("Estimated","0/hr")
+pstats.hgph=Stats:addLabel("Highest Rate","0/hr")
 Local:addTextBox("WalkSpeed",hum.WalkSpeed,function(v)
 	hum.WalkSpeed=tonumber(v)
 end)
@@ -373,6 +257,10 @@ end)
 Local:addToggle("Inf Jump",false,function(v)
 	toggle.infj=v
 end)
+Local:addTextBox("Inventory Width",plr.PlayerGui.BuildGui.InventoryFrame.ScrollingFrame.Size.X.Offset,function(v)
+	local frme=plr.PlayerGui.BuildGui.InventoryFrame.ScrollingFrame
+	frme.Size=UDim2.new(0,tonumber(v),0,frme.Size.Y.Offset)
+end)
 Local:addButton("Rejoin",function()
 	plr:Kick" "
 	task.wait()
@@ -381,5 +269,6 @@ end)
 Local:destroyGui(function()
 	for i,v in pairs(binds)do v:Disconnect()end
 	for i,v in pairs(toggle)do toggle[i]=false end
-	conveyor:Destroy()--3600/sc*ge=income
+	workspace:FindFirstChild"conveyor":Destroy()
+	workspace:FindFirstChild"pf1":Destroy()
 end)--game.Players.LocalPlayer.PlayerGui.BuildGui.InventoryFrame.ScrollingFrame.Size=UDim2.new(0,430,0,220)
