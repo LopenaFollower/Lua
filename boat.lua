@@ -38,7 +38,7 @@ function secToTime(s)
 	return pad(hr)..":"..pad(min)..":"..pad(s)
 end
 local delete={["TitaniumBlock"]=true,["SwitchBig"]=true,["SonicJetTurbine"]=true,["BalloonBlock"]=true,["MarbleBlock"]=true,["ObsidianBlock"]=true,["FabricBlock"]=true,["NeonBlock"]=true,["ConcreteBlock"]=true,["CarSeat"]=true,["MetalBlock"]=true,["WoodBlock"]=true,["Piston"]=true,["BackWheel"]=true,["Trees"]=true,["Thruster"]=true,["Seat"]=true,["Steel I-Beam"]=true,["Glue"]=true,["Hinge"]=true,["RustedBlock"]=true,["GlassBlock"]=true,["MetalRod"]=true,["Truss"]=true,["WoodDoor"]=true,["TreasureSmall"]=true,["WoodRod"]=true,["CoalBlock"]=true,["Window"]=true,["RustedRod"]=true,["Lamp"]=true,["StoneBlock"]=true,["TreasureMedium"]=true,["TreasureLarge"]=true,["Torch"]=true,["GrassBlock"]=true,["Mast"]=true,["Switch"]=true,["Camera"]=true,["WoodTrapDoor"]=true,["Throne"]=true,["PlasticBlock"]=true,["CandyBlue"]=true,["IceBlock"]=true,["Wedge"]=true,["JetPack"]=true,["BoatMotor"]=true,["ConcreteRod"]=true,["Motor"]=true,["SandBlock"]=true,["Cake"]=true,["Chair"]=true,["TNT"]=true,["SpringFlowers"]=true,["Egg"]=true,["BrickBlock"]=true,["Servo"]=true,["TitaniumRod"]=true,["PilotSeat"]=true,["JetPackEaster"]=true,["UltraThruster"]=true,["Portal"]=true,["GoldBlock"]=true,["SandUnderWater"]=true,["Harpoon"]=true,["ShieldGenerator"]=true,["FrontWheel"]=true,["Step"]=true,["Trophy1st"]=true,["Helm"]=true,["LightBulb"]=true,["Trophy2nd"]=true,["Sign"]=true,["Cannon"]=true,["JetTurbine"]=true,["Button"]=true,["LockedDoor"]=true,["Trophy3rd"]=true,["MarbleRod"]=true,["Delay"]=true,["Spring"]=true,["SpikeTrap"]=true,["MiniGun"]=true,["CornerWedge"]=true,["StoneRod"]=true,["Flag"]=true,["ParachuteBlock"]=true,["SticksOfTNT"]=true,["CameraDome"]=true,["CornerWedge"]=true,["CornerWedge"]=true,["CornerWedge"]=true,["CornerWedge"]=true,["CornerWedge"]=true,["CornerWedge"]=true,["CornerWedge"]=true}
-local items={"Common Chest","Uncommon Chest","Rare Chest","Epic Chest","Legendary Chest","Sign","BoatMotor","Car Parts","Balloons","JetPacks","Plane Parts","Parachutes","Shield Generators","Harpoon","Note","HingeBlocks","Delay","Pistons","Locked Doors","Magnets","PVP Pack","LegacyCarPack","Switch","Button","LightBulb","Camera","CameraDome","SpikeTrap","Cannon","MiniGun","CannonTurret","WoodBlock","SmootWoodBlock","GlassBlock","StoneBlock","FabricBlock","PlasticBlock","GrassBlock","SandBlock","RustedBlock","BouncyBlock","MetalBlock","ConcreteBlock","IceBlock","CoalBlock","BrickBlock","MarbleBlock","TitaniumBlock","ObsidianBlock"}
+local items={"Random","Common Chest","Uncommon Chest","Rare Chest","Epic Chest","Legendary Chest","Sign","BoatMotor","Car Parts","Balloons","JetPacks","Plane Parts","Parachutes","Shield Generators","Harpoon","Note","HingeBlocks","Delay","Pistons","Locked Doors","Magnets","PVP Pack","LegacyCarPack","Switch","Button","LightBulb","Camera","CameraDome","SpikeTrap","Cannon","MiniGun","CannonTurret","WoodBlock","SmootWoodBlock","GlassBlock","StoneBlock","FabricBlock","PlasticBlock","GrassBlock","SandBlock","RustedBlock","BouncyBlock","MetalBlock","ConcreteBlock","IceBlock","CoalBlock","BrickBlock","MarbleBlock","TitaniumBlock","ObsidianBlock"}
 if not workspace:FindFirstChild"conveyor"then
 	local p=Instance.new("Part",workspace)
 	p.Name="conveyor"
@@ -123,7 +123,9 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				plr.PlayerGui:FindFirstChild"ItemGained":Destroy()
 			end
 			if(type(autobuy.min)=="number"and(autobuy.check and tonumber(plr.PlayerGui.GoldGui.Frame.Amount.Text)>autobuy.min))or not autobuy.check then
-				workspace:WaitForChild"ItemBoughtFromShop":InvokeServer(autobuy.item,1)
+				local itm=autobuy.item
+				if itm=="random"then itm=items[math.random(2,#items)]end
+				workspace:WaitForChild"ItemBoughtFromShop":InvokeServer(itm,1)
 			end
 		end)
 		wait(.25)
