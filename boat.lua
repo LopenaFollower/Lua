@@ -120,7 +120,7 @@ binds.main=game:GetService"RunService".Heartbeat:Connect(function()
 				workspace:WaitForChild"ItemBoughtFromShop":InvokeServer(itm,1)
 			end
 		end)
-		wait(.1)
+		wait(.15)
 		autobuy.cd=true
 	end
 	pcall(function()
@@ -148,7 +148,7 @@ binds.rspwn=plr.CharacterAdded:Connect(function(v)
 		hrp=v:FindFirstChild"HumanoidRootPart"
 		hum=v:FindFirstChild"Humanoid"
 		hrp.CFrame=CFrame.new(-56,53,1390)
-		repeat task.wait()until hrp.CFrame.z>=1452
+		repeat task.wait()until hrp.CFrame.z>=1453
 		hrp.CFrame=CFrame.new(-56,-358,9488)
 		noVelocity()
 	end
@@ -182,7 +182,7 @@ Main:addToggle("Start",toggle.farm,function(v)
 		if not totaltime then totaltime=os.time()end
 		if not highestgph then highestgph=0 end
 		hrp.CFrame=CFrame.new(-56,53,1390)
-		repeat task.wait()until hrp.CFrame.z>=1452
+		repeat task.wait()until hrp.CFrame.z>=1453
 		hrp.CFrame=CFrame.new(-56,-358,9488)
 	end
 end)
