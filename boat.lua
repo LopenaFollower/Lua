@@ -148,12 +148,13 @@ binds.rspwn=plr.CharacterAdded:Connect(function(v)
 	repeat task.wait(.25)until v:FindFirstChild"HumanoidRootPart"or not toggle.farm
 	if toggle.farm then
 		if not totaltime then totaltime=os.time()end
+		if not highestgph then highestgph=0 end
 		chr=v
 		hrp=v:FindFirstChild"HumanoidRootPart"
 		hum=v:FindFirstChild"Humanoid"
 		hrp.CFrame=CFrame.new(-56,53,1390)
 		workspace.ClaimRiverResultsGold:FireServer()
-		repeat task.wait()until hrp.CFrame.z>=1451
+		repeat task.wait()until hrp.CFrame.z>=1452
 		hrp.CFrame=CFrame.new(-56,-358,9488)
 		noVelocity()
 		wait(2.5)
@@ -169,7 +170,7 @@ binds.light=game:GetService"Lighting".Changed:Connect(function()
 		game.TweenService:Create(hrp,TweenInfo.new(14.25,Enum.EasingStyle.Linear),{CFrame=CFrame.new(-56,53,8385)}):Play()
 		wait(.5)
 		task.spawn(function()
-			while hrp.CFrame.z<7500 and hrp.CFrame.z>1950 do
+			while hrp.CFrame.z<7700 and hrp.CFrame.z>1950 do
 				task.wait()
 				noVelocity()
 				workspace.ClaimRiverResultsGold:FireServer()
@@ -189,6 +190,7 @@ Main:addToggle("Start",toggle.farm,function(v)
 	if toggle.farm and hrp.CFrame.z<1200 then
 		workspace.ClaimRiverResultsGold:FireServer()
 		if not totaltime then totaltime=os.time()end
+		if not highestgph then highestgph=0 end
 		hrp.CFrame=CFrame.new(-56,53,1390)
 		repeat task.wait()until hrp.CFrame.z>=1452
 		hrp.CFrame=CFrame.new(-56,-358,9488)
