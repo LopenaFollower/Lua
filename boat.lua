@@ -208,7 +208,7 @@ Shop:addToggle("Check gold",autobuy.check,function(v)
 	autobuy.check=v
 	autobuy.cd=true
 end)
-Shop:addTextBox("Min Balance",100405,function(v)
+Shop:addTextBox("Min Balance",1070000,function(v)
 	autobuy.min=tonumber(v)
 	autobuy.cd=true
 end)
