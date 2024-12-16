@@ -1,4 +1,4 @@
---Entire thing Made by Bytes#0001
+--Credit to Bytes#0001
 --Modified by github.com/lopenafollower
 --Added features by me (github.com/lopenafollower):
 -- * Fixed slider on mobile to detect release.
