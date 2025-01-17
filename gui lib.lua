@@ -1,4 +1,4 @@
---Credit to Bytes#0001
+--Credits to Bytes#0001
 --Modified by github.com/lopenafollower
 --Added features by me (github.com/lopenafollower):
 -- * Fixed slider on mobile to detect release.
@@ -161,19 +161,24 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=310
-local CoreGui=game.CoreGui
-local UserInputService=game:GetService"UserInputService"
-if CoreGui:FindFirstChild"fu8rj82n"then
-	CoreGui.fu8rj82n:Destroy()
+local Version=313
+local destroyButton=false
+local destroyCallback=function()end
+local UIS=game:GetService"UserInputService"
+local G=game.CoreGui:FindFirstChild"51e6b58a-772cd11d-27fc1803-22496d1a-43580b73"
+if G then
+	G.Running.Value=false
 end
 task.spawn(function()
 	print("Gui version: "..Version)
 	loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
 end)
+function toRGB(n)
+	return Color3.fromRGB((n>>16)&0xff,(n>>8)&0xff,n&0xff)
+end
 local Library={}
 function Library:CreateWindow(windowname,windowinfo,scrollsize)
-	local fu8rj82n=Instance.new"ScreenGui"
+	local Gui=Instance.new"ScreenGui"
 	local Frame=Instance.new"Frame"
 	local FrameCorner=Instance.new"UICorner"
 	local DashBoard=Instance.new"Frame"
@@ -188,13 +193,14 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 	local Cre=Instance.new"ImageLabel"
 	local YepTitle=Instance.new"TextLabel"
 	local YepCorner=Instance.new"UICorner"
-	fu8rj82n.Name="fu8rj82n"
-	fu8rj82n.Parent=CoreGui
-	fu8rj82n.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
-	fu8rj82n.ResetOnSpawn=false
-	Frame.Parent=fu8rj82n
-	Frame.BackgroundColor3=Color3.fromRGB(20,20,20)
-	Frame.BorderColor3=Color3.fromRGB(20,20,20)
+	local Status=Instance.new"BoolValue"
+	Gui.Name="51e6b58a-772cd11d-27fc1803-22496d1a-43580b73"
+	Gui.Parent=game.CoreGui
+	Gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
+	Gui.ResetOnSpawn=false
+	Frame.Parent=Gui
+	Frame.BackgroundColor3=toRGB(0x141414)
+	Frame.BorderColor3=toRGB(0x141414)
 	Frame.BorderSizePixel=0
 	Frame.Position=UDim2.new(.289808273,0,.313227266,0)
 	Frame.Size=UDim2.new(0,432,0,285)
@@ -202,8 +208,8 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 	FrameCorner.Parent=Frame
 	DashBoard.Name="DashBoard"
 	DashBoard.Parent=Frame
-	DashBoard.BackgroundColor3=Color3.fromRGB(15,15,15)
-	DashBoard.BorderColor3=Color3.fromRGB(15,15,15)
+	DashBoard.BackgroundColor3=toRGB(0xF0F0F)
+	DashBoard.BorderColor3=toRGB(0xF0F0F)
 	DashBoard.Position=UDim2.new(.0185185205,0,.16842106,0)
 	DashBoard.Size=UDim2.new(0,107,0,223)
 	DashBoardCorner.CornerRadius=UDim.new(0,6)
@@ -212,14 +218,14 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 	TabContainer.Name="TabContainer"
 	TabContainer.Parent=DashBoard
 	TabContainer.Active=true
-	TabContainer.BackgroundColor3=Color3.fromRGB(15,15,15)
+	TabContainer.BackgroundColor3=toRGB(0xF0F0F)
 	TabContainer.BackgroundTransparency=1
-	TabContainer.BorderColor3=Color3.fromRGB(15,15,15)
+	TabContainer.BorderColor3=toRGB(0xF0F0F)
 	TabContainer.BorderSizePixel=0
 	TabContainer.Position=UDim2.new(.0280373823,0,.0391304344,0)
 	TabContainer.Size=UDim2.new(0,100,0,214)
 	TabContainer.ScrollBarThickness=3
-	TabContainer.ScrollBarImageColor3=Color3.fromRGB(5,5,5)
+	TabContainer.ScrollBarImageColor3=toRGB(0x50505)
 	TabContainer.CanvasSize=UDim2.new(0,0,scrollsize or 1e3,0)
 	TabContainer.Visible=true
 	TabContainerLayout.Name="TabContainer"
@@ -229,8 +235,8 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 	TabContainerLayout.Padding=UDim.new(0,8)
 	PageContainer.Name="PageContainer"
 	PageContainer.Parent=Frame
-	PageContainer.BackgroundColor3=Color3.fromRGB(15,15,15)
-	PageContainer.BorderColor3=Color3.fromRGB(15,15,15)
+	PageContainer.BackgroundColor3=toRGB(0xF0F0F)
+	PageContainer.BorderColor3=toRGB(0xF0F0F)
 	PageContainer.Position=UDim2.new(.282407403,0,.16842106,0)
 	PageContainer.Size=UDim2.new(0,299,0,223)
 	PageContainerCorner.CornerRadius=UDim.new(0,6)
@@ -240,29 +246,29 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 	PageFolder.Parent=PageContainer
 	Title.Name="Title"
 	Title.Parent=Frame
-	Title.BackgroundColor3=Color3.fromRGB(20,20,20)
+	Title.BackgroundColor3=toRGB(0x141414)
 	Title.BackgroundTransparency=1
-	Title.BorderColor3=Color3.fromRGB(20,20,20)
+	Title.BorderColor3=toRGB(0x141414)
 	Title.BorderSizePixel=0
 	Title.Position=UDim2.new(.0428240746,0,.028070176,0)
 	Title.Size=UDim2.new(0,355,0,33)
 	Title.Font=Enum.Font.GothamSemibold
 	Title.Text=windowname
-	Title.TextColor3=Color3.fromRGB(255,255,255)
+	Title.TextColor3=toRGB(0xFFFFFF)
 	Title.TextSize=14
 	Title.TextXAlignment=Enum.TextXAlignment.Left
 	Yep.Name="Yep"
 	Yep.Parent=Frame
-	Yep.BackgroundColor3=Color3.fromRGB(20,20,20)
+	Yep.BackgroundColor3=toRGB(0x141414)
 	Yep.BackgroundTransparency=1
-	Yep.BorderColor3=Color3.fromRGB(20,20,20)
+	Yep.BorderColor3=toRGB(0x141414)
 	Yep.BorderSizePixel=0
 	Yep.Position=UDim2.new(.885,0,.0495263338,0)
 	Yep.Size=UDim2.new(0,38,0,22)
 	Yep.AutoButtonColor=false
 	Yep.Font=Enum.Font.SourceSans
 	Yep.Text=""
-	Yep.TextColor3=Color3.fromRGB(0,0,0)
+	Yep.TextColor3=toRGB(0)
 	Yep.TextSize=14
 	Cre.Name="Cre"
 	Cre.Parent=Yep
@@ -272,38 +278,47 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 	Cre.ScaleType=Enum.ScaleType.Fit
 	YepTitle.Name="YepTitle"
 	YepTitle.Parent=Yep
-	YepTitle.BackgroundColor3=Color3.fromRGB(20,20,20)
+	YepTitle.BackgroundColor3=toRGB(0x141414)
 	YepTitle.BackgroundTransparency=1
-	YepTitle.BorderColor3=Color3.fromRGB(20,20,20)
+	YepTitle.BorderColor3=toRGB(0x141414)
 	YepTitle.BorderSizePixel=0
 	YepTitle.Position=UDim2.new(1.57894742,0,-.318181813,0)
 	YepTitle.Size=UDim2.new(0,128,0,33)
 	YepTitle.Font=Enum.Font.GothamSemibold
 	YepTitle.Text=windowinfo or Version
-	YepTitle.TextColor3=Color3.fromRGB(255,255,255)
+	YepTitle.TextColor3=toRGB(0xFFFFFF)
 	YepTitle.TextSize=9
 	YepTitle.TextTransparency=1
 	YepCorner.Name="YepCorner"
 	YepCorner.Parent=YepTitle
+	Status.Name="Running"
+	Status.Parent=Gui
+	Status.Value=true
+	Status.Changed:Connect(function(v)
+		if not v then
+			destroyCallback()
+			Gui:Destroy()
+		end
+	end)
 	Cre.MouseEnter:Connect(function()
 		YepTitle.BackgroundTransparency=.8
 		YepTitle.TextTransparency=.5
-		wait(.05)
+		wait(.02)
 		YepTitle.BackgroundTransparency=.5
 		YepTitle.TextTransparency=.3
-		Cre.ImageColor3=Color3.fromRGB(137,246,255)
-		wait(.05)
+		Cre.ImageColor3=toRGB(0x89F6FF)
+		wait(.02)
 		YepTitle.BackgroundTransparency=0
 		YepTitle.TextTransparency=0
 	end)
 	Cre.MouseLeave:Connect(function()
 		YepTitle.BackgroundTransparency=.5
 		YepTitle.TextTransparency=.3
-		wait(.05)
+		wait(.02)
 		YepTitle.BackgroundTransparency=.8
 		YepTitle.TextTransparency=.5
-		Cre.ImageColor3=Color3.fromRGB(255,255,255)
-		wait(.05)
+		Cre.ImageColor3=toRGB(0xFFFFFF)
+		wait(.02)
 		YepTitle.BackgroundTransparency=1
 		YepTitle.TextTransparency=1
 	end)
@@ -330,7 +345,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			dragInput=e
 		end
 	end)
-	UserInputService.InputChanged:Connect(function(e)
+	UIS.InputChanged:Connect(function(e)
 		if e==dragInput and dragging then
 			update(e)
 		end
@@ -344,14 +359,14 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 		local PageLayout=Instance.new"UIListLayout"
 		Tab.Name="Tab"
 		Tab.Parent=TabContainer
-		Tab.BackgroundColor3=Color3.fromRGB(15,15,15)
-		Tab.BorderColor3=Color3.fromRGB(15,15,15)
+		Tab.BackgroundColor3=toRGB(0xF0F0F)
+		Tab.BorderColor3=toRGB(0xF0F0F)
 		Tab.Position=UDim2.new(-.025,0,0,0)
 		Tab.Size=UDim2.new(0,106,0,26)
 		Tab.AutoButtonColor=false
 		Tab.Font=Enum.Font.GothamSemibold
 		Tab.Text=pagename or"nil"
-		Tab.TextColor3=Color3.fromRGB(255,255,255)
+		Tab.TextColor3=toRGB(0xFFFFFF)
 		Tab.TextSize=11
 		Tab.TextTransparency=.300
 		TabCorner.CornerRadius=UDim.new(0,7)
@@ -360,14 +375,14 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 		Home.Name="Page"
 		Home.Parent=PageFolder
 		Home.Active=true
-		Home.BackgroundColor3=Color3.fromRGB(15,15,15)
+		Home.BackgroundColor3=toRGB(0xF0F0F)
 		Home.BackgroundTransparency=1
-		Home.BorderColor3=Color3.fromRGB(15,15,15)
+		Home.BorderColor3=toRGB(0xF0F0F)
 		Home.BorderSizePixel=0
 		Home.Position=UDim2.new(0,0,.0391303785,0)
 		Home.Size=UDim2.new(0,298,0,205)
-		Home.ScrollBarThickness=3
-		Home.ScrollBarImageColor3=Color3.fromRGB(5,5,5)
+		Home.ScrollBarThickness=5
+		Home.ScrollBarImageColor3=toRGB(0)
 		Home.CanvasSize=UDim2.new(0,0,scrollsize or 4,0)
 		Home.Visible=visible or false
 		PageLayout.Name="PageLayout"
@@ -401,13 +416,12 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			Tab.TextTransparency=.5
 		end
 		Tab.MouseEnter:Connect(function()
-			Tab.BackgroundColor3=Color3.fromRGB(10,10,10)
+			Tab.BackgroundColor3=toRGB(0xA0A0A)
 		end)
 		Tab.MouseLeave:Connect(function()
-			Tab.BackgroundColor3=Color3.fromRGB(15,15,15)
+			Tab.BackgroundColor3=toRGB(0xF0F0F)
 		end)
 		local PageElements={}
-		local destroyButton=true
 		function PageElements:rename(n)
 			local name=tostring(n)
 			if name:len()>0 then
@@ -421,8 +435,8 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			local LabelInfo=Instance.new"TextLabel"
 			LabelHolder.Name="LabelHolder"
 			LabelHolder.Parent=Home
-			LabelHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-			LabelHolder.BorderColor3=Color3.fromRGB(17,17,17)
+			LabelHolder.BackgroundColor3=toRGB(0x111111)
+			LabelHolder.BorderColor3=toRGB(0x111111)
 			LabelHolder.BorderSizePixel=0
 			LabelHolder.Position=UDim2.new(.0167785231,0,0,0)
 			LabelHolder.Size=UDim2.new(0,288,0,26)
@@ -431,26 +445,26 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			LabelHolderCorner.Parent=LabelHolder
 			LabelTitle.Name="LabelTitle"
 			LabelTitle.Parent=LabelHolder
-			LabelTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
+			LabelTitle.BackgroundColor3=toRGB(0x111111)
 			LabelTitle.BackgroundTransparency=1
-			LabelTitle.BorderColor3=Color3.fromRGB(17,17,17)
+			LabelTitle.BorderColor3=toRGB(0x111111)
 			LabelTitle.BorderSizePixel=0
 			LabelTitle.Size=UDim2.new(0,288,0,15)
 			LabelTitle.Font=Enum.Font.GothamSemibold
 			LabelTitle.Text=labelname or""
-			LabelTitle.TextColor3=Color3.fromRGB(255,255,255)
+			LabelTitle.TextColor3=toRGB(0xFFFFFF)
 			LabelTitle.TextSize=11
 			LabelInfo.Name="LabelInfo"
 			LabelInfo.Parent=LabelHolder
-			LabelInfo.BackgroundColor3=Color3.fromRGB(17,17,17)
+			LabelInfo.BackgroundColor3=toRGB(0x111111)
 			LabelInfo.BackgroundTransparency=1
-			LabelInfo.BorderColor3=Color3.fromRGB(17,17,17)
+			LabelInfo.BorderColor3=toRGB(0x111111)
 			LabelInfo.BorderSizePixel=0
 			LabelInfo.Position=UDim2.new(0,0,.653846145,0)
 			LabelInfo.Size=UDim2.new(0,288,0,9)
 			LabelInfo.Font=Enum.Font.GothamSemibold
 			LabelInfo.Text=labelinfo or""
-			LabelInfo.TextColor3=Color3.fromRGB(255,255,255)
+			LabelInfo.TextColor3=toRGB(0xFFFFFF)
 			LabelInfo.TextSize=9
 			LabelInfo.TextTransparency=.3
 			local methods={}
@@ -474,35 +488,35 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			local callback=callback or function()end
 			ButtonHolder.Name="ButtonHolder"
 			ButtonHolder.Parent=Home
-			ButtonHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-			ButtonHolder.BorderColor3=Color3.fromRGB(17,17,17)
+			ButtonHolder.BackgroundColor3=toRGB(0x111111)
+			ButtonHolder.BorderColor3=toRGB(0x111111)
 			ButtonHolder.BorderSizePixel=0
 			ButtonHolder.Position=UDim2.new(.0167785231,0,0,0)
 			ButtonHolder.Size=UDim2.new(0,288,0,26)
 			ButtonTitle.Name="ButtonTitle"
 			ButtonTitle.Parent=ButtonHolder
-			ButtonTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
+			ButtonTitle.BackgroundColor3=toRGB(0x111111)
 			ButtonTitle.BackgroundTransparency=1
-			ButtonTitle.BorderColor3=Color3.fromRGB(17,17,17)
+			ButtonTitle.BorderColor3=toRGB(0x111111)
 			ButtonTitle.BorderSizePixel=0
 			ButtonTitle.Position=UDim2.new(.024305556,0,0,0)
 			ButtonTitle.Size=UDim2.new(0,195,0,24)
 			ButtonTitle.Font=Enum.Font.GothamSemibold
 			ButtonTitle.Text=buttonname or""
-			ButtonTitle.TextColor3=Color3.fromRGB(255,255,255)
+			ButtonTitle.TextColor3=toRGB(0xFFFFFF)
 			ButtonTitle.TextSize=11
 			ButtonTitle.TextXAlignment=Enum.TextXAlignment.Left
 			Button.Name="Button"
 			Button.Parent=ButtonHolder
-			Button.BackgroundColor3=Color3.fromRGB(5,5,5)
+			Button.BackgroundColor3=toRGB(0x50505)
 			Button.BackgroundTransparency=0
-			Button.BorderColor3=Color3.fromRGB(17,17,17)
+			Button.BorderColor3=toRGB(0x111111)
 			Button.Position=UDim2.new(.8534,0,1.17375305e-06,0)
 			Button.Size=UDim2.new(0,34,0,19)
 			Button.AutoButtonColor=false
 			Button.Font=Enum.Font.SourceSans
 			Button.Text="btn"
-			Button.TextColor3=Color3.fromRGB(255,255,255)
+			Button.TextColor3=toRGB(0xFFFFFF)
 			Button.TextSize=11
 			ButtonCorner.Name="ButtonCorner"
 			ButtonCorner.Parent=Button
@@ -537,8 +551,8 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			local ToggleEnabled=toggledefault or false
 			ToggleHolder.Name="ToggleHolder"
 			ToggleHolder.Parent=Home
-			ToggleHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-			ToggleHolder.BorderColor3=Color3.fromRGB(17,17,17)
+			ToggleHolder.BackgroundColor3=toRGB(0x111111)
+			ToggleHolder.BorderColor3=toRGB(0x111111)
 			ToggleHolder.BorderSizePixel=0
 			ToggleHolder.Position=UDim2.new(.0167785231,0,0,0)
 			ToggleHolder.Size=UDim2.new(0,288,0,26)
@@ -547,40 +561,40 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			ToggleHolderCorner.Parent=ToggleHolder
 			ToggleTitle.Name="ToggleTitle"
 			ToggleTitle.Parent=ToggleHolder
-			ToggleTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
+			ToggleTitle.BackgroundColor3=toRGB(0x111111)
 			ToggleTitle.BackgroundTransparency=1
-			ToggleTitle.BorderColor3=Color3.fromRGB(17,17,17)
+			ToggleTitle.BorderColor3=toRGB(0x111111)
 			ToggleTitle.BorderSizePixel=0
 			ToggleTitle.Position=UDim2.new(.024305556,0,0,0)
 			ToggleTitle.Size=UDim2.new(0,195,0,24)
 			ToggleTitle.Font=Enum.Font.GothamSemibold
 			ToggleTitle.Text=togglename or""
-			ToggleTitle.TextColor3=Color3.fromRGB(255,255,255)
+			ToggleTitle.TextColor3=toRGB(0xFFFFFF)
 			ToggleTitle.TextSize=11
 			ToggleTitle.TextXAlignment=Enum.TextXAlignment.Left
 			ToggleButton.Name="ToggleButton"
 			ToggleButton.Parent=ToggleHolder
-			ToggleButton.BackgroundColor3=Color3.fromRGB(17,17,17)
+			ToggleButton.BackgroundColor3=toRGB(0x111111)
 			ToggleButton.BackgroundTransparency=1
-			ToggleButton.BorderColor3=Color3.fromRGB(17,17,17)
+			ToggleButton.BorderColor3=toRGB(0x111111)
 			ToggleButton.Position=UDim2.new(.802083313,0,1.17375305e-06,0)
 			ToggleButton.Size=UDim2.new(0,57,0,25)
 			ToggleButton.AutoButtonColor=false
 			ToggleButton.Font=Enum.Font.SourceSans
 			ToggleButton.Text=""
-			ToggleButton.TextColor3=Color3.fromRGB(0,0,0)
+			ToggleButton.TextColor3=toRGB(0)
 			ToggleButton.TextSize=14
 			ToggleFrame.Name="ToggleFrame"
 			ToggleFrame.Parent=ToggleButton
-			ToggleFrame.BackgroundColor3=Color3.fromRGB(5,5,5)
-			ToggleFrame.BorderColor3=Color3.fromRGB(5,5,5)
+			ToggleFrame.BackgroundColor3=toRGB(0x50505)
+			ToggleFrame.BorderColor3=toRGB(0x50505)
 			ToggleFrame.Position=UDim2.new(.27192983,0,.12,0)
 			ToggleFrame.Size=UDim2.new(0,34,0,19)
 			ToggleFrameCorner.Name="ToggleFrameCorner"
 			ToggleFrameCorner.Parent=ToggleFrame
 			ToggleBall.Name="ToggleBall"
 			ToggleBall.Parent=ToggleFrame
-			ToggleBall.BackgroundColor3=Color3.fromRGB(255,255,255)
+			ToggleBall.BackgroundColor3=toRGB(0xFFFFFF)
 			ToggleBall.Position=UDim2.new(.123,0,.158,0)
 			ToggleBall.Size=UDim2.new(0,14,0,12)
 			ToggleBallCorner.CornerRadius=UDim.new(0,100)
@@ -628,22 +642,22 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			local callback=callback or function()end
 			SliderHolder.Name="SliderHolder"
 			SliderHolder.Parent=Home
-			SliderHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-			SliderHolder.BorderColor3=Color3.fromRGB(17,16,16)
+			SliderHolder.BackgroundColor3=toRGB(0x111111)
+			SliderHolder.BorderColor3=toRGB(0x111010)
 			SliderHolder.BorderSizePixel=0
 			SliderHolder.Position=UDim2.new(.0167785231,0,0,0)
 			SliderHolder.Size=UDim2.new(0,288,0,26)
 			SliderTitle.Name="SliderTitle"
 			SliderTitle.Parent=SliderHolder
-			SliderTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
+			SliderTitle.BackgroundColor3=toRGB(0x111111)
 			SliderTitle.BackgroundTransparency=1
-			SliderTitle.BorderColor3=Color3.fromRGB(17,17,17)
+			SliderTitle.BorderColor3=toRGB(0x111111)
 			SliderTitle.BorderSizePixel=0
 			SliderTitle.Position=UDim2.new(.024305556,0,.15384616,0)
 			SliderTitle.Size=UDim2.new(0,239,0,8)
 			SliderTitle.Font=Enum.Font.GothamSemibold
 			SliderTitle.Text=slidername
-			SliderTitle.TextColor3=Color3.fromRGB(255,255,255)
+			SliderTitle.TextColor3=toRGB(0xFFFFFF)
 			SliderTitle.TextSize=11
 			SliderTitle.TextXAlignment=Enum.TextXAlignment.Left
 			SliderHolderScript.CornerRadius=UDim.new(0,5)
@@ -651,36 +665,36 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			SliderHolderScript.Parent=SliderHolder
 			SliderButton.Name="SliderButton"
 			SliderButton.Parent=SliderHolder
-			SliderButton.BackgroundColor3=Color3.fromRGB(5,5,5)
-			SliderButton.BorderColor3=Color3.fromRGB(15,15,15)
+			SliderButton.BackgroundColor3=toRGB(0x50505)
+			SliderButton.BorderColor3=toRGB(0xF0F0F)
 			SliderButton.BorderSizePixel=0
 			SliderButton.Position=UDim2.new(0,8,0,17)
 			SliderButton.Size=UDim2.new(0,273,0,10)
 			SliderButton.AutoButtonColor=false
 			SliderButton.Font=Enum.Font.SourceSans
 			SliderButton.Text=""
-			SliderButton.TextColor3=Color3.fromRGB(0,0,0)
+			SliderButton.TextColor3=toRGB(0)
 			SliderButton.TextSize=14
 			SliderButtonCorner.Name="SliderButtonCorner"
 			SliderButtonCorner.Parent=SliderButton
 			SliderTrail.Name="SliderTrail"
 			SliderTrail.Parent=SliderButton
-			SliderTrail.BackgroundColor3=Color3.fromRGB(40,40,40)
-			SliderTrail.BorderColor3=Color3.fromRGB(40,40,40)
+			SliderTrail.BackgroundColor3=toRGB(0x282828)
+			SliderTrail.BorderColor3=toRGB(0x282828)
 			SliderTrail.Size=UDim2.new(0,10,0,10)
 			SliderTrailCorner.Name="SliderTrailCorner"
 			SliderTrailCorner.Parent=SliderTrail
 			SliderNumber.Name="SliderNumber"
 			SliderNumber.Parent=SliderHolder
-			SliderNumber.BackgroundColor3=Color3.fromRGB(17,17,17)
+			SliderNumber.BackgroundColor3=toRGB(0x111111)
 			SliderNumber.BackgroundTransparency=1
-			SliderNumber.BorderColor3=Color3.fromRGB(17,17,17)
+			SliderNumber.BorderColor3=toRGB(0x111111)
 			SliderNumber.BorderSizePixel=0
 			SliderNumber.Position=UDim2.new(.885,0,.192,1)
 			SliderNumber.Size=UDim2.new(0,33,0,6)
 			SliderNumber.Font=Enum.Font.GothamSemibold
 			SliderNumber.Text=minvalue or 0
-			SliderNumber.TextColor3=Color3.fromRGB(255,255,255)
+			SliderNumber.TextColor3=toRGB(0xFFFFFF)
 			SliderNumber.TextSize=10
 			SliderNumber.TextXAlignment=Enum.TextXAlignment.Left
 			local mouse=game.Players.LocalPlayer:GetMouse()
@@ -696,7 +710,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 						if input.UserInputState==Enum.UserInputState.End then
 							Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
 							pcall(callback,SliderNumber.Text)
-							SliderHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
+							SliderHolder.BackgroundColor3=toRGB(0x111111)
 							SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
 							releaseinteraction:Disconnect()
 						end
@@ -708,12 +722,12 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 					dragInput=input
 				end
 			end)
-			UserInputService.InputChanged:Connect(function(input)
+			UIS.InputChanged:Connect(function(input)
 				if input==dragInput then
 					SliderNumber.Text=Value
 					Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
 					pcall(callback,SliderNumber.Text)
-					SliderHolder.BackgroundColor3=Color3.fromRGB(14,14,14)
+					SliderHolder.BackgroundColor3=toRGB(0xE0E0E)
 					SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
 				end
 			end)
@@ -749,31 +763,31 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			local callback=callback or function()end
 			TextBoxHolder.Name="TextBoxHolder"
 			TextBoxHolder.Parent=Home
-			TextBoxHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-			TextBoxHolder.BorderColor3=Color3.fromRGB(17,16,16)
+			TextBoxHolder.BackgroundColor3=toRGB(0x111111)
+			TextBoxHolder.BorderColor3=toRGB(0x111010)
 			TextBoxHolder.BorderSizePixel=0
 			TextBoxHolder.Position=UDim2.new(.0167785231,0,0,0)
 			TextBoxHolder.Size=UDim2.new(0,288,0,26)
 			TextBoxTitle.Name="TextBoxTitle"
 			TextBoxTitle.Parent=TextBoxHolder
-			TextBoxTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
+			TextBoxTitle.BackgroundColor3=toRGB(0x111111)
 			TextBoxTitle.BackgroundTransparency=1
-			TextBoxTitle.BorderColor3=Color3.fromRGB(17,17,17)
+			TextBoxTitle.BorderColor3=toRGB(0x111111)
 			TextBoxTitle.BorderSizePixel=0
 			TextBoxTitle.Position=UDim2.new(.024305556,0,.0769230798,0)
 			TextBoxTitle.Size=UDim2.new(0,195,0,21)
 			TextBoxTitle.Font=Enum.Font.GothamSemibold
 			TextBoxTitle.Text=textboxname
-			TextBoxTitle.TextColor3=Color3.fromRGB(255,255,255)
+			TextBoxTitle.TextColor3=toRGB(0xFFFFFF)
 			TextBoxTitle.TextSize=11
 			TextBoxTitle.TextXAlignment=Enum.TextXAlignment.Left
 			TextBox.Parent=TextBoxHolder
-			TextBox.BackgroundColor3=Color3.fromRGB(5,5,5)
+			TextBox.BackgroundColor3=toRGB(0x50505)
 			TextBox.Position=UDim2.new(.725694418,0,.115384623,0)
 			TextBox.Size=UDim2.new(0,72,0,20)
 			TextBox.Font=Enum.Font.GothamSemibold
 			TextBox.Text=textboxdefault or"nil"
-			TextBox.TextColor3=Color3.fromRGB(255,255,255)
+			TextBox.TextColor3=toRGB(0xFFFFFF)
 			TextBox.TextSize=9
 			TextBoxCorner.CornerRadius=UDim.new(0,5)
 			TextBoxCorner.Name="TextBoxCorner"
@@ -782,10 +796,10 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			TextBoxHolderCorner.Name="TextBoxHolderCorner"
 			TextBoxHolderCorner.Parent=TextBoxHolder
 			TextBox.Focused:Connect(function()
-				TextBoxHolder.BackgroundColor3=Color3.fromRGB(10,10,10)
+				TextBoxHolder.BackgroundColor3=toRGB(0xA0A0A)
 			end)
 			TextBox.FocusLost:Connect(function()
-				TextBoxHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
+				TextBoxHolder.BackgroundColor3=toRGB(0x111111)
 				pcall(callback,TextBox.Text)
 			end)
 			local methods={}
@@ -815,8 +829,8 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			local DropDownEnabled=false
 			DropdownHolder.Name="DropdownHolder"
 			DropdownHolder.Parent=Home
-			DropdownHolder.BackgroundColor3=Color3.fromRGB(17,17,17)
-			DropdownHolder.BorderColor3=Color3.fromRGB(17,17,17)
+			DropdownHolder.BackgroundColor3=toRGB(0x111111)
+			DropdownHolder.BorderColor3=toRGB(0x111111)
 			DropdownHolder.BorderSizePixel=0
 			DropdownHolder.Position=UDim2.new(.0167785231,0,0,0)
 			DropdownHolder.Size=UDim2.new(0,288,0,26)
@@ -825,25 +839,25 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			DropdownHolderCorner.Parent=DropdownHolder
 			DropdownTitle.Name="DropdownTitle"
 			DropdownTitle.Parent=DropdownHolder
-			DropdownTitle.BackgroundColor3=Color3.fromRGB(17,17,17)
+			DropdownTitle.BackgroundColor3=toRGB(0x111111)
 			DropdownTitle.BackgroundTransparency=1
-			DropdownTitle.BorderColor3=Color3.fromRGB(17,17,17)
+			DropdownTitle.BorderColor3=toRGB(0x111111)
 			DropdownTitle.BorderSizePixel=0
 			DropdownTitle.Position=UDim2.new(.024305556,0,0,0)
 			DropdownTitle.Size=UDim2.new(0,195,0,24)
 			DropdownTitle.Font=Enum.Font.GothamSemibold
 			DropdownTitle.Text=dropdownname
-			DropdownTitle.TextColor3=Color3.fromRGB(255,255,255)
+			DropdownTitle.TextColor3=toRGB(0xFFFFFF)
 			DropdownTitle.TextSize=11
 			DropdownTitle.TextXAlignment=Enum.TextXAlignment.Left
 			DropdownButton.Name="DropdownButton"
 			DropdownButton.Parent=DropdownHolder
-			DropdownButton.BackgroundColor3=Color3.fromRGB(255,255,255)
+			DropdownButton.BackgroundColor3=toRGB(0xFFFFFF)
 			DropdownButton.BackgroundTransparency=1
 			DropdownButton.Size=UDim2.new(0,288,0,26)
 			DropdownButton.Font=Enum.Font.SourceSans
 			DropdownButton.Text=""
-			DropdownButton.TextColor3=Color3.fromRGB(0,0,0)
+			DropdownButton.TextColor3=toRGB(0)
 			DropdownButton.TextSize=14
 			DropdownIcon.Name="DropdownIcon"
 			DropdownIcon.Parent=DropdownButton
@@ -855,8 +869,8 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			DropdownContainer.Name="DropdownContainer"
 			DropdownContainer.Parent=DropdownHolder
 			DropdownContainer.Active=true
-			DropdownContainer.BackgroundColor3=Color3.fromRGB(17,17,17)
-			DropdownContainer.BorderColor3=Color3.fromRGB(17,17,17)
+			DropdownContainer.BackgroundColor3=toRGB(0x111111)
+			DropdownContainer.BorderColor3=toRGB(0x111111)
 			DropdownContainer.BorderSizePixel=0
 			DropdownContainer.ClipsDescendants=true
 			DropdownContainer.Position=UDim2.new(0,0,1.34615386,0)
@@ -868,15 +882,15 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			DropdownOptionContainer.Name="DropdownOptionContainer"
 			DropdownOptionContainer.Parent=DropdownContainer
 			DropdownOptionContainer.Active=true
-			DropdownOptionContainer.BackgroundColor3=Color3.fromRGB(17,17,17)
+			DropdownOptionContainer.BackgroundColor3=toRGB(0x111111)
 			DropdownOptionContainer.BackgroundTransparency=1
-			DropdownOptionContainer.BorderColor3=Color3.fromRGB(17,17,17)
+			DropdownOptionContainer.BorderColor3=toRGB(0x111111)
 			DropdownOptionContainer.BorderSizePixel=0
 			DropdownOptionContainer.Position=UDim2.new(0,0,.0782608688,0)
 			DropdownOptionContainer.Size=UDim2.new(0,288,0,8)
 			DropdownOptionContainer.Visible=false
 			DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or 5,0)
-			DropdownOptionContainer.ScrollBarThickness=3
+			DropdownOptionContainer.ScrollBarThickness=5
 			DropdownOptionContainerLayout.Name="DropdownOptionContainerLayout"
 			DropdownOptionContainerLayout.Parent=DropdownOptionContainer
 			DropdownOptionContainerLayout.HorizontalAlignment=Enum.HorizontalAlignment.Center
@@ -895,7 +909,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 					makeelements(false)
 					DropdownContainer.Visible=true
 					DropdownContainer:TweenSize(UDim2.new(0,288,0,115),"Out","Linear",.3)
-					DropdownIcon.ImageColor3=Color3.fromRGB(137,246,255)
+					DropdownIcon.ImageColor3=toRGB(0x89F6FF)
 					wait(.3)
 					DropdownOptionContainer.Visible=true
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,106),"Out","Linear",.2)
@@ -905,7 +919,7 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,106),"Out","Linear",.1)
 				else
 					DropDownEnabled=false
-					DropdownIcon.ImageColor3=Color3.fromRGB(255,255,255)
+					DropdownIcon.ImageColor3=toRGB(0xFFFFFF)
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
 					wait(.2)
 					DropdownOptionContainer.Visible=false
@@ -923,35 +937,35 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 				local OptionCorner=Instance.new"UICorner"
 				Option.Name="Option"
 				Option.Parent=DropdownOptionContainer
-				Option.BackgroundColor3=Color3.fromRGB(15,15,15)
-				Option.BorderColor3=Color3.fromRGB(15,15,15)
+				Option.BackgroundColor3=toRGB(0xF0F0F)
+				Option.BorderColor3=toRGB(0xF0F0F)
 				Option.Position=UDim2.new(.0173611119,0,0,0)
 				Option.Size=UDim2.new(0,283,0,22)
 				Option.AutoButtonColor=false
 				Option.Font=Enum.Font.GothamSemibold
 				Option.Text=v
-				Option.TextColor3=Color3.fromRGB(255,255,255)
+				Option.TextColor3=toRGB(0xFFFFFF)
 				Option.TextSize=10
 				OptionCorner.CornerRadius=UDim.new(0,6)
 				OptionCorner.Name="OptionCorner"
 				OptionCorner.Parent=Option
 				Option.MouseEnter:Connect(function()
-					Option.BackgroundColor3=Color3.fromRGB(10,10,10)
+					Option.BackgroundColor3=toRGB(0xA0A0A)
 				end)
 				Option.MouseLeave:Connect(function()
-					Option.BackgroundColor3=Color3.fromRGB(15,15,15)
+					Option.BackgroundColor3=toRGB(0xF0F0F)
 				end)
 				Option.MouseButton1Down:Connect(function()
 					for i,v in pairs(Option.Parent:GetChildren())do
 						if v:IsA"GuiButton"and v~=Option then
-							v.TextColor3=Color3.fromRGB(255,255,255)
+							v.TextColor3=toRGB(0xFFFFFF)
 						end
 					end
-					Option.TextColor3=Color3.fromRGB(137,246,255)
+					Option.TextColor3=toRGB(0x89F6FF)
 				end)
 				Option.MouseButton1Down:Connect(function()
 					DropDownEnabled=false
-					DropdownIcon.ImageColor3=Color3.fromRGB(255,255,255)
+					DropdownIcon.ImageColor3=toRGB(0xFFFFFF)
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
 					wait(.2)
 					DropdownOptionContainer.Visible=false
@@ -983,35 +997,35 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 					local OptionCorner=Instance.new"UICorner"
 					Option.Name="Option"
 					Option.Parent=DropdownOptionContainer
-					Option.BackgroundColor3=Color3.fromRGB(15,15,15)
-					Option.BorderColor3=Color3.fromRGB(15,15,15)
+					Option.BackgroundColor3=toRGB(0xF0F0F)
+					Option.BorderColor3=toRGB(0xF0F0F)
 					Option.Position=UDim2.new(.0173611119,0,0,0)
 					Option.Size=UDim2.new(0,283,0,22)
 					Option.AutoButtonColor=false
 					Option.Font=Enum.Font.GothamSemibold
 					Option.Text=v
-					Option.TextColor3=Color3.fromRGB(255,255,255)
+					Option.TextColor3=toRGB(0xFFFFFF)
 					Option.TextSize=10
 					OptionCorner.CornerRadius=UDim.new(0,6)
 					OptionCorner.Name="OptionCorner"
 					OptionCorner.Parent=Option
 					Option.MouseEnter:Connect(function()
-						Option.BackgroundColor3=Color3.fromRGB(10,10,10)
+						Option.BackgroundColor3=toRGB(0xA0A0A)
 					end)
 					Option.MouseLeave:Connect(function()
-						Option.BackgroundColor3=Color3.fromRGB(15,15,15)
+						Option.BackgroundColor3=toRGB(0xF0F0F)
 					end)
 					Option.MouseButton1Down:Connect(function()
 						for i,v in pairs(Option.Parent:GetChildren())do
 							if v:IsA"GuiButton"and v~=Option then
-								v.TextColor3=Color3.fromRGB(255,255,255)
+								v.TextColor3=toRGB(0xFFFFFF)
 							end
 						end
-						Option.TextColor3=Color3.fromRGB(137,246,255)
+						Option.TextColor3=toRGB(0x89F6FF)
 					end)
 					Option.MouseButton1Down:Connect(function()
 						DropDownEnabled=false
-						DropdownIcon.ImageColor3=Color3.fromRGB(255,255,255)
+						DropdownIcon.ImageColor3=toRGB(0xFFFFFF)
 						DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
 						wait(.2)
 						DropdownOptionContainer.Visible=false
@@ -1028,11 +1042,12 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			return methods
 		end
 		function PageElements:destroyGui(callback)
-			if destroyButton then
-				destroyButton=false
+			if not destroyButton then
+				destroyButton=true
+				destroyCallback=callback
 				PageElements:addButton("Destroy Gui",function()
 					pcall(callback)
-					fu8rj82n:Destroy()
+					Gui:Destroy()
 				end)
 			end
 		end
