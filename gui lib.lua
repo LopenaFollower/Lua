@@ -161,7 +161,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=313
+local Version=314
 local destroyButton=false
 local destroyCallback=function()end
 local UIS=game:GetService"UserInputService"
@@ -174,7 +174,7 @@ task.spawn(function()
 	loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
 end)
 function toRGB(n)
-	return Color3.fromRGB((n>>16)&0xff,(n>>8)&0xff,n&0xff)
+	return Color3.fromRGB(bit32.band(bit32.rshift(n,16),255),bit32.band(bit32.rshift(n,8),255),bit32.band(n,255))
 end
 local Library={}
 function Library:CreateWindow(windowname,windowinfo,scrollsize)
