@@ -161,7 +161,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=314
+local Version=315
 local destroyButton=false
 local destroyCallback=function()end
 local UIS=game:GetService"UserInputService"
@@ -699,20 +699,20 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			SliderNumber.TextXAlignment=Enum.TextXAlignment.Left
 			local mouse=game.Players.LocalPlayer:GetMouse()
 			local Value
-			local dragInput
+			local dragInput,released
 			--fixed slider for mobile
 			SliderButton.InputBegan:Connect(function(input)
 				if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
 					Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))or 0
 					pcall(callback,SliderNumber.Text)
 					SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
-					releaseinteraction=input.Changed:Connect(function()
+					released=input.Changed:Connect(function()
 						if input.UserInputState==Enum.UserInputState.End then
 							Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
 							pcall(callback,SliderNumber.Text)
 							SliderHolder.BackgroundColor3=toRGB(0x111111)
 							SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
-							releaseinteraction:Disconnect()
+							released:Disconnect()
 						end
 					end)
 				end
