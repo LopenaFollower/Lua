@@ -161,7 +161,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=315
+local Version=316
 local destroyButton=false
 local destroyCallback=function()end
 local UIS=game:GetService"UserInputService"
@@ -698,20 +698,22 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 			SliderNumber.TextSize=10
 			SliderNumber.TextXAlignment=Enum.TextXAlignment.Left
 			local mouse=game.Players.LocalPlayer:GetMouse()
-			local Value
-			local dragInput,released
+			local Value,dragInput,released,held
 			--fixed slider for mobile
+			local function update()
+				Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))or 0
+				pcall(callback,SliderNumber.Text)
+				SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
+			end
 			SliderButton.InputBegan:Connect(function(input)
 				if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
-					Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))or 0
-					pcall(callback,SliderNumber.Text)
-					SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
+					held=true
+					update()
 					released=input.Changed:Connect(function()
 						if input.UserInputState==Enum.UserInputState.End then
-							Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
-							pcall(callback,SliderNumber.Text)
+							held=false
+							update()
 							SliderHolder.BackgroundColor3=toRGB(0x111111)
-							SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
 							released:Disconnect()
 						end
 					end)
@@ -723,12 +725,10 @@ function Library:CreateWindow(windowname,windowinfo,scrollsize)
 				end
 			end)
 			UIS.InputChanged:Connect(function(input)
-				if input==dragInput then
+				if input==dragInput and held then
 					SliderNumber.Text=Value
-					Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))
-					pcall(callback,SliderNumber.Text)
+					update()
 					SliderHolder.BackgroundColor3=toRGB(0xE0E0E)
-					SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
 				end
 			end)
 			local methods={}
