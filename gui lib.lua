@@ -183,7 +183,7 @@
 --		:rename()
 --		Button
 --			methods
-local Version=318
+local Version=319
 local destroyButton=false
 local destroyCallback=function()end
 local UIS=game:GetService"UserInputService"
@@ -1070,7 +1070,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			if not destroyButton then
 				destroyButton=true
 				destroyCallback=callback
-				Page[pagename]:addButton("Destroy Gui",function()
+				Page[pagename].addButton("Destroy Gui",function()
 					pcall(callback)
 					Gui:Destroy()
 				end)
