@@ -183,7 +183,7 @@
 --		:rename()
 --		Button
 --			methods
-local Version=317
+local Version=318
 local destroyButton=false
 local destroyCallback=function()end
 local UIS=game:GetService"UserInputService"
@@ -444,13 +444,13 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			Tab.BackgroundColor3=toRGB(0xF0F0F)
 		end)
 		Page[pagename]={}
-		function Page[pagename]:rename(n)
+		Page[pagename].rename=function(n)
 			local name=tostring(n)
 			if name:len()>0 then
 				Tab.Text=name
 			end
 		end
-		function Page[pagename]:addLabel(labelname,labelinfo)
+		Page[pagename].addLabel=function(labelname,labelinfo)
 			local LabelHolder=Instance.new"Frame"
 			local LabelHolderCorner=Instance.new"UICorner"
 			local LabelTitle=Instance.new"TextLabel"
@@ -490,18 +490,18 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			LabelInfo.TextSize=9
 			LabelInfo.TextTransparency=.3
 			Page[pagename][labelname]={}
-			function Page[pagename][labelname]:remove()
+			Page[pagename][labelname].remove=function()
 				LabelHolder:Destroy()
 			end
-			function Page[pagename][labelname]:setTitle(t)
+			Page[pagename][labelname].setTitle=function(t)
 				LabelTitle.Text=tostring(t)or""
 			end
-			function Page[pagename][labelname]:setInfo(t)
+			Page[pagename][labelname].setInfo=function(t)
 				LabelInfo.Text=tostring(t)or""
 			end
 			return Page[pagename][labelname]
 		end
-		function Page[pagename]:addButton(buttonname,callback)
+		Page[pagename].addButton=function(buttonname,callback)
 			local ButtonHolder=Instance.new"Frame"
 			local ButtonTitle=Instance.new"TextLabel"
 			local Button=Instance.new"TextButton"
@@ -552,18 +552,18 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 				pcall(callback)
 			end)
 			Page[pagename][buttonname]={}
-			function Page[pagename][buttonname]:remove()
+			Page[pagename][buttonname].remove=function()
 				ButtonHolder:Destroy()
 			end
-			function Page[pagename][buttonname]:setText(t)
+			Page[pagename][buttonname].setText=function(t)
 				Button.Text=tostring(t)or""
 			end
-			function Page[pagename][buttonname]:call()
+			Page[pagename][buttonname].call=function()
 				pcall(callback)
 			end
 			return Page[pagename][buttonname]
 		end
-		function Page[pagename]:addToggle(togglename,toggledefault,callback)
+		Page[pagename].addToggle=function(togglename,toggledefault,callback)
 			local ToggleHolder=Instance.new"Frame"
 			local ToggleHolderCorner=Instance.new"UICorner"
 			local ToggleTitle=Instance.new"TextLabel"
@@ -639,13 +639,13 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			end)
 			check()
 			Page[pagename][togglename]={}
-			function Page[pagename][togglename]:remove()
+			Page[pagename][togglename].remove=function()
 				ToggleHolder:Destroy()
 			end
-			function Page[pagename][togglename]:setText(t)
+			Page[pagename][togglename].setText=function(t)
 				ToggleTitle.Text=tostring(t)or""
 			end
-			function Page[pagename][togglename]:setStatus(b)
+			Page[pagename][togglename].setStatus=function(b)
 				if type(b)=="boolean"then
 					ToggleEnabled=b
 					check()
@@ -653,7 +653,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			end
 			return Page[pagename][togglename]
 		end
-		function Page[pagename]:addSlider(slidername,minvalue,maxvalue,callback)
+		Page[pagename].addSlider=function(slidername,minvalue,maxvalue,callback)
 			local SliderHolder=Instance.new"Frame"
 			local SliderTitle=Instance.new"TextLabel"
 			local SliderHolderScript=Instance.new"UICorner"
@@ -727,7 +727,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			--fixed slider for mobile
 			local function update()
 				Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*SliderTrail.AbsoluteSize.X)+tonumber(minvalue))or 0
-				pcall(callback,SliderNumber.Text)
+				pcall(callback,Value)
 				SliderTrail.Size=UDim2.new(0,math.clamp(mouse.X-SliderTrail.AbsolutePosition.X,0,273),0,7)
 			end
 			SliderButton.InputBegan:Connect(function(input)
@@ -751,35 +751,35 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			end)
 			UIS.InputChanged:Connect(function(input)
 				if input==dragInput and held then
-					SliderNumber.Text=Value
 					update()
+					SliderNumber.Text=Value
 					SliderHolder.BackgroundColor3=toRGB(0xE0E0E)
 				end
 			end)
 			Page[pagename][slidername]={}
-			function Page[pagename][slidername]:remove()
+			Page[pagename][slidername].remove=function()
 				SliderHolder:Destroy()
 			end
-			function Page[pagename][slidername]:setText(t)
+			Page[pagename][slidername].setText=function(t)
 				SliderTitle.Text=tostring(t)or""
 			end
-			function Page[pagename][slidername]:setMin(t)
-				minvalue=tonumber(t)
+			Page[pagename][slidername].setMin=function(n)
+				minvalue=tonumber(n)
 			end
-			function Page[pagename][slidername]:setMax(t)
-				maxvalue=tonumber(t)
+			Page[pagename][slidername].setMax=function(n)
+				maxvalue=tonumber(n)
 			end
-			function Page[pagename][slidername]:setValue(t)
-				local i=tonumber(t)
+			Page[pagename][slidername].setValue=function(n)
+				local i=tonumber(n)
 				if type(i)=="number"and i<=maxvalue and i>=minvalue then
 					Value=i
-					SliderNumber.Text=Value
-					pcall(callback,SliderNumber.Text)
+					SliderNumber.Text=i
+					pcall(callback,i)
 				end
 			end
 			return Page[pagename][slidername]
 		end
-		function Page[pagename]:addTextBox(textboxname,textboxdefault,callback)
+		Page[pagename].addTextBox=function(textboxname,textboxdefault,callback)
 			local TextBoxHolder=Instance.new"Frame"
 			local TextBoxTitle=Instance.new"TextLabel"
 			local TextBox=Instance.new"TextBox"
@@ -828,19 +828,19 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 				pcall(callback,TextBox.Text)
 			end)
 			Page[pagename][textboxname]={}
-			function Page[pagename][textboxname]:remove()
+			Page[pagename][textboxname].remove=function()
 				TextBoxHolder:Destroy()
 			end
-			function Page[pagename][textboxname]:setText(t)
+			Page[pagename][textboxname].setText=function(t)
 				TextBoxTitle.Text=tostring(t)or""
 			end
-			function Page[pagename][textboxname]:setValue(t)
+			Page[pagename][textboxname].setValue=function(t)
 				TextBox.Text=t
-				pcall(callback,TextBox.Text)
+				pcall(callback,t)
 			end
 			return Page[pagename][textboxname]
 		end
-		function Page[pagename]:addDropdown(dropdownname,list,scrollsize,callback)
+		Page[pagename].addDropdown=function(dropdownname,list,scrollsize,callback)
 			local DropdownHolder=Instance.new"Frame"
 			local DropdownHolderCorner=Instance.new"UICorner"
 			local DropdownTitle=Instance.new"TextLabel"
@@ -1004,13 +1004,13 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 				end)
 			end
 			Page[pagename][dropdownname]={}
-			function Page[pagename][dropdownname]:remove()
+			Page[pagename][dropdownname].remove=function()
 				DropdownHolder:Destroy()
 			end
-			function Page[pagename][dropdownname]:setText(t)
+			Page[pagename][dropdownname].setText=function(t)
 				DropdownTitle.Text=tostring(t)or""
 			end
-			function Page[pagename][dropdownname]:setList(newlist,scrollsize)
+			Page[pagename][dropdownname].setList=function(newlist,scrollsize)
 				for i,v in pairs(DropdownOptionContainer:GetChildren())do
 					if v.Name=="Option"and v~=DropdownOptionContainerLayout then
 						v:Destroy()
@@ -1066,7 +1066,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			end
 			return Page[pagename][dropdownname]
 		end
-		function Page[pagename]:destroyGui(callback)
+		Page[pagename].destroyGui=function(callback)
 			if not destroyButton then
 				destroyButton=true
 				destroyCallback=callback
