@@ -1,7 +1,7 @@
-if game.PlaceId~=16732694052 then return else repeat wait(1)until game:IsLoaded()and game.Players.LocalPlayer end
+if game.PlaceId~=16732694052 then return else repeat wait()until game:IsLoaded()and game.Players.LocalPlayer end
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
-local hum=chr and chr:FindFirstChildWhichIsA"Humanoid"
+local hum=chr:FindFirstChildWhichIsA"Humanoid"
 local hrp=chr.HumanoidRootPart
 local plrGui=plr.PlayerGui
 local binds={}
@@ -16,8 +16,7 @@ local togs={
 	evf=false,
 	oxyg=true,
 	temp=true,
-	water=false,
-	invcam=true,
+	invcam=true
 }
 local cd={
 	cast=true,
@@ -134,7 +133,7 @@ if not workspace:FindFirstChild"platform"then
 	p.Name="platform"
 	p.Parent=workspace
 	p.Transparency=.5
-	p.Size=Vector3.new(3,0.1,3)
+	p.Size=Vector3.new(2,0.1,2)
 	p.Anchored=true
 	p.CFrame=CFrame.new(0,0,0)
 end
@@ -177,7 +176,7 @@ end
 function isAuroraActive()
 	return plrGui.hud.safezone.worldstatuses["2_weather"].label.Text=="Aurora Borealis"
 end
-binds.main=game:GetService"RunService".Stepped:Connect(function()
+binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=plr.Character
@@ -321,7 +320,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		if not he and vals.anchor then
 			hrp.CFrame=vals.anchor
 		end
-		wait(1)
+		wait(.1)
 		cd.evf=true
 	end
 	if togs.tpw and chr and hum then
@@ -424,10 +423,6 @@ end)
 Local.addToggle("Disable Temperature",togs.temp,function(v)
 	togs.temp=v
 end)
-Local.addToggle("Disable Water",togs.water,function(v)
-	togs.water=v
-	hum.SetStateEnabled(Enum.HumanoidStateType.Swimming,not v)
-end)
 Local.addToggle("Invis Cam",togs.invcam,function(v)
 	togs.invcam=v
 	plr.DevCameraOcclusionMode=v and Enum.DevCameraOcclusionMode.Invisicam or Enum.DevCameraOcclusionMode.Zoom
@@ -441,6 +436,7 @@ end)
 Local.addSlider("TPWalk Speed",0,150,function(v)
 	vals.tpws=v
 end)
+UI["Local Player"]["TPWalk Speed"].setValue(vals.tpws)
 Local.addButton("Rejoin",function()
 	plr:Kick"Rejoining..."
 	wait()
