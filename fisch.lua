@@ -14,8 +14,8 @@ local togs={
 	sell=false,
 	anglerQ=false,
 	evf=false,
-	oxyg=true,
-	temp=true,
+	oxyg=false,
+	temp=false,
 	invcam=true
 }
 local cd={
@@ -176,16 +176,16 @@ end
 function isAuroraActive()
 	return plrGui.hud.safezone.worldstatuses["2_weather"].label.Text=="Aurora Borealis"
 end
-binds.main=game:GetService"RunService".RenderStepped:Connect(function()
+binds.main=game:GetService"RunService".Stepped:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
 		chr=plr.Character
 		hum=chr.Humanoid
 		hrp=chr.HumanoidRootPart
 		plrGui=plr.PlayerGui
-		chr.client.oxygen.Disabled=togs.oxyg
-		chr.client["oxygen(peaks)"].Disabled=togs.oxyg
-		chr.client.temperature.Disabled=togs.temp
+		chr.oxygen.Disabled=togs.oxyg
+		chr["oxygen(peaks)"].Disabled=togs.oxyg
+		chr.temperature.Disabled=togs.temp
 	end)
 	if togs.cast then
 		local rod=chr:FindFirstChildOfClass"Tool"
@@ -203,7 +203,7 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 	end
 	if togs.instacatch and plrGui:FindFirstChild"reel"then
 		if plrGui.reel.bar.playerbar.Transparency==0 then
-			rsEvs.reelfinished:FireServer(100,math.random(0,100)~=0)
+			rsEvs["reelfinished "]:FireServer(100,math.random(0,100)~=0)
 		end
 	end
 	if togs.appraise and cd.appraise then
@@ -250,7 +250,7 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 		pcall(function()
 			workspace.world.npcs.Merlin.Merlin.luck:InvokeServer()
 		end)
-		wait(.2)
+		wait(.1)
 		cd.luck=true
 	end
 	if togs.anglerQ and cd.anglerQ1 then
