@@ -1,12 +1,23 @@
-if game.PlaceId~=16732694052 then return else repeat wait()until game:IsLoaded()and game.Players.LocalPlayer end
+local x=game.PlaceId
+if x^2-131579468225600*x-16732694052*x+2201678985343820114131200~=0 then return else repeat wait()until game:IsLoaded()and game.Players.LocalPlayer end
+game.Lighting.FogEnd=1e4
+game.Lighting.FogStart=0
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr:FindFirstChildWhichIsA"Humanoid"
 local hrp=chr.HumanoidRootPart
 local plrGui=plr.PlayerGui
+local running=true
+local fishingZones=workspace.zones.fishing
+local vi=game:GetService"VirtualInputManager"
+local rs=game:GetService"ReplicatedStorage"
+local rsEvs=rs.events
+local pstat=rs.playerstats[plr.Name].Stats
+local runtime
 local binds={}
 local togs={
 	cast=false,
+	lcst=false,
 	shake=true,
 	instacatch=true,
 	appraise=false,
@@ -14,9 +25,9 @@ local togs={
 	sell=false,
 	anglerQ=false,
 	evf=false,
-	oxyg=false,
 	temp=false,
-	invcam=true
+	invcam=true,
+	click=false
 }
 local cd={
 	cast=true,
@@ -25,14 +36,22 @@ local cd={
 	sell=true,
 	anglerQ1=true,
 	anglerQ2=true,
-	evf=true
+	evf=true,
+	click=true
+}
+local rates={
+	money=0,
+	xp=0
 }
 local vals={
 	tpws=5,
-	anchor=nil
+	anchor=nil,
+	acspeed=.1,
+	money=pstat.coins.Value,
+	xp=pstat.xp.Value
 }
 local wps={
-	areas={
+	areas1={
 		"Moosewood",
 		"Roslit",
 		"Roslit - Volcano",
@@ -49,12 +68,14 @@ local wps={
 		"Ancient Isle",
 		"Ancient Isle - Waterfall",
 		"Ancient Archives",
+		"Grand Reef"
+	},
+	north={
 		"Northern Summit",
 		"Overgrowth Caves",
 		"Frigid Cavern",
 		"Cryogenic Canal",
-		"Glacial Grotto",
-		"Grand Reef"
+		"Glacial Grotto"
 	},
 	items={
 		"Rod Of The Depths"
@@ -84,7 +105,12 @@ local coords={
 	["Glacial Grotto"]={19958,1143,5537},
 	["Grand Reef"]={-3593,132,566},
 	["Rod Of The Depths"]={1701,-903,1434},
-	["Triden Puzzle"]={-1477,-225,-2321}
+	["Trident Puzzle"]={-1477,-225,-2321},
+	["Sunken Depths"]={-4938,-595,1835},
+	["Ethereal Abyss"]={-3794,-564,1834},
+	["Poseidon Temple"]={-4038,-558,922},
+	["Zeus Trial"]={-4296,-627,2682},
+	["Kraken Pool"]={-4375,-996,2049}
 }
 local appraiseSettings={
 	slot=nil,
@@ -116,16 +142,12 @@ local events={
 	{"Shark Hunt",0},
 	{"Megalodon",0},
 	{"Depth Serpent",0},
-	{"Gold Tide",0},
-	{"Algae",0},
 	{"Isonade",0}
 }
 local fzs={
-	["Gold Tide"]={"Golden Tide"},
 	["Shark Hunt"]={"Whale Shark","Great White Shark","Great Hammerhead Shark"},
 	["Megalodon"]={"Megalodon Default"},
 	["Depth Serpent"]={"The Depths - Serpent"},
-	["Algae"]={"Mushgrove Algae Pool","Forsaken Algae Pool","Ancient Algae Pool","Snowcap Algae Pool"},
 	["Isonade"]={"Isonade"},
 }
 if not workspace:FindFirstChild"platform"then
@@ -137,18 +159,14 @@ if not workspace:FindFirstChild"platform"then
 	p.Anchored=true
 	p.CFrame=CFrame.new(0,0,0)
 end
-local fishingZones=workspace.zones.fishing
-local vi=game:GetService"VirtualInputManager"
-local rs=game:GetService"ReplicatedStorage"
-local rsEvs=rs.events
 local tempFolder=Instance.new("Folder",workspace)
 local platform=workspace:FindFirstChild"platform"
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
 local UI=GUI:CreateWindow("0x3b5 Internal Edition","v0.1")
-function notify(ti,tx,d)
+function notify(t,m,d)
 	game.StarterGui:SetCore("SendNotification",{
-		Title=ti or"";
-		Text=tx or"";
+		Title=t or"";
+		Text=m or"";
 		Duration=d or 1;
 	})
 end
@@ -183,20 +201,34 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		hum=chr.Humanoid
 		hrp=chr.HumanoidRootPart
 		plrGui=plr.PlayerGui
-		chr.oxygen.Disabled=togs.oxyg
-		chr["oxygen(peaks)"].Disabled=togs.oxyg
 		chr.temperature.Disabled=togs.temp
+		UI.Stats.Money.setInfo(rates.money)
+		UI.Stats.XP.setInfo(rates.xp)
 	end)
-	if togs.cast then
+	if togs.tpw and chr and hum then
+		if hum.MoveDirection.Magnitude>0 then
+			chr:TranslateBy(hum.MoveDirection*(vals.tpws/5))
+		end
+	end
+	if togs.cast and cd.cast then
+		cd.cast=false
 		local rod=chr:FindFirstChildOfClass"Tool"
 		if rod and rod:FindFirstChild"events"then
 			if not rod.values.casted.Value then
-				rod.events.cast:FireServer(1)
+				if togs.lcst then
+					mouse(0,0,1)
+					wait(.45)
+					mouse(0,0,0)
+				else
+					rod.events.cast:FireServer(1)
+				end
 			end
 		end
+		cd.cast=true
 	end
 	if togs.shake and plrGui:FindFirstChild"shakeui"and plrGui.shakeui.safezone:FindFirstChild"button"then
 		local btn=plrGui.shakeui.safezone.button
+		btn.Position=UDim2.new(.5,0,.5,0)
 		local x,y=btn.AbsolutePosition.X+btn.AbsoluteSize.X/1.5,btn.AbsolutePosition.Y+btn.AbsoluteSize.Y/1.5
 		mouse(x,y,1,btn)
 		mouse(x,y,0,btn)
@@ -250,7 +282,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		pcall(function()
 			workspace.world.npcs.Merlin.Merlin.luck:InvokeServer()
 		end)
-		wait(.1)
+		wait(.075)
 		cd.luck=true
 	end
 	if togs.anglerQ and cd.anglerQ1 then
@@ -323,27 +355,59 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		wait(.1)
 		cd.evf=true
 	end
-	if togs.tpw and chr and hum then
-		if hum.MoveDirection.Magnitude>0 then
-			chr:TranslateBy(hum.MoveDirection*(vals.tpws/5))
-		end
-	end
 end)
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	if togs.infj and hum then
 		hum:ChangeState"Jumping"
 	end
 end)
+binds.money=pstat.coins:GetPropertyChangedSignal("Value"):Connect(function()
+	local v=pstat.coins.Value
+	local c=v-vals.money
+	rates.money=rates.money+c
+	vals.money=v
+	task.spawn(function()
+		task.wait(60)
+		rates.money=rates.money-c
+	end)
+end)
+binds.xp=pstat.xp:GetPropertyChangedSignal("Value"):Connect(function()
+	local v=pstat.xp.Value
+	local c=v-vals.xp
+	if c<0 then return end
+	rates.xp=rates.xp+c
+	vals.xp=v
+	task.spawn(function()
+		task.wait(60)
+		rates.xp=rates.xp-c
+	end)
+end)
+task.spawn(function()
+	while running and task.wait()do
+		if togs.click and cd.click then
+			cd.click=false
+			mouse(0,0,1)
+			mouse(0,0,0)
+			task.wait(vals.acspeed)
+			cd.click=true
+		end
+	end
+end)
 local Main=UI:addPage("Main",3,true,1)
 local EvFarm=UI:addPage("Event Farming",3,false,1)
 local Waypoints=UI:addPage("Locations",3,false,1)
 local Appraisal=UI:addPage("Appraise",4,false,1)
+local Stats=UI:addPage("Stats",4,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
 Main.addToggle("Auto Cast",togs.cast,function(v)
 	togs.cast=v
+	if not runtime then runtime=os.time()end
 	if v then
 		cd.cast=true
 	end
+end)
+Main.addToggle("Legit Cast",togs.lcst,function(v)
+	togs.lcst=v
 end)
 Main.addToggle("Auto Shake",togs.shake,function(v)
 	togs.shake=v
@@ -360,7 +424,10 @@ end)
 Main.addToggle("Angler Quest",togs.anglerQ,function(v)
 	togs.anglerQ=v
 end)
-Waypoints.addDropdown("Areas",wps.areas,#wps.areas*0.235,function(v)
+Waypoints.addDropdown("Main Areas",wps.areas1,#wps.areas1*0.235,function(v)
+	tpTo(v)
+end)
+Waypoints.addDropdown("Northern Expedition",wps.north,#wps.north*0.235,function(v)
 	tpTo(v)
 end)
 EvFarm.addLabel("Set the farming priority for each event","Set to -1 to excluded, priority ordered from 0 up to "..(#events-1))
@@ -417,9 +484,8 @@ for k,v in pairs(appraiseSettings.mutations)do
 		appraiseSettings.mutations[k]=b
 	end)
 end
-Local.addToggle("Disable Drown/Suffocate",togs.oxyg,function(v)
-	togs.oxyg=v
-end)
+Stats.addLabel("Money","0/hr")
+Stats.addLabel("XP","0/hr")
 Local.addToggle("Disable Temperature",togs.temp,function(v)
 	togs.temp=v
 end)
@@ -437,12 +503,19 @@ Local.addSlider("TPWalk Speed",0,150,function(v)
 	vals.tpws=v
 end)
 UI["Local Player"]["TPWalk Speed"].setValue(vals.tpws)
+Local.addToggle("Auto Click",togs.click,function(v)
+	togs.click=v
+end)
+Local.addTextBox("Click Speed(seconds)",vals.acspeed,function(v)
+	vals.acspeed=tonumber(v)
+end)
 Local.addButton("Rejoin",function()
 	plr:Kick"Rejoining..."
 	wait()
 	game:GetService"TeleportService":Teleport(game.PlaceId,plr)
 end)
 Main.destroyGui(function()
+	running=false
 	for _,v in pairs(binds)do
 		v:Disconnect()
 	end
