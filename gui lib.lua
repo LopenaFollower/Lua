@@ -325,22 +325,22 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 	Cre.MouseEnter:Connect(function()
 		YepTitle.BackgroundTransparency=.8
 		YepTitle.TextTransparency=.5
-		wait(.02)
+		task.wait(.02)
 		YepTitle.BackgroundTransparency=.5
 		YepTitle.TextTransparency=.3
 		Cre.ImageColor3=toRGB(0x89F6FF)
-		wait(.02)
+		task.wait(.02)
 		YepTitle.BackgroundTransparency=0
 		YepTitle.TextTransparency=0
 	end)
 	Cre.MouseLeave:Connect(function()
 		YepTitle.BackgroundTransparency=.5
 		YepTitle.TextTransparency=.3
-		wait(.02)
+		task.wait(.02)
 		YepTitle.BackgroundTransparency=.8
 		YepTitle.TextTransparency=.5
 		Cre.ImageColor3=toRGB(0xFFFFFF)
-		wait(.02)
+		task.wait(.02)
 		YepTitle.BackgroundTransparency=1
 		YepTitle.TextTransparency=1
 	end)
@@ -417,7 +417,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			for i,v in pairs(PageFolder:GetChildren())do
 				v.Visible=false
 			end
-			wait(.02)
+			task.wait(.02)
 			Home.Visible=true
 			Tab.TextTransparency=0
 			Tab.TextSize=11
@@ -547,7 +547,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			ButtonHolderCorner.Parent=ButtonHolder
 			Button.MouseButton1Down:Connect(function()
 				Button.TextSize=11
-				wait(.1)
+				task.wait(.1)
 				Button.TextSize=14
 				pcall(callback)
 			end)
@@ -935,10 +935,10 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 					DropdownContainer.Visible=true
 					DropdownContainer:TweenSize(UDim2.new(0,288,0,115),"Out","Linear",.3)
 					DropdownIcon.ImageColor3=toRGB(0x89F6FF)
-					wait(.3)
+					task.wait(.3)
 					DropdownOptionContainer.Visible=true
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,106),"Out","Linear",.2)
-					wait(.09)
+					task.wait(.09)
 					Home.CanvasPosition=Vector2.new(0,0)
 					DropdownContainer:TweenSize(UDim2.new(0,288,0,115),"Out","Linear",.1)
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,106),"Out","Linear",.1)
@@ -946,13 +946,13 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 					DropDownEnabled=false
 					DropdownIcon.ImageColor3=toRGB(0xFFFFFF)
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
-					wait(.2)
+					task.wait(.2)
 					DropdownOptionContainer.Visible=false
 					DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.3)
-					wait(.3)
+					task.wait(.3)
 					makeelements(true)
 					DropdownContainer.Visible=false
-					wait(.09)
+					task.wait(.09)
 					DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.1)
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
 				end
@@ -992,11 +992,11 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 					DropDownEnabled=false
 					DropdownIcon.ImageColor3=toRGB(0xFFFFFF)
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
-					wait(.2)
+					task.wait(.2)
 					DropdownOptionContainer.Visible=false
 					DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.3)
 					pcall(callback,v)
-					wait(.3)
+					task.wait(.3)
 					makeelements(true)
 					DropdownContainer.Visible=false
 					DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.1)
@@ -1052,11 +1052,11 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 						DropDownEnabled=false
 						DropdownIcon.ImageColor3=toRGB(0xFFFFFF)
 						DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
-						wait(.2)
+						task.wait(.2)
 						DropdownOptionContainer.Visible=false
 						DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.3)
 						pcall(callback,v)
-						wait(.3)
+						task.wait(.3)
 						makeelements(true)
 						DropdownContainer.Visible=false
 						DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.1)
@@ -1070,7 +1070,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			if not destroyButton then
 				destroyButton=true
 				destroyCallback=callback
-				Page[pagename].addButton("Destroy Gui",function()
+				Page[pagename]:addButton("Destroy Gui",function()
 					pcall(callback)
 					Gui:Destroy()
 				end)
