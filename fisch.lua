@@ -297,8 +297,8 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		chr.temperature.Disabled=togs.temp
 		chr.oxygen.Disabled=togs.oxyg
 		chr["oxygen(peaks)"].Disabled=togs.oxyg
-		UI.Stats.Money.setInfo(rates.money)
-		UI.Stats.XP.setInfo(rates.xp)
+		UI.Stats.Money.setInfo(rates.money.."/hr")
+		UI.Stats.XP.setInfo(rates.xp.."/hr")
 		plr.Passdown:Destroy()
 	end)
 	if togs.tpw and chr and hum then
@@ -649,7 +649,7 @@ for k,o in pairs(totems)do
 	ATotem.addSlider("Buy Amount",1,10,function(v)
 		o.buyAmount=tonumber(v)
 	end)	
-	ATotem.addLabel()
+	ATotem.addLabel("")
 end
 ATotem.addToggle("Megalodon",togs.sundialmeg,function(v)
 	togs.sundialmeg=v
