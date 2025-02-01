@@ -249,7 +249,7 @@ end
 function useTotem(name)
 	local totem=plr.Backpack:FindFirstChild(name)
 	if totem then
-		repeat task.wait()until not plrGui:FindFirstChild"reel"and not plrGui:FindFirstChild"shakeui"
+		repeat task.wait()until not plrGui:FindFirstChild"reel"
 		equipBP(totem)
 		task.wait(.5)
 		mouse(0,0,1)
@@ -641,17 +641,17 @@ for k,v in pairs(appraiseSettings.mutations)do
 	end)
 end
 for k,o in pairs(totems)do
-	if o.during~=nil then
-		ATotem.addDropdown("Use during",{"Day","Night","Always"},nil,function(v)
-			o.during=v
-		end)
-	end
 	ATotem.addToggle("Auto use "..k,o.use,function(v)
 		o.use=v
 	end)
 	ATotem.addSlider("Buy Amount",1,10,function(v)
 		o.buyAmount=tonumber(v)
-	end)	
+	end)
+	if o.during~=nil then
+		ATotem.addDropdown("Use during",{"Day","Night","Always"},nil,function(v)
+			o.during=v
+		end)
+	end
 	ATotem.addLabel("")
 end
 ATotem.addToggle("Megalodon",togs.sundialmeg,function(v)
