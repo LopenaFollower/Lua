@@ -181,13 +181,15 @@ local events={
 	{"Megalodon",0},
 	{"Depth Serpent",0},
 	{"Isonade",0},
-	{"Kraken",0}
+	{"Kraken",0},
+	{"Orcas",0}
 }
 local fzs={
 	["Shark Hunt"]={"Whale Shark","Great White Shark","Great Hammerhead Shark"},
 	["Megalodon"]={"Megalodon Default"},
 	["Depth Serpent"]={"The Depths - Serpent"},
 	["Kraken"]={"The Kraken Pool"},
+	["Orcas"]={"Orcas Pool"}
 }
 lt.FogEnd=1e4
 lt.FogStart=0
