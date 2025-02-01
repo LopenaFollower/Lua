@@ -38,7 +38,7 @@
 --  - Total height of the ScrollingFrame
 -- * visible (bool)
 --  - Decides the initial page that will
---    be shown upon loading.
+--	be shown upon loading.
 -- * elementspacing (number)
 --  - The padding between elements.
 --
@@ -183,7 +183,7 @@
 --		:rename()
 --		Button
 --			methods
-local Version=321
+local Version=322
 local destroyButton=false
 local destroyCallback=function()end
 local UIS=game:GetService"UserInputService"
@@ -455,7 +455,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			local LabelHolderCorner=Instance.new"UICorner"
 			local LabelTitle=Instance.new"TextLabel"
 			local LabelInfo=Instance.new"TextLabel"
-            local align=align or"Center"
+			local align=align or"Center"
 			LabelHolder.Name="LabelHolder"
 			LabelHolder.Parent=Home
 			LabelHolder.BackgroundColor3=toRGB(0x111111)
@@ -476,7 +476,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			LabelTitle.Font=Enum.Font.GothamSemibold
 			LabelTitle.Text=labelname or""
 			LabelTitle.TextColor3=toRGB(0xFFFFFF)
-            LabelTitle.TextXAlignment=Enum.TextXAlignment[align]
+			LabelTitle.TextXAlignment=Enum.TextXAlignment[align]
 			LabelTitle.TextSize=11
 			LabelInfo.Name="LabelInfo"
 			LabelInfo.Parent=LabelHolder
@@ -489,7 +489,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			LabelInfo.Font=Enum.Font.GothamSemibold
 			LabelInfo.Text=labelinfo or""
 			LabelInfo.TextColor3=toRGB(0xFFFFFF)
-            LabelInfo.TextXAlignment=Enum.TextXAlignment[align]
+			LabelInfo.TextXAlignment=Enum.TextXAlignment[align]
 			LabelInfo.TextSize=9
 			LabelInfo.TextTransparency=.3
 			Page[pagename][labelname]={}
@@ -728,7 +728,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 				Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*Trail.AbsoluteSize.X)+tonumber(minvalue))or 0
 				pcall(callback,Value)
 				Trail.Size=UDim2.new(0,math.clamp(mouse.X-Trail.AbsolutePosition.X,0,273),0,7)
-                Number.Text=Value
+				Number.Text=Value
 			end
 			Button.InputBegan:Connect(function(input)
 				if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
@@ -812,7 +812,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			TextBox.Font=Enum.Font.GothamSemibold
 			TextBox.Text=textboxdefault or""
 			TextBox.TextColor3=toRGB(0xFFFFFF)
-            TextBox.ClearTextOnFocus=false
+			TextBox.ClearTextOnFocus=false
 			TextBox.TextSize=9
 			TextBoxCorner.CornerRadius=UDim.new(0,5)
 			TextBoxCorner.Name="TextBoxCorner"
@@ -914,7 +914,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			DropdownOptionContainer.Position=UDim2.new(0,0,.0782608688,0)
 			DropdownOptionContainer.Size=UDim2.new(0,288,0,8)
 			DropdownOptionContainer.Visible=false
-			DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #scrollsize*0.2375,0)
+			DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #list*0.2375,0)
 			DropdownOptionContainer.ScrollBarThickness=5
 			DropdownOptionContainerLayout.Name="DropdownOptionContainerLayout"
 			DropdownOptionContainerLayout.Parent=DropdownOptionContainer
@@ -942,8 +942,8 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 					task.wait(.09)
 					DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.1)
 					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
-                else
-                    DropDownEnabled=true
+				else
+					DropDownEnabled=true
 					makeelements(false)
 					DropdownContainer.Visible=true
 					DropdownContainer:TweenSize(UDim2.new(0,288,0,115),"Out","Linear",.3)
@@ -1016,7 +1016,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 						v:Destroy()
 					end
 				end
-				DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #scrollsize*0.2375,0)
+				DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #list*0.2375,0)
 				for i,v in pairs(newlist)do
 					local Option=Instance.new"TextButton"
 					local OptionCorner=Instance.new"UICorner"
