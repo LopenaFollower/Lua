@@ -27,12 +27,12 @@ local togs={
 	sell=false,
 	anglerQ=false,
 	evf=false,
-	temp=false,
+	temp=true,
 	invcam=true,
 	click=false,
 	sundialmeg=false,
 	sundialkraken=false,
-	oxyg=false,
+	oxyg=true,
 	swim=false,
 	fb=false
 }
@@ -61,6 +61,7 @@ local vals={
 local totems={
 	["Sundial Totem"]={
 		use=false,
+		during="day",
 		buyAmount=1,
 		db=false
 	},
@@ -87,16 +88,27 @@ local wps={
 		"Brine Pool",
 		"Ancient Isle",
 		"Ancient Isle - Waterfall",
-		"Ancient Archives",
-		"Grand Reef",
-		"Atlantean Storm"
+		"Ancient Archives"
 	},
 	north={
 		"Northern Summit",
-		"Overgrowth Caves",
-		"Frigid Cavern",
+		"Overgrowth Caves1",
+		"Overgrowth Caves2",
+		"Frigid Cavern1",
+		"Frigid Cavern2",
 		"Cryogenic Canal",
-		"Glacial Grotto"
+		"Glacial Grotto1",
+		"Glacial Grotto2"
+	},
+	atlantis={
+		"Grand Reef",
+		"Atlantean Storm",
+		"Atlantis Main",
+		"Sunken Depths",
+		"Ethereal Abyss",
+		"Poseidon Temple",
+		"Zeus Trial",
+		"Kraken Pool"
 	},
 	items={
 		"Rod Of The Depths"
@@ -122,13 +134,16 @@ local coords={
 	["Northern Summit"]={19552,133,5299},
 	["Overgrowth Caves1"]={19756,415,5412},
 	["Overgrowth Caves2"]={20306,272,5471},
-	["Frigid Cavern"]={20229,731,5685},
+	["Frigid Cavern1"]={20229,731,5685},
+	["Frigid Cavern2"]={19844,439,5617},
 	["Cryogenic Canal"]={20018,508,5415},
-	["Glacial Grotto"]={19958,1143,5537},
+	["Glacial Grotto1"]={19958,1143,5537},
+	["Glacial Grotto2"]={20034,883,5639},
 	["Grand Reef"]={-3593,132,566},
 	["Atlantean Storm"]={-3645,131,780},
 	["Rod Of The Depths"]={1701,-903,1434},
 	["Trident Puzzle"]={-1477,-225,-2321},
+	["Atlantis Main"]={-4261,-603,1810},
 	["Sunken Depths"]={-4938,-595,1835},
 	["Ethereal Abyss"]={-3794,-564,1834},
 	["Poseidon Temple"]={-4038,-558,922},
@@ -159,9 +174,7 @@ local appraiseSettings={
 		["Silver"]=false,
 		["Translucent"]=false
 	},
-	attributes={
-		["Big"]=false,["Giant"]=false,["Shiny"]=false,["Sparkling"]=false
-	}
+	attributes={["Big"]=false,["Giant"]=false,["Shiny"]=false,["Sparkling"]=false}
 }
 local events={
 	{"Shark Hunt",0},
@@ -441,13 +454,16 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 end)
 binds.fps60=game:GetService"RunService".RenderStepped:Connect(function()
 	pcall(function()
-		lt.brightness.Enabled=togs.fb
-		lt.cc.Enabled=not togs.fb
-		lt.location.Enabled=not togs.fb
-		lt.uiblur.Enabled=not togs.fb
-		lt.uicc.Enabled=not togs.fb
-		lt.underwaterbl.Enabled=not togs.fb
-		lt.underwatercc.Enabled=not togs.fb
+		if togs.fb then
+			lt.brightness.Enabled=true
+			lt.cc.Enabled=false
+			lt.location.Enabled=false
+			lt.uiblur.Enabled=false
+			lt.uicc.Enabled=false
+			lt.underwaterbl.Enabled=false
+			lt.underwatercc.Enabled=false
+			lt.atmos.Density=0
+		end
 		hum:SetStateEnabled(4,not togs.swim)
 		if togs.swim then
 			chr.Head.ui:Destroy()
@@ -486,18 +502,19 @@ end)
 binds.cycle=rsWorld.cycle.Changed:Connect(function()
 	local v=rsWorld.cycle.Value
 	local usingTotem=rsWorld.totemInUse.Value
-	if v=="Day"then
-		task.wait(.1)
-		if not usingTotem and totems["Sundial Totem"].use then
+	task.wait(.1)
+	if not usingTotem and totems["Sundial Totem"].use then
+		if totems["Sundial Totem"].during==v or totems["Sundial Totem"].during=="Always"then
 			useTotem("Sundial Totem")
 		end
-	elseif v=="Night"then
-		task.wait(.5)
+	end
+	if v=="Night"then
+		task.wait(.4)
 		if not usingTotem and not auroraActive and totems["Aurora Totem"].use then
 			useTotem("Aurora Totem")
 		end
 	end
-	task.wait(.2)
+	task.wait(.1)
 	cd.spamsundial=true
 end)
 binds.weather=rsWorld.weather.Changed:Connect(function()
@@ -557,10 +574,13 @@ end)
 Main.addToggle("Angler Quest",togs.anglerQ,function(v)
 	togs.anglerQ=v
 end)
-Waypoints.addDropdown("Main Areas",wps.areas1,#wps.areas1*.235,function(v)
+Waypoints.addDropdown("Main Areas",wps.areas1,nil,function(v)
 	tpTo(v)
 end)
-Waypoints.addDropdown("Northern Expedition",wps.north,#wps.north*.235,function(v)
+Waypoints.addDropdown("Northern Expedition",wps.north,nil,function(v)
+	tpTo(v)
+end)
+Waypoints.addDropdown("Atlantis",wps.atlantis,nil,function(v)
 	tpTo(v)
 end)
 EvFarm.addLabel("Set the farming priority for each event","Set to -1 to excluded, priority ordered from 0 up to "..(#events-1))
@@ -617,13 +637,19 @@ for k,v in pairs(appraiseSettings.mutations)do
 		appraiseSettings.mutations[k]=b
 	end)
 end
-for k,_ in pairs(totems)do
-	ATotem.addToggle("Auto use "..k,totems[k].use,function(v)
-		totems[k].use=v
+for k,o in pairs(totems)do
+	if o.during~=nil then
+		ATotem.addDropdown("Use during",{"Day","Night","Always"},nil,function(v)
+			o.during=v
+		end)
+	end
+	ATotem.addToggle("Auto use "..k,o.use,function(v)
+		o.use=v
 	end)
 	ATotem.addSlider("Buy Amount",1,10,function(v)
-		totems[k].buyAmount=tonumber(v)
-	end)
+		o.buyAmount=tonumber(v)
+	end)	
+	ATotem.addLabel()
 end
 ATotem.addToggle("Megalodon",togs.sundialmeg,function(v)
 	togs.sundialmeg=v
