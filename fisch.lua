@@ -1,7 +1,5 @@
 local x=game.PlaceId
 if x^2-131579468225600*x-16732694052*x+2201678985343820114131200~=0 then return else repeat task.wait()until game:IsLoaded()and game.Players.LocalPlayer end
-game.Lighting.FogEnd=1e4
-game.Lighting.FogStart=0
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr:FindFirstChildWhichIsA"Humanoid"
@@ -9,11 +7,13 @@ local hrp=chr.HumanoidRootPart
 local plrGui=plr.PlayerGui
 local running=true
 local fishingZones=workspace.zones.fishing
+local lt=game:GetService"Lighting"
 local vi=game:GetService"VirtualInputManager"
 local rs=game:GetService"ReplicatedStorage"
 local rsEvs=rs.events
 local pstat=rs.playerstats[plr.Name].Stats
 local rsWorld=rs.world
+local cam=workspace.CurrentCamera
 local runtime,auroraActive
 local pauseFishing=false
 local binds={}
@@ -29,7 +29,12 @@ local togs={
 	evf=false,
 	temp=false,
 	invcam=true,
-	click=false
+	click=false,
+	sundialmeg=false,
+	sundialkraken=false,
+	oxyg=false,
+	swim=false,
+	fb=false
 }
 local cd={
 	cast=true,
@@ -39,7 +44,8 @@ local cd={
 	anglerQ1=true,
 	anglerQ2=true,
 	evf=true,
-	click=true
+	click=true,
+	spamsundial=true
 }
 local rates={
 	money=0,
@@ -82,7 +88,8 @@ local wps={
 		"Ancient Isle",
 		"Ancient Isle - Waterfall",
 		"Ancient Archives",
-		"Grand Reef"
+		"Grand Reef",
+		"Atlantean Storm"
 	},
 	north={
 		"Northern Summit",
@@ -113,11 +120,13 @@ local coords={
 	["Ancient Isle - Waterfall"]={5801,135,405},
 	["Ancient Archives"]={-3153,-755,1922},
 	["Northern Summit"]={19552,133,5299},
-	["Overgrowth Caves"]={19756,415,5412},
+	["Overgrowth Caves1"]={19756,415,5412},
+	["Overgrowth Caves2"]={20306,272,5471},
 	["Frigid Cavern"]={20229,731,5685},
 	["Cryogenic Canal"]={20018,508,5415},
 	["Glacial Grotto"]={19958,1143,5537},
 	["Grand Reef"]={-3593,132,566},
+	["Atlantean Storm"]={-3645,131,780},
 	["Rod Of The Depths"]={1701,-903,1434},
 	["Trident Puzzle"]={-1477,-225,-2321},
 	["Sunken Depths"]={-4938,-595,1835},
@@ -167,6 +176,8 @@ local fzs={
 	["Depth Serpent"]={"The Depths - Serpent"},
 	["Kraken"]={"The Kraken Pool"},
 }
+lt.FogEnd=1e4
+lt.FogStart=0
 if not workspace:FindFirstChild"platform"then
 	local p=Instance.new"Part"
 	p.Name="platform"
@@ -178,7 +189,7 @@ if not workspace:FindFirstChild"platform"then
 end
 local platform=workspace:FindFirstChild"platform"
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("0x3b5 Internal Edition","v0.6")
+local UI=GUI:CreateWindow("0x3b5 Internal Edition","v1.1")
 function notify(t,m,d)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=t or"";
@@ -216,7 +227,7 @@ function equipBP(v)
 end
 function equipRod()
 	for _,v in pairs(plr.Backpack:GetChildren())do
-		if v.Name:lower():find" rod"then	
+		if v.Name:lower():find" rod"then
 			equipBP(v)
 			break
 		end
@@ -248,6 +259,7 @@ function useTotem(name)
 		task.wait(1)
 		totems[name].db=true
 		while true do
+			cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
 			press(101)
 			task.wait(1)
 			if plr.Backpack:FindFirstChild(name)then
@@ -270,13 +282,15 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		hrp=chr.HumanoidRootPart
 		plrGui=plr.PlayerGui
 		chr.temperature.Disabled=togs.temp
+		chr.oxygen.Disabled=togs.oxyg
+		chr["oxygen(peaks)"].Disabled=togs.oxyg
 		UI.Stats.Money.setInfo(rates.money)
 		UI.Stats.XP.setInfo(rates.xp)
 		plr.Passdown:Destroy()
 	end)
 	if togs.tpw and chr and hum then
 		if hum.MoveDirection.Magnitude>0 then
-			chr:TranslateBy(hum.MoveDirection*(vals.tpws/5))
+			chr:TranslateBy(hum.MoveDirection*vals.tpws/5)
 		end
 	end
 	if togs.cast and cd.cast and not pauseFishing then
@@ -291,6 +305,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 				else
 					rod.events.cast:FireServer(1)
 				end
+				task.wait(.1)
 			end
 		end
 		cd.cast=true
@@ -351,7 +366,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		pcall(function()
 			workspace.world.npcs.Merlin.Merlin.luck:InvokeServer()
 		end)
-		task.wait(.075)
+		task.wait(.05)
 		cd.luck=true
 	end
 	if togs.anglerQ and cd.anglerQ1 then
@@ -386,7 +401,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	if togs.sell and cd.sell then
 		cd.sell=false
 		rsEvs.SellAll:InvokeServer()
-		task.wait(5)
+		task.wait(3)
 		cd.sell=true
 	end
 	if togs.evf and cd.evf and not pauseFishing then
@@ -419,8 +434,25 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		task.wait(.1)
 		cd.evf=true
 	end
+	if cd.spamsundial and((not workspace.zones.fishing:FindFirstChild"Megalodon Default"and togs.sundialmeg)and(not workspace.zones.fishing:FindFirstChild"The Kraken Pool"and togs.sundialkraken))then
+		cd.spamsundial=false
+		useTotem("Sundial Totem")
+	end
 end)
 binds.fps60=game:GetService"RunService".RenderStepped:Connect(function()
+	pcall(function()
+		lt.brightness.Enabled=togs.fb
+		lt.cc.Enabled=not togs.fb
+		lt.location.Enabled=not togs.fb
+		lt.uiblur.Enabled=not togs.fb
+		lt.uicc.Enabled=not togs.fb
+		lt.underwaterbl.Enabled=not togs.fb
+		lt.underwatercc.Enabled=not togs.fb
+		hum:SetStateEnabled(4,not togs.swim)
+		if togs.swim then
+			chr.Head.ui:Destroy()
+		end
+	end)
 	if togs.click and cd.click then
 		cd.click=false
 		mouse(0,0,1)
@@ -465,6 +497,8 @@ binds.cycle=rsWorld.cycle.Changed:Connect(function()
 			useTotem("Aurora Totem")
 		end
 	end
+	task.wait(.2)
+	cd.spamsundial=true
 end)
 binds.weather=rsWorld.weather.Changed:Connect(function()
 	local v=rsWorld.weather.Value
@@ -591,14 +625,30 @@ for k,_ in pairs(totems)do
 		totems[k].buyAmount=tonumber(v)
 	end)
 end
-Stats.addLabel("Money","0/hr")
-Stats.addLabel("XP","0/hr")
+ATotem.addToggle("Megalodon",togs.sundialmeg,function(v)
+	togs.sundialmeg=v
+end)
+ATotem.addToggle("Kraken",togs.sundialkraken,function(v)
+	togs.sundialkraken=v
+end)
+Stats.addLabel("Money","0/hr","Left")
+Stats.addLabel("XP","0/hr","Left")
 Local.addToggle("Disable Temperature",togs.temp,function(v)
 	togs.temp=v
 end)
+Local.addToggle("Infinite Oxygen",togs.oxyg,function(v)
+	togs.oxyg=v
+end)
+Local.addToggle("No Swim",togs.swim,function(v)
+	togs.swim=v
+end)
 Local.addToggle("Invis Cam",togs.invcam,function(v)
 	togs.invcam=v
+	plr.CameraMaxZoomDistance=300
 	plr.DevCameraOcclusionMode=v and Enum.DevCameraOcclusionMode.Invisicam or Enum.DevCameraOcclusionMode.Zoom
+end)
+Local.addToggle("Fullbright/No blur",togs.fb,function(v)
+	togs.fb=v
 end)
 Local.addToggle("Inf Jump",togs.infj,function(v)
 	togs.infj=v
