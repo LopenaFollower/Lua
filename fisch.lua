@@ -249,6 +249,7 @@ end
 function useTotem(name)
 	local totem=plr.Backpack:FindFirstChild(name)
 	if totem then
+		repeat task.wait()until not plrGui:FindFirstChild"reel"and not plrGui:FindFirstChild"shakeui"
 		equipBP(totem)
 		task.wait(.5)
 		mouse(0,0,1)
