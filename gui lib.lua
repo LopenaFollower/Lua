@@ -914,7 +914,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			DropdownOptionContainer.Position=UDim2.new(0,0,.0782608688,0)
 			DropdownOptionContainer.Size=UDim2.new(0,288,0,8)
 			DropdownOptionContainer.Visible=false
-			DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #list*0.2375,0)
+			DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #list*.2375,0)
 			DropdownOptionContainer.ScrollBarThickness=5
 			DropdownOptionContainerLayout.Name="DropdownOptionContainerLayout"
 			DropdownOptionContainerLayout.Parent=DropdownOptionContainer
@@ -1016,7 +1016,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 						v:Destroy()
 					end
 				end
-				DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #list*0.2375,0)
+				DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #list*.2375,0)
 				for i,v in pairs(newlist)do
 					local Option=Instance.new"TextButton"
 					local OptionCorner=Instance.new"UICorner"
