@@ -261,10 +261,12 @@ function useTotem(name)
 		pauseFishing=true
 		task.wait(.1)
 		while task.wait()do
-			local rod=chr:FindFirstChildOfClass"Tool"
-			if rod and rod:FindFirstChild"events"and not plrGui:FindFirstChild"reel"and not plrGui:FindFirstChild"shakeui"then
+			if not plrGui:FindFirstChild"reel"and not plrGui:FindFirstChild"shakeui"then
 				task.wait(.05)
-				rod.events.reset:FireServer()
+				local rod=chr:FindFirstChildOfClass"Tool"
+				if rod and rod:FindFirstChild"events"then
+					rod.events.reset:FireServer()
+				end
 				break
 			end
 		end
