@@ -14,7 +14,8 @@ local rsEvs=rs.events
 local pstat=rs.playerstats[plr.Name].Stats
 local rsWorld=rs.world
 local cam=workspace.CurrentCamera
-local runtime,auroraActive
+local runtime,auroraActive,sunkenActive
+local nextSunken=60
 local pauseFishing=false
 local binds={}
 local togs={
@@ -61,7 +62,7 @@ local vals={
 local totems={
 	["Sundial Totem"]={
 		use=false,
-		during="day",
+		during="Day",
 		buyAmount=1,
 		db=false
 	},
@@ -232,7 +233,7 @@ end
 function tpTo(name)
 	hrp.CFrame=CFrame.new(unpack(coords[name]))
 end	
-function tpOnPart(pt,t)
+function tpOnPart(pt)
 	local p=pt.Position
 	local top=p.Y+pt.Size.Y/2+5
 	platform.CFrame=CFrame.new(p.X,top-3,p.Z)
@@ -243,7 +244,7 @@ function equipBP(v)
 end
 function equipRod()
 	for _,v in pairs(plr.Backpack:GetChildren())do
-		if v.Name:lower():find" rod"then
+		if v.Name:lower():find"rod"then
 			equipBP(v)
 			break
 		end
@@ -258,7 +259,7 @@ function useTotem(name)
 		task.wait(.5)
 		mouse(0,0,1)
 		mouse(0,0,0)
-		task.wait(.35)
+		task.wait(.4)
 		equipRod()
 	else
 		local pos=hrp.CFrame
@@ -281,13 +282,13 @@ function useTotem(name)
 		while true do
 			cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
 			press(101)
-			task.wait(1)
+			task.wait(1.5)
 			if plr.Backpack:FindFirstChild(name)then
 				break
 			end
 		end
 		totems[name].db=false
-		task.wait(1)
+		task.wait(.1)
 		useTotem(name)
 		hrp.CFrame=pos
 		pauseFishing=false
@@ -432,6 +433,9 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			if v[2]>0 then
 				local efv=nil
 				for _,fz in pairs(fzs[v[1]])do
+					if type(fz)=="userdata"then
+						
+					end
 					if fishingZones:FindFirstChild(fz)then
 						efv=fz
 						break
@@ -498,7 +502,7 @@ binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	end
 end)
 binds.over=plrGui.over.ChildAdded:Connect(function(p)
-	if p.Name=="prompt"then
+	if p.Name=="prompt"and p:FindFirstChild"question"then
 		for k,v in pairs(totems)do
 			local q=p.question
 			if q.Text:find(k)and v.db then
@@ -512,6 +516,11 @@ binds.over=plrGui.over.ChildAdded:Connect(function(p)
 				press(92)
 			end
 		end
+	end
+end)
+binds.anno=plrGui.hud.safezone.topannouncements.ChildAdded:Connect(function(v)
+	if v.Name=="ui"then
+	
 	end
 end)
 binds.cycle=rsWorld.cycle.Changed:Connect(function()
@@ -730,3 +739,4 @@ Main.destroyGui(function()
 		cd[i]=false
 	end
 end)
+--workspace.ActiveChestsFolder.Pad.Chests.Mythical.Chest.Main.Prompt
