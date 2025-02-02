@@ -317,8 +317,8 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		chr.temperature.Disabled=togs.temp
 		chr.oxygen.Disabled=togs.oxyg
 		chr["oxygen(peaks)"].Disabled=togs.oxyg
-		UI.Stats.Money.setInfo(rates.money.."/min")
-		UI.Stats.XP.setInfo(rates.xp.."/min")
+		UI.Stats.Money.setInfo(rates.money.."/hr")
+		UI.Stats.XP.setInfo(rates.xp.."/hr")
 		plrGui.uiparticles.Enabled=false
 		plr.Passdown:Destroy()
 	end)
