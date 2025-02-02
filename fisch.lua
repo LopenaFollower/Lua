@@ -15,7 +15,6 @@ local pstat=rs.playerstats[plr.Name].Stats
 local rsWorld=rs.world
 local cam=workspace.CurrentCamera
 local runtime,auroraActive,sunkenActive
-local nextSunken=60
 local pauseFishing=false
 local binds={}
 local togs={
@@ -35,7 +34,8 @@ local togs={
 	sundialkraken=false,
 	oxyg=true,
 	swim=false,
-	fb=false
+	fb=false,
+	sunkenchest=false
 }
 local cd={
 	cast=true,
@@ -191,7 +191,15 @@ local fzs={
 	["Depth Serpent"]={"The Depths - Serpent"},
 	["Kraken"]={"The Kraken Pool"},
 	["Isonade"]={"Isonade"},
-	["Orcas"]={"Orcas Pool"}
+	["Orcas"]={"Orcas Pool","Ancient Orcas Pool"}
+}
+local sunkenLocs={
+	["moosewood"]={{936,130,-159},{693,130,-362},{613,130,498},{285,130,564},{283,130,-159}},
+	["roslit"]={{-1179,130,565},{-1217,130,201},{-1967,130,980},{-2444,130,266},{-2444,130,-37}},
+	["sunstone"]={{-852,130,-1560},{-1000,130,-751},{-1500,130,-750},{-1547,130,-1080},{-1618,130,-1560}},
+	["terrapin"]={{798,130,1667},{562,130,2455},{393,130,2435},{-1,130,1632},{-190,130,2450}},
+	["mushgrove"]={{2890,130,-997},{2729,130,-1098},{2410,130,-1110},{2266,130,-721}},
+	["forsaken"]={{-2460,130,2047}}
 }
 lt.FogEnd=1e4
 lt.FogStart=0
@@ -422,10 +430,10 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	if togs.sell and cd.sell then
 		cd.sell=false
 		rsEvs.SellAll:InvokeServer()
-		task.wait(1)
+		task.wait(5)
 		cd.sell=true
 	end
-	if togs.evf and cd.evf and not pauseFishing then
+	if togs.evf and cd.evf and not pauseFishing and not sunkenActive then
 		cd.evf=false
 		local he=false
 		for i=1,#events do
@@ -433,9 +441,6 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			if v[2]>0 then
 				local efv=nil
 				for _,fz in pairs(fzs[v[1]])do
-					if type(fz)=="userdata"then
-						
-					end
 					if fishingZones:FindFirstChild(fz)then
 						efv=fz
 						break
@@ -518,9 +523,31 @@ binds.over=plrGui.over.ChildAdded:Connect(function(p)
 		end
 	end
 end)
-binds.anno=plrGui.hud.safezone.topannouncements.ChildAdded:Connect(function(v)
-	if v.Name=="ui"then
-	
+binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
+	local l=a:lower()
+	if l:find"sunken treasure"and togs.sunkenchest then
+		sunkenActive=true
+		task.wait(.2)
+		for k,v in pairs(sunkenLocs)do
+			if l:find(k)then
+				for _,p in pairs(v)do
+					hrp.CFrame=CFrame.new(unpack(p))
+					hrp.Anchored=true
+					task.wait(.1)
+					local pad=workspace.ActiveChestsFolder:FindFirstChild"Pad"
+					if pad then
+						for _,c in pairs(pad.Spawns:GetChildren())do
+							hrp.CFrame=v.CFrame
+							task.wait(.1)
+							cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
+							press(101)
+						end
+						break
+					end
+				end
+			end
+		end
+		hrp.Anchored=false
 	end
 end)
 binds.cycle=rsWorld.cycle.Changed:Connect(function()
@@ -624,6 +651,9 @@ end
 EvFarm.addLabel("Select a location to farm while there are no events.","Just stand and face at the spot you wish to tp.")
 EvFarm.addButton("Set Anchor",function()
 	vals.anchor=hrp.CFrame
+end)
+EvFarm.addToggle("Sunken Treasure",togs.sunkenchest,function(v)
+	togs.sunkenchest=v
 end)
 Appraisal.addLabel("Equip the item you wish to appraise.","Ensure that it stays at the same hotbar slot.")
 Appraisal.addToggle("Appraise",togs.appraise,function(v)
@@ -739,4 +769,3 @@ Main.destroyGui(function()
 		cd[i]=false
 	end
 end)
---workspace.ActiveChestsFolder.Pad.Chests.Mythical.Chest.Main.Prompt
