@@ -14,7 +14,7 @@ local rsEvs=rs.events
 local pstat=rs.playerstats[plr.Name].Stats
 local rsWorld=rs.world
 local cam=workspace.CurrentCamera
-local runtime,auroraActive,sunkenActive
+local auroraActive,sunkenActive
 local pauseFishing=false
 local startTime=os.time()
 local binds={}
@@ -317,8 +317,8 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		chr.temperature.Disabled=togs.temp
 		chr.oxygen.Disabled=togs.oxyg
 		chr["oxygen(peaks)"].Disabled=togs.oxyg
-		UI.Stats.Money.setInfo(rates.money.."/hr")
-		UI.Stats.XP.setInfo(rates.xp.."/hr")
+		UI.Stats.Money.setInfo(formatNum(rates.money).."/hr")
+		UI.Stats.XP.setInfo(formatNum(rates.xp).."/hr")
 		plrGui.uiparticles.Enabled=false
 		plr.Passdown:Destroy()
 	end)
@@ -598,7 +598,6 @@ local Stats=UI:addPage("Stats",4,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
 Main.addToggle("Auto Cast",togs.cast,function(v)
 	togs.cast=v
-	if not runtime then runtime=os.time()end
 	if v then
 		cd.cast=true
 	end
