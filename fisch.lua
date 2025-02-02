@@ -16,6 +16,7 @@ local rsWorld=rs.world
 local cam=workspace.CurrentCamera
 local runtime,auroraActive,sunkenActive
 local pauseFishing=false
+local startTime=os.time()
 local binds={}
 local togs={
 	cast=false,
@@ -230,6 +231,9 @@ function StrSplit(s,d)
 	local r={}
 	for w in s:gmatch("[^"..d.."]+")do table.insert(r,w)end
 	return r
+end
+function formatNum(n)
+	return tostring(math.floor(n)):reverse():gsub("(%d%d%d)","%1,"):gsub(",(%-?)$","%1"):reverse()
 end
 function mouse(x,y,d,l)
 	vi:SendMouseButtonEvent(x,y,0,d,l or plr,0)
@@ -575,25 +579,15 @@ binds.weather=rsWorld.weather.Changed:Connect(function()
 	auroraActive=v=="Aurora_Borealis"
 end)
 binds.money=pstat.coins:GetPropertyChangedSignal("Value"):Connect(function()
-	local v=pstat.coins.Value
-	local c=v-vals.money
-	rates.money=rates.money+c
-	vals.money=v
-	task.spawn(function()
-		task.wait(60)
-		rates.money=rates.money-c
-	end)
+	local c=pstat.coins.Value-vals.money
+	local t=os.time()-startTime
+	rates.money=math.round(3600/t*c)
 end)
 binds.xp=pstat.xp:GetPropertyChangedSignal("Value"):Connect(function()
-	local v=pstat.xp.Value
-	local c=v-vals.xp
+	local c=pstat.xp.Value-vals.xp
 	if c<0 then return end
-	rates.xp=rates.xp+c
-	vals.xp=v
-	task.spawn(function()
-		task.wait(60)
-		rates.xp=rates.xp-c
-	end)
+	local t=os.time()-startTime
+	rates.xp=math.round(3600/t*c)
 end)
 local Main=UI:addPage("Main",3,true,1)
 local EvFarm=UI:addPage("Event Farming",3,false,1)
