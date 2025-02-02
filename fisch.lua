@@ -189,6 +189,7 @@ local fzs={
 	["Megalodon"]={"Megalodon Default"},
 	["Depth Serpent"]={"The Depths - Serpent"},
 	["Kraken"]={"The Kraken Pool"},
+	["Isonade"]={"Isonade"},
 	["Orcas"]={"Orcas Pool"}
 }
 lt.FogEnd=1e4
@@ -252,6 +253,7 @@ function useTotem(name)
 	local totem=plr.Backpack:FindFirstChild(name)
 	if totem then
 		repeat task.wait()until not plrGui:FindFirstChild"reel"
+		print("use")
 		equipBP(totem)
 		task.wait(.5)
 		mouse(0,0,1)
@@ -419,7 +421,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	if togs.sell and cd.sell then
 		cd.sell=false
 		rsEvs.SellAll:InvokeServer()
-		task.wait(3)
+		task.wait(1)
 		cd.sell=true
 	end
 	if togs.evf and cd.evf and not pauseFishing then
@@ -448,13 +450,21 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		end
 		if not he and vals.anchor then
 			hrp.CFrame=vals.anchor
+			task.wait(.1)
 		end
-		task.wait(.1)
 		cd.evf=true
 	end
-	if cd.spamsundial and((not workspace.zones.fishing:FindFirstChild"Megalodon Default"and togs.sundialmeg)and(not workspace.zones.fishing:FindFirstChild"The Kraken Pool"and togs.sundialkraken))then
+	if cd.spamsundial then
 		cd.spamsundial=false
-		useTotem("Sundial Totem")
+		local use=false
+		if not workspace.zones.fishing:FindFirstChild"Megalodon Default"and togs.sundialmeg then
+			use=true
+		elseif not workspace.zones.fishing:FindFirstChild"The Kraken Pool"and togs.sundialkraken then
+			use=true
+		end
+		if use then
+			useTotem("Sundial Totem")
+		end
 	end
 end)
 binds.fps60=game:GetService"RunService".RenderStepped:Connect(function()
@@ -658,9 +668,15 @@ for k,o in pairs(totems)do
 end
 ATotem.addToggle("Megalodon",togs.sundialmeg,function(v)
 	togs.sundialmeg=v
+	if v then
+		cd.spamsundial=true
+	end
 end)
 ATotem.addToggle("Kraken",togs.sundialkraken,function(v)
 	togs.sundialkraken=v
+	if v then
+		cd.spamsundial=true
+	end
 end)
 Stats.addLabel("Money","0/hr","Left")
 Stats.addLabel("XP","0/hr","Left")
