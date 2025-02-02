@@ -313,8 +313,9 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		chr.temperature.Disabled=togs.temp
 		chr.oxygen.Disabled=togs.oxyg
 		chr["oxygen(peaks)"].Disabled=togs.oxyg
-		UI.Stats.Money.setInfo(rates.money.."/hr")
-		UI.Stats.XP.setInfo(rates.xp.."/hr")
+		UI.Stats.Money.setInfo(rates.money.."/min")
+		UI.Stats.XP.setInfo(rates.xp.."/min")
+		plrGui.uiparticles.Enabled=false
 		plr.Passdown:Destroy()
 	end)
 	if togs.tpw and chr and hum then
@@ -535,11 +536,11 @@ binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 					hrp.Anchored=true
 					task.wait(.1)
 					local pad=workspace.ActiveChestsFolder:FindFirstChild"Pad"
-					if pad then
+					if pad and pad:FindFirstChild"Spawns"then
 						for _,c in pairs(pad.Spawns:GetChildren())do
-							hrp.CFrame=v.CFrame
-							task.wait(.1)
+							hrp.CFrame=c.CFrame
 							cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
+							task.wait(.1)
 							press(101)
 						end
 						break
@@ -547,6 +548,7 @@ binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 				end
 			end
 		end
+		sunkenActive=false
 		hrp.Anchored=false
 	end
 end)
