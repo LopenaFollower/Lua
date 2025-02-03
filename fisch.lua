@@ -47,7 +47,8 @@ local cd={
 	anglerQ2=true,
 	evf=true,
 	click=true,
-	spamsundial=true
+	spamsundial=true,
+	fastcatch=true
 }
 local rates={
 	money=0,
@@ -179,12 +180,12 @@ local appraiseSettings={
 	attributes={["Big"]=false,["Giant"]=false,["Shiny"]=false,["Sparkling"]=false}
 }
 local events={
-	{"Shark Hunt",0},
-	{"Megalodon",0},
-	{"Depth Serpent",0},
-	{"Isonade",0},
-	{"Kraken",0},
-	{"Orcas",0}
+	{"Shark Hunt",0,false},
+	{"Megalodon",0,false},
+	{"Depth Serpent",0,false},
+	{"Isonade",0,true},
+	{"Kraken",0,false},
+	{"Orcas",0,false}
 }
 local fzs={
 	["Shark Hunt"]={"Whale Shark","Great White Shark","Great Hammerhead Shark"},
@@ -223,15 +224,6 @@ function notify(t,m,d)
 		Duration=d or 1;
 	})
 end
-function Reverse(t)
-	for i=1,math.floor(#t/2),1 do t[i],t[#t-i+1]=t[#t-i+1],t[i]end
-	return t
-end
-function StrSplit(s,d)
-	local r={}
-	for w in s:gmatch("[^"..d.."]+")do table.insert(r,w)end
-	return r
-end
 function formatNum(n)
 	return tostring(math.floor(n)):reverse():gsub("(%d%d%d)","%1,"):gsub(",(%-?)$","%1"):reverse()
 end
@@ -245,22 +237,37 @@ end
 function tpTo(name)
 	hrp.CFrame=CFrame.new(unpack(coords[name]))
 end	
-function tpOnPart(pt)
+function tpOnPart(pt,t)
 	local p=pt.Position
-	local top=p.Y+pt.Size.Y/2+5
-	platform.CFrame=CFrame.new(p.X,top-3,p.Z)
-	hrp.CFrame=CFrame.new(p.X,top,p.Z)
+	local h=t and pt.Size.Y/2 or 0
+	local top=t and pt.Size.Y/2+5 or -pt.Size.Y/3
+	platform.CFrame=CFrame.new(p.X,p.Y+top-3,p.Z)
+	hrp.CFrame=CFrame.new(p.X,p.Y+top,p.Z)
+end
+function unequip()
+	for k,v in pairs(chr:GetChildren())do
+		if v:IsA"Tool"then
+			v.Parent=plr.Backpack
+		end
+	end
 end
 function equipBP(v)
 	rs.packages.Net["RE/Backpack/Equip"]:FireServer(v)
 end
-function equipRod()
-	for _,v in pairs(plr.Backpack:GetChildren())do
-		if v.Name:lower():find"rod"then
-			equipBP(v)
-			break
+function getRod()
+	for _,v in pairs(chr:GetChildren())do
+		if v:IsA"Tool"and v.Name:lower():find"rod"then
+			return v
 		end
 	end
+	for _,v in pairs(plr.Backpack:GetChildren())do
+		if v.Name:lower():find"rod"then
+			return v
+		end
+	end
+end
+function equipRod()
+	equipBP(getRod())
 end
 function useTotem(name)
 	local totem=plr.Backpack:FindFirstChild(name)
@@ -307,6 +314,7 @@ function useTotem(name)
 		hrp.Anchored=false
 	end
 end
+
 binds.main=game:GetService"RunService".Stepped:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
@@ -319,7 +327,20 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		chr["oxygen(peaks)"].Disabled=togs.oxyg
 		UI.Stats.Money.setInfo(formatNum(rates.money).."/hr")
 		UI.Stats.XP.setInfo(formatNum(rates.xp).."/hr")
-		plrGui.uiparticles.Enabled=false
+		if togs.fb then
+			lt.brightness.Enabled=true
+			lt.cc.Enabled=false
+			lt.location.Enabled=false
+			lt.uiblur.Enabled=false
+			lt.uicc.Enabled=false
+			lt.underwaterbl.Enabled=false
+			lt.underwatercc.Enabled=false
+			lt.atmos.Density=0
+		end
+		if togs.swim and chr.Head:FindFirstChild"ui"then
+			chr.Head.ui:Destroy()
+		end
+		workspace.world.interactables["Enchant Altar"].ProximityPrompt.HoldDuration=0
 		plr.Passdown:Destroy()
 	end)
 	if togs.tpw and chr and hum then
@@ -354,6 +375,16 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	if togs.instacatch and plrGui:FindFirstChild"reel"then
 		if plrGui.reel.bar.playerbar.Transparency==0 then
 			rsEvs["reelfinished "]:FireServer(100,math.random(0,100)~=0)
+		end
+		local rod=getRod()
+		if rod then
+			if rod.values.bite.Value==true and cd.fastcatch then
+				cd.fastcatch=false
+				unequip()
+				equipRod()
+				task.wait(2)
+				cd.fastcatch=true
+			end
 		end
 	end
 	if togs.appraise and cd.appraise then
@@ -445,7 +476,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			local v=events[i]
 			if v[2]>0 then
 				local efv=nil
-				for _,fz in pairs(fzs[v[1]])do
+				for _,fz in pairs(fzs[v[1] ])do
 					if fishingZones:FindFirstChild(fz)then
 						efv=fz
 						break
@@ -455,16 +486,19 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 					local fp=fishingZones:FindFirstChild(efv)
 					if fp then
 						he=true
-						fp.CanCollide=true
-						tpOnPart(fp)
+						hum:SetStateEnabled(4,false)
+						tpOnPart(fp,v[3])
 						break
 					end
 				end
 			end
 		end
-		if not he and vals.anchor then
-			hrp.CFrame=vals.anchor
-			task.wait(.1)
+		if not he then
+			hum:SetStateEnabled(4,not togs.swim)
+			if vals.anchor then
+				hrp.CFrame=vals.anchor
+				task.wait(.1)
+			end
 		end
 		cd.evf=true
 	end
@@ -480,24 +514,6 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			useTotem("Sundial Totem")
 		end
 	end
-end)
-binds.fps60=game:GetService"RunService".RenderStepped:Connect(function()
-	pcall(function()
-		if togs.fb then
-			lt.brightness.Enabled=true
-			lt.cc.Enabled=false
-			lt.location.Enabled=false
-			lt.uiblur.Enabled=false
-			lt.uicc.Enabled=false
-			lt.underwaterbl.Enabled=false
-			lt.underwatercc.Enabled=false
-			lt.atmos.Density=0
-		end
-		hum:SetStateEnabled(4,not togs.swim)
-		if togs.swim then
-			chr.Head.ui:Destroy()
-		end
-	end)
 	if togs.click and cd.click then
 		cd.click=false
 		mouse(0,0,1)
@@ -532,28 +548,37 @@ binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 	local l=a:lower()
 	if l:find"sunken treasure"and togs.sunkenchest then
 		sunkenActive=true
-		task.wait(.2)
+		task.wait(.1)
 		for k,v in pairs(sunkenLocs)do
 			if l:find(k)then
 				for _,p in pairs(v)do
 					hrp.CFrame=CFrame.new(unpack(p))
-					hrp.Anchored=true
-					task.wait(.1)
+					task.wait(2)
 					local pad=workspace.ActiveChestsFolder:FindFirstChild"Pad"
 					if pad and pad:FindFirstChild"Spawns"then
+						for _,v in pairs(pad:GetDescendants())do
+							if v:IsA"ProximityPrompt"then
+								v.RequiresLineOfSight=false
+								v.HoldDuration=0
+								v.MaxActivationDistance=1000
+							end
+						end
+						task.wait(.25)
 						for _,c in pairs(pad.Spawns:GetChildren())do
 							hrp.CFrame=c.CFrame
 							cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
-							task.wait(.1)
+							press(101)
+							task.wait(.25)
+							press(101)
+							task.wait(.25)
 							press(101)
 						end
+						sunkenActive=false
 						break
 					end
 				end
 			end
 		end
-		sunkenActive=false
-		hrp.Anchored=false
 	end
 end)
 binds.cycle=rsWorld.cycle.Changed:Connect(function()
@@ -595,6 +620,7 @@ local Waypoints=UI:addPage("Locations",3,false,1)
 local Appraisal=UI:addPage("Appraise",4,false,1)
 local ATotem=UI:addPage("Totems",4,false,1)
 local Stats=UI:addPage("Stats",4,false,1)
+local Webhook=UI:addPage("Webhook",4,false,1)
 local Local=UI:addPage("Local Player",3,false,1)
 Main.addToggle("Auto Cast",togs.cast,function(v)
 	togs.cast=v
@@ -722,6 +748,7 @@ Local.addToggle("Infinite Oxygen",togs.oxyg,function(v)
 end)
 Local.addToggle("No Swim",togs.swim,function(v)
 	togs.swim=v
+	hum:SetStateEnabled(4,not togs.swim)
 end)
 Local.addToggle("Invis Cam",togs.invcam,function(v)
 	togs.invcam=v
