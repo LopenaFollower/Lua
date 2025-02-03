@@ -221,6 +221,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 	Gui.ZIndexBehavior=1
 	Gui.ResetOnSpawn=false
 	Frame.Parent=Gui
+	Frame.Active=true
 	Frame.BackgroundColor3=toRGB(0x141414)
 	Frame.BorderColor3=toRGB(0x141414)
 	Frame.BorderSizePixel=0
