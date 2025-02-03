@@ -378,11 +378,11 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		end
 		local rod=getRod()
 		if rod then
-			if rod.values.bite.Value==true and cd.fastcatch then
+			if rod.values.bite.Value and cd.fastcatch then
 				cd.fastcatch=false
 				unequip()
 				equipRod()
-				task.wait(2)
+				task.wait(1.925)
 				cd.fastcatch=true
 			end
 		end
