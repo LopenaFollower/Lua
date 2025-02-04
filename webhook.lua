@@ -1,10 +1,10 @@
+local req=http_request or request or HttpPost or syn.request
 local connector={}
 function trim(s)
 	return s:match"^%s*(.*%S)"or""
 end
 function connector:connect(api)
 	local webhook={}
-	local req=http_request or request or HttpPost or syn.request
 	local embeds,payload
 	function default()
 		embeds={
