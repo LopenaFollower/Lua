@@ -1,7 +1,7 @@
 local req=http_request or request or HttpPost or syn.request
 local connector={}
 function trim(s)
-	return s:match"^%s*(.*%S)"or""
+	return(s or""):match"^%s*(.*%S)"
 end
 function connector:connect(api)
 	local webhook={}
@@ -29,7 +29,7 @@ function connector:connect(api)
 			["username"]="Spidey Bot",
 			["avatar_url"]="",
 			["content"]="",
-			["embeds"]={embeds}
+			["embeds"]={}
 		}
 	end
 	default()
@@ -49,6 +49,7 @@ function connector:connect(api)
 	end
 	function webhook:author(name,url,icon)
 		if trim(name)~=""then
+			payload.embeds[1]=embeds
 			embeds.author={}
 			embeds.author.name=name
 			if url then
@@ -60,13 +61,19 @@ function connector:connect(api)
 		end
 	end
 	function webhook:title(str)
-		embeds.title=str
+		if trim(str)~=""then
+			payload.embeds[1]=embeds
+			embeds.title=str
+		end
 	end
 	function webhook:url(url)
 		embeds.url=url
 	end
 	function webhook:description(str)
-		embeds.description=str
+		if trim(str)~=""then
+			payload.embeds[1]=embeds
+			embeds.description=str
+		end
 	end
 	function webhook:desc(str)
 		embeds.description=str
@@ -75,22 +82,32 @@ function connector:connect(api)
 		embeds.fields={}
 	end
 	function webhook:addField(title,text,inline)
+		payload.embeds[1]=embeds
 		table.insert(embeds.fields,{
-			["name"]=title,
-			["value"]=text,
+			["name"]=title or"",
+			["value"]=text or"",
 			["inline"]=inline or false
 		})
 	end
 	function webhook:thumbnail(url)
-		embeds.thumbnail.url=url
+		if trim(url)~=""then
+			payload.embeds[1]=embeds
+			embeds.thumbnail.url=url
+		end
 	end
 	function webhook:image(url)
-		embeds.image.url=url
-	end
-	function webhook:setFooter(str,url)
-		embeds.footer.text=str
 		if trim(url)~=""then
-			embeds.footer.url=url
+			payload.embeds[1]=embeds
+			embeds.image.url=url
+		end
+	end
+	function webhook:footer(str,url)
+		if trim(str)~=""then
+			payload.embeds[1]=embeds
+			embeds.footer.text=str
+			if trim(url)~=""then
+				embeds.footer.url=url
+			end
 		end
 	end
 	function webhook:username(str)
