@@ -48,7 +48,12 @@ local cd={
 	evf=true,
 	click=true,
 	spamsundial=true,
-	fastcatch=true
+	webhook=true
+}
+local webhookOpt={
+	enabled=false,
+	sendInterval=300,
+	url=""
 }
 local rates={
 	money=0,
@@ -215,6 +220,7 @@ if not workspace:FindFirstChild"platform"then
 	p.CFrame=CFrame.new(0,0,0)
 end
 local platform=workspace:FindFirstChild"platform"
+local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/refs/heads/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
 local UI=GUI:CreateWindow("0x3b5 Internal Edition","v1.1")
 function notify(t,m,d)
@@ -240,9 +246,16 @@ end
 function tpOnPart(pt,t)
 	local p=pt.Position
 	local h=t and pt.Size.Y/2 or 0
-	local top=t and pt.Size.Y/2+5 or -pt.Size.Y/3
+	local top=t and pt.Size.Y/2+5 or pt.Size.Y/5
 	platform.CFrame=CFrame.new(p.X,p.Y+top-3,p.Z)
 	hrp.CFrame=CFrame.new(p.X,p.Y+top,p.Z)
+end
+function removeVelocity()
+	pcall(function()
+		hrp.AssemblyAngularVelocity=Vector3.new(0,0,0)
+		hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
+		hrp.Velocity=Vector3.new(0,0,0)
+	end)
 end
 function unequip()
 	for k,v in pairs(chr:GetChildren())do
@@ -282,6 +295,7 @@ function useTotem(name)
 		equipRod()
 	else
 		local pos=hrp.CFrame
+		removeVelocity()
 		hrp.Anchored=true
 		pauseFishing=true
 		task.wait(.1)
@@ -296,7 +310,8 @@ function useTotem(name)
 			end
 		end
 		tpTo(name)
-		task.wait(1)
+		removeVelocity()
+		task.wait(.2)
 		totems[name].db=true
 		while true do
 			cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
@@ -314,7 +329,6 @@ function useTotem(name)
 		hrp.Anchored=false
 	end
 end
-
 binds.main=game:GetService"RunService".Stepped:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
@@ -359,8 +373,8 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 					mouse(0,0,0)
 				else
 					rod.events.cast:FireServer(1)
+					task.wait(.35)
 				end
-				task.wait(.1)
 			end
 		end
 		cd.cast=true
@@ -373,18 +387,10 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		mouse(x,y,0,btn)
 	end
 	if togs.instacatch and plrGui:FindFirstChild"reel"then
+		local rod=getRod()
 		if plrGui.reel.bar.playerbar.Transparency==0 then
 			rsEvs["reelfinished "]:FireServer(100,math.random(0,100)~=0)
-		end
-		local rod=getRod()
-		if rod then
-			if rod.values.bite.Value and cd.fastcatch then
-				cd.fastcatch=false
-				unequip()
-				equipRod()
-				task.wait(1.925)
-				cd.fastcatch=true
-			end
+			rod.events.reset:FireServer()
 		end
 	end
 	if togs.appraise and cd.appraise then
@@ -476,7 +482,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			local v=events[i]
 			if v[2]>0 then
 				local efv=nil
-				for _,fz in pairs(fzs[v[1] ])do
+				for _,fz in pairs(fzs[v[1]])do
 					if fishingZones:FindFirstChild(fz)then
 						efv=fz
 						break
@@ -487,6 +493,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 					if fp then
 						he=true
 						hum:SetStateEnabled(4,false)
+						removeVelocity()
 						tpOnPart(fp,v[3])
 						break
 					end
@@ -520,6 +527,21 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		mouse(0,0,0)
 		task.wait(vals.acspeed)
 		cd.click=true
+	end
+	if webhookOpt.enabled and cd.webhook and webhookOpt.url~=""then
+		cd.webhook=false
+		if DateTime.now():ToLocalTime().Minute==0 then
+			local w=WHC:connect(webhookOpt.url)
+			w:title("Hourly Report")
+			w:author("0x3b5","","https://media.discordapp.net/attachments/1320467041752449116/1332649895445790761/101_20250125105259.png")
+			w:addField("Money",formatNum(math.ceil(pstat.coins.Value)).."C$ ("..formatNum(rates.money).."/hr)",true)
+			w:addField("Level",pstat.level.Value.." ("..formatNum(rates.xp).." XP/hr)",true)
+			w:send()
+			task.wait(70)
+		else
+			task.wait(5)
+		end
+		cd.webhook=true
 	end
 end)
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
@@ -566,6 +588,7 @@ binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 						task.wait(.25)
 						for _,c in pairs(pad.Spawns:GetChildren())do
 							hrp.CFrame=c.CFrame
+							removeVelocity()
 							cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
 							press(101)
 							task.wait(.25)
@@ -598,6 +621,12 @@ binds.cycle=rsWorld.cycle.Changed:Connect(function()
 	end
 	task.wait(.1)
 	cd.spamsundial=true
+end)
+binds.reel=plrGui.ChildAdded:Connect(function(v)
+	if v.Name=="reel"and togs.instacatch then
+		task.wait(4)
+		v:Destroy()
+	end
 end)
 binds.weather=rsWorld.weather.Changed:Connect(function()
 	local v=rsWorld.weather.Value
@@ -738,8 +767,22 @@ ATotem.addToggle("Kraken",togs.sundialkraken,function(v)
 		cd.spamsundial=true
 	end
 end)
+Stats.addButton("Reset",function()
+	vals.money=pstat.coins.Value
+	vals.xp=pstat.xp.Value
+	startTime=os.time()
+	rates.money=0
+	rates.xp=0
+end)
 Stats.addLabel("Money","0/hr","Left")
 Stats.addLabel("XP","0/hr","Left")
+Webhook.addLabel("This webhook serves as an hourly report")
+Webhook.addTextBox("Url",webhookOpt.url,function(v)
+	webhookOpt.url=v
+end)
+Webhook.addToggle("Enable Webhook",webhookOpt.enabled,function(v)
+	webhookOpt.enabled=v
+end)
 Local.addToggle("Disable Temperature",togs.temp,function(v)
 	togs.temp=v
 end)
