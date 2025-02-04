@@ -183,7 +183,7 @@
 --		:rename()
 --		Button
 --			methods
-local Version=323
+local Version=324
 local destroyButton=false
 local destroyCallback=function()end
 local UIS=game:GetService"UserInputService"
@@ -410,7 +410,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 		PageLayout.Parent=Home
 		PageLayout.HorizontalAlignment=Enum.HorizontalAlignment.Center
 		PageLayout.SortOrder=Enum.SortOrder.LayoutOrder
-		PageLayout.Padding=UDim.new(0,elementspacing or 6)
+		PageLayout.Padding=UDim.new(0,elementspacing or 1)
 		Tab.MouseButton1Down:Connect(function()
 			Tab.TextSize=9
 			for i,v in pairs(PageFolder:GetChildren())do

@@ -52,6 +52,7 @@ local cd={
 }
 local webhookOpt={
 	enabled=false,
+	test=false,
 	sendInterval=300,
 	url=""
 }
@@ -182,7 +183,7 @@ local appraiseSettings={
 		["Silver"]=false,
 		["Translucent"]=false
 	},
-	attributes={["Big"]=false,["Giant"]=false,["Shiny"]=false,["Sparkling"]=false}
+	attributes={Big=false,Giant=false,Shiny=false,Sparkling=false}
 }
 local events={
 	{"Shark Hunt",0,false},
@@ -201,15 +202,13 @@ local fzs={
 	["Orcas"]={"Orcas Pool","Ancient Orcas Pool"}
 }
 local sunkenLocs={
-	["moosewood"]={{936,130,-159},{693,130,-362},{613,130,498},{285,130,564},{283,130,-159}},
-	["roslit"]={{-1179,130,565},{-1217,130,201},{-1967,130,980},{-2444,130,266},{-2444,130,-37}},
-	["sunstone"]={{-852,130,-1560},{-1000,130,-751},{-1500,130,-750},{-1547,130,-1080},{-1618,130,-1560}},
-	["terrapin"]={{798,130,1667},{562,130,2455},{393,130,2435},{-1,130,1632},{-190,130,2450}},
-	["mushgrove"]={{2890,130,-997},{2729,130,-1098},{2410,130,-1110},{2266,130,-721}},
-	["forsaken"]={{-2460,130,2047}}
+	moosewood={{936,130,-159},{693,130,-362},{613,130,498},{285,130,564},{283,130,-159}},
+	roslit={{-1179,130,565},{-1217,130,201},{-1967,130,980},{-2444,130,266},{-2444,130,-37}},
+	sunstone={{-852,130,-1560},{-1000,130,-751},{-1500,130,-750},{-1547,130,-1080},{-1618,130,-1560}},
+	terrapin={{798,130,1667},{562,130,2455},{393,130,2435},{-1,130,1632},{-190,130,2450}},
+	mushgrove={{2890,130,-997},{2729,130,-1098},{2410,130,-1110},{2266,130,-721}},
+	forsaken={{-2460,130,2047}}
 }
-lt.FogEnd=1e4
-lt.FogStart=0
 if not workspace:FindFirstChild"platform"then
 	local p=Instance.new"Part"
 	p.Name="platform"
@@ -286,7 +285,6 @@ function useTotem(name)
 	local totem=plr.Backpack:FindFirstChild(name)
 	if totem then
 		repeat task.wait()until not plrGui:FindFirstChild"reel"
-		print("use")
 		equipBP(totem)
 		task.wait(.5)
 		mouse(0,0,1)
@@ -350,6 +348,8 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			lt.underwaterbl.Enabled=false
 			lt.underwatercc.Enabled=false
 			lt.atmos.Density=0
+			lt.FogEnd=1e4
+			lt.FogStart=0
 		end
 		if togs.swim and chr.Head:FindFirstChild"ui"then
 			chr.Head.ui:Destroy()
@@ -518,7 +518,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			use=true
 		end
 		if use then
-			useTotem("Sundial Totem")
+			useTotem"Sundial Totem"
 		end
 	end
 	if togs.click and cd.click then
@@ -528,16 +528,21 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		task.wait(vals.acspeed)
 		cd.click=true
 	end
-	if webhookOpt.enabled and cd.webhook and webhookOpt.url~=""then
+	if(webhookOpt.enabled or webhookOpt.test)and cd.webhook and webhookOpt.url~=""then
 		cd.webhook=false
-		if DateTime.now():ToLocalTime().Minute==0 then
+		if DateTime.now():ToLocalTime().Minute==0 or webhookOpt.test then
 			local w=WHC:connect(webhookOpt.url)
-			w:title("Hourly Report")
-			w:author("0x3b5","","https://media.discordapp.net/attachments/1320467041752449116/1332649895445790761/101_20250125105259.png")
+			w:title"Hourly Report"
+			w:author("0x3b5","https://discord.gg/Fh5rmgg27X","https://media.discordapp.net/attachments/1320467041752449116/1332649895445790761/101_20250125105259.png")
 			w:addField("Money",formatNum(math.ceil(pstat.coins.Value)).."C$ ("..formatNum(rates.money).."/hr)",true)
 			w:addField("Level",pstat.level.Value.." ("..formatNum(rates.xp).." XP/hr)",true)
 			w:send()
-			task.wait(70)
+			if webhookOpt.test then
+				task.wait(1)
+			else
+				task.wait(70)
+			end
+			webhookOpt.test=false
 		else
 			task.wait(5)
 		end
@@ -610,13 +615,13 @@ binds.cycle=rsWorld.cycle.Changed:Connect(function()
 	task.wait(.1)
 	if not usingTotem and totems["Sundial Totem"].use then
 		if totems["Sundial Totem"].during==v or totems["Sundial Totem"].during=="Always"then
-			useTotem("Sundial Totem")
+			useTotem"Sundial Totem"
 		end
 	end
 	if v=="Night"then
 		task.wait(.4)
 		if not usingTotem and not auroraActive and totems["Aurora Totem"].use then
-			useTotem("Aurora Totem")
+			useTotem"Aurora Totem"
 		end
 	end
 	task.wait(.1)
@@ -632,25 +637,25 @@ binds.weather=rsWorld.weather.Changed:Connect(function()
 	local v=rsWorld.weather.Value
 	auroraActive=v=="Aurora_Borealis"
 end)
-binds.money=pstat.coins:GetPropertyChangedSignal("Value"):Connect(function()
+binds.money=pstat.coins:GetPropertyChangedSignal"Value":Connect(function()
 	local c=pstat.coins.Value-vals.money
 	local t=os.time()-startTime
 	rates.money=math.round(3600/t*c)
 end)
-binds.xp=pstat.xp:GetPropertyChangedSignal("Value"):Connect(function()
+binds.xp=pstat.xp:GetPropertyChangedSignal"Value":Connect(function()
 	local c=pstat.xp.Value-vals.xp
 	if c<0 then return end
 	local t=os.time()-startTime
 	rates.xp=math.round(3600/t*c)
 end)
-local Main=UI:addPage("Main",3,true,1)
-local EvFarm=UI:addPage("Event Farming",3,false,1)
-local Waypoints=UI:addPage("Locations",3,false,1)
-local Appraisal=UI:addPage("Appraise",4,false,1)
-local ATotem=UI:addPage("Totems",4,false,1)
-local Stats=UI:addPage("Stats",4,false,1)
-local Webhook=UI:addPage("Webhook",4,false,1)
-local Local=UI:addPage("Local Player",3,false,1)
+local Main=UI:addPage("Main",2,true)
+local EvFarm=UI:addPage("Event Farming",2)
+local Waypoints=UI:addPage("Locations",1)
+local Appraisal=UI:addPage("Appraise",4)
+local ATotem=UI:addPage("Totems",2)
+local Stats=UI:addPage("Stats",1)
+local Webhook=UI:addPage("Webhook",1)
+local Local=UI:addPage("Local Player",2)
 Main.addToggle("Auto Cast",togs.cast,function(v)
 	togs.cast=v
 	if v then
@@ -729,13 +734,13 @@ Appraisal.addToggle("Appraise",togs.appraise,function(v)
 	togs.appraise=v
 end)
 Appraisal.addLabel("Auto-appraise stops when detecting any of the selected","Will run indefinitely when none selected")
-Appraisal.addLabel("Attributes")
+Appraisal.addLabel"Attributes"
 for k,v in pairs(appraiseSettings.attributes)do
 	Appraisal.addToggle(k,v,function(b)
 		appraiseSettings.attributes[k]=b
 	end)
 end
-Appraisal.addLabel("Mutations")
+Appraisal.addLabel"Mutations"
 for k,v in pairs(appraiseSettings.mutations)do
 	Appraisal.addToggle(k,v,function(b)
 		appraiseSettings.mutations[k]=b
@@ -782,6 +787,11 @@ Webhook.addTextBox("Url",webhookOpt.url,function(v)
 end)
 Webhook.addToggle("Enable Webhook",webhookOpt.enabled,function(v)
 	webhookOpt.enabled=v
+end)
+Webhook.addButton("Test Webhook",function()
+	if not webhookOpt.test then
+		webhookOpt.test=true
+	end
 end)
 Local.addToggle("Disable Temperature",togs.temp,function(v)
 	togs.temp=v
