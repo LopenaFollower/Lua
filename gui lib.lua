@@ -183,7 +183,7 @@
 --		:rename()
 --		Button
 --			methods
-local Version=322
+local Version=323
 local destroyButton=false
 local destroyCallback=function()end
 local UIS=game:GetService"UserInputService"
@@ -221,7 +221,6 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 	Gui.ZIndexBehavior=1
 	Gui.ResetOnSpawn=false
 	Frame.Parent=Gui
-	Frame.Active=true
 	Frame.BackgroundColor3=toRGB(0x141414)
 	Frame.BorderColor3=toRGB(0x141414)
 	Frame.BorderSizePixel=0
@@ -814,6 +813,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			TextBox.Text=textboxdefault or""
 			TextBox.TextColor3=toRGB(0xFFFFFF)
 			TextBox.ClearTextOnFocus=false
+			TextBox.TextWrapped=true
 			TextBox.TextSize=9
 			TextBoxCorner.CornerRadius=UDim.new(0,5)
 			TextBoxCorner.Name="TextBoxCorner"
