@@ -226,6 +226,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 	Frame.BorderSizePixel=0
 	Frame.Position=UDim2.new(.289808273,0,.313227266,0)
 	Frame.Size=UDim2.new(0,432,0,285)
+	Frame.Active=true
 	FrameCorner.Name="FrameCorner"
 	FrameCorner.Parent=Frame
 	DashBoard.Name="DashBoard"
@@ -239,7 +240,6 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 	DashBoardCorner.Parent=DashBoard
 	TabContainer.Name="TabContainer"
 	TabContainer.Parent=DashBoard
-	TabContainer.Active=true
 	TabContainer.BackgroundColor3=toRGB(0xF0F0F)
 	TabContainer.BackgroundTransparency=1
 	TabContainer.BorderColor3=toRGB(0xF0F0F)
@@ -396,7 +396,6 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 		TabCorner.Parent=Tab
 		Home.Name="Page"
 		Home.Parent=PageFolder
-		Home.Active=true
 		Home.BackgroundColor3=toRGB(0xF0F0F)
 		Home.BackgroundTransparency=1
 		Home.BorderColor3=toRGB(0xF0F0F)
