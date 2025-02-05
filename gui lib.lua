@@ -183,7 +183,7 @@
 --		:rename()
 --		Button
 --			methods
-local Version=324
+local Version=325
 local destroyButton=false
 local destroyCallback=function()end
 local UIS=game:GetService"UserInputService"

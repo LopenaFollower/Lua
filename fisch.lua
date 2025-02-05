@@ -392,17 +392,6 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		mouse(x,y,1,btn)
 		mouse(x,y,0,btn)
 	end
-	if togs.autocatch and plrGui:FindFirstChild"reel"and cd.catch then
-		cd.catch=false
-		if plrGui.reel.bar.playerbar.Transparency==0 then
-			task.wait(vals.catch)
-			repeat
-				rsEvs["reelfinished "]:FireServer(100,true)
-				task.wait(.1)
-			until not plrGui:FindFirstChild"reel"
-		end
-		cd.catch=true
-	end
 	if togs.appraise and cd.appraise then
 		cd.appraise=false
 		if appraiseSettings.slot then
@@ -642,8 +631,14 @@ binds.cycle=rsWorld.cycle.Changed:Connect(function()
 end)
 binds.reel=plrGui.ChildAdded:Connect(function(v)
 	if v.Name=="reel"and togs.autocatch then
-		task.wait(vals.catch+4)
-		v:Destroy()
+		local wt=os.time()
+		repeat
+			v.bar.playerbar.Size=UDim2.new(1,0,1.3,0)
+			task.wait()
+			if os.time()>=wt+vals.catch then
+				rsEvs["reelfinished "]:FireServer(100,true)
+			end
+		until not plrGui:FindFirstChild"reel"
 	end
 end)
 binds.weather=rsWorld.weather.Changed:Connect(function()
@@ -684,7 +679,7 @@ end)
 Main.addToggle("Auto Catch",togs.autocatch,function(v)
 	togs.autocatch=v
 end)
-Main.addSlider("Catch Delay",0,30,vals.catch,function(v)
+Main.addSlider("Catch Delay",0,30,function(v)
 	vals.catch=v
 end)
 Main.addToggle("Auto Sell",togs.sell,function(v)
