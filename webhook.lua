@@ -1,7 +1,7 @@
 local req=(syn and syn.request)or(http and http.request)or http_request or(fluxus and fluxus.request)or request
 local connector={}
 function trim(s)
-	return(s or""):match"^%s*(.*%S)"
+	return(tostring(s)or""):match"^%s*(.*%S)"
 end
 function connector:connect(api)
 	local webhook,embeds,payload={},{

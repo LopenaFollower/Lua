@@ -22,7 +22,7 @@ local togs={
 	cast=false,
 	lcst=false,
 	shake=true,
-	instacatch=true,
+	autocatch=true,
 	appraise=false,
 	luck=false,
 	sell=false,
@@ -40,6 +40,7 @@ local togs={
 }
 local cd={
 	cast=true,
+	catch=true,
 	appraise=true,
 	luck=true,
 	sell=true,
@@ -64,6 +65,7 @@ local vals={
 	tpws=5,
 	anchor=nil,
 	acspeed=.1,
+	catch=0,
 	money=pstat.coins.Value,
 	xp=pstat.xp.Value
 }
@@ -373,7 +375,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 					mouse(0,0,0)
 				else
 					rod.events.cast:FireServer(1)
-					task.wait(.35)
+					task.wait(.3)
 				end
 			end
 		end
@@ -386,11 +388,18 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		mouse(x,y,1,btn)
 		mouse(x,y,0,btn)
 	end
-	if togs.instacatch and plrGui:FindFirstChild"reel"then
-		local rod=getRod()
+	if togs.autocatch and plrGui:FindFirstChild"reel"and cd.catch then
+		cd.catch=false
 		if plrGui.reel.bar.playerbar.Transparency==0 then
-			rsEvs["reelfinished "]:FireServer(100,math.random(0,100)~=0)
-			rod.events.reset:FireServer()
+			cd.catch=false
+			task.wait(vals.catch)
+			repeat
+				rsEvs["reelfinished "]:FireServer(100,math.random(0,100)~=0)
+				task.wait(.05)
+			until not plrGui:FindFirstChild"reel"
+			cd.catch=true
+		else
+			cd.catch=true
 		end
 	end
 	if togs.appraise and cd.appraise then
@@ -530,12 +539,14 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	end
 	if(webhookOpt.enabled or webhookOpt.test)and cd.webhook and webhookOpt.url~=""then
 		cd.webhook=false
-		if DateTime.now():ToLocalTime().Minute==0 or webhookOpt.test then
+		local lt=DateTime.now():ToLocalTime()
+		if lt.Minute==0 or webhookOpt.test then
 			local w=WHC:connect(webhookOpt.url)
 			w:title"Hourly Report"
 			w:author("0x3b5","https://discord.gg/Fh5rmgg27X","https://media.discordapp.net/attachments/1320467041752449116/1332649895445790761/101_20250125105259.png")
 			w:addField("Money",formatNum(math.ceil(pstat.coins.Value)).."C$ ("..formatNum(rates.money).."/hr)",true)
-			w:addField("Level",pstat.level.Value.." ("..formatNum(rates.xp).." XP/hr)",true)
+			w:addField("Level",formatNum(pstat.level.Value).." ("..formatNum(rates.xp).." XP/hr)",true)
+			w:timestamp()
 			w:send()
 			if webhookOpt.test then
 				task.wait(1)
@@ -580,7 +591,7 @@ binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 			if l:find(k)then
 				for _,p in pairs(v)do
 					hrp.CFrame=CFrame.new(unpack(p))
-					task.wait(2)
+					task.wait(1.2)
 					local pad=workspace.ActiveChestsFolder:FindFirstChild"Pad"
 					if pad and pad:FindFirstChild"Spawns"then
 						for _,v in pairs(pad:GetDescendants())do
@@ -590,16 +601,16 @@ binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 								v.MaxActivationDistance=1000
 							end
 						end
-						task.wait(.25)
+						task.wait(.2)
 						for _,c in pairs(pad.Spawns:GetChildren())do
 							hrp.CFrame=c.CFrame
 							removeVelocity()
 							cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
-							press(101)
-							task.wait(.25)
-							press(101)
-							task.wait(.25)
-							press(101)
+							for i=0,5 do
+								press(101)
+								press(111)
+								task.wait(.125)
+							end
 						end
 						sunkenActive=false
 						break
@@ -628,8 +639,8 @@ binds.cycle=rsWorld.cycle.Changed:Connect(function()
 	cd.spamsundial=true
 end)
 binds.reel=plrGui.ChildAdded:Connect(function(v)
-	if v.Name=="reel"and togs.instacatch then
-		task.wait(4)
+	if v.Name=="reel"and togs.autocatch then
+		task.wait(vals.catch+4)
 		v:Destroy()
 	end
 end)
@@ -668,8 +679,11 @@ end)
 Main.addToggle("Auto Shake",togs.shake,function(v)
 	togs.shake=v
 end)
-Main.addToggle("Insta Catch",togs.instacatch,function(v)
-	togs.instacatch=v
+Main.addToggle("Auto Catch",togs.autocatch,function(v)
+	togs.autocatch=v
+end)
+Main.addSlider("Catch Delay",0,30,vals.catch,function(v)
+	vals.catch=v
 end)
 Main.addToggle("Auto Sell",togs.sell,function(v)
 	togs.sell=v
@@ -751,7 +765,7 @@ for k,o in pairs(totems)do
 		o.use=v
 	end)
 	ATotem.addSlider("Buy Amount",1,10,function(v)
-		o.buyAmount=tonumber(v)
+		o.buyAmount=v
 	end)
 	if o.during~=nil then
 		ATotem.addDropdown("Use during",{"Day","Night","Always"},nil,function(v)
