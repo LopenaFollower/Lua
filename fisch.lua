@@ -17,6 +17,7 @@ local cam=workspace.CurrentCamera
 local auroraActive,sunkenActive
 local pauseFishing=false
 local startTime=os.time()
+local sessionStart=os.time()
 local binds={}
 local togs={
 	cast=false,
@@ -231,6 +232,9 @@ function notify(t,m,d)
 		Duration=d or 1;
 	})
 end
+function toHMS(s)
+	return string.format("%02i:%02i:%02i",s/3600,s/60%60,s%60)
+end
 function formatNum(n)
 	return tostring(math.floor(n)):reverse():gsub("(%d%d%d)","%1,"):gsub(",(%-?)$","%1"):reverse()
 end
@@ -391,16 +395,13 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	if togs.autocatch and plrGui:FindFirstChild"reel"and cd.catch then
 		cd.catch=false
 		if plrGui.reel.bar.playerbar.Transparency==0 then
-			cd.catch=false
 			task.wait(vals.catch)
 			repeat
-				rsEvs["reelfinished "]:FireServer(100,math.random(0,100)~=0)
-				task.wait(.05)
+				rsEvs["reelfinished "]:FireServer(100,true)
+				task.wait(.1)
 			until not plrGui:FindFirstChild"reel"
-			cd.catch=true
-		else
-			cd.catch=true
 		end
+		cd.catch=true
 	end
 	if togs.appraise and cd.appraise then
 		cd.appraise=false
@@ -546,6 +547,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			w:author("0x3b5","https://discord.gg/Fh5rmgg27X","https://media.discordapp.net/attachments/1320467041752449116/1332649895445790761/101_20250125105259.png")
 			w:addField("Money",formatNum(math.ceil(pstat.coins.Value)).."C$ ("..formatNum(rates.money).."/hr)",true)
 			w:addField("Level",formatNum(pstat.level.Value).." ("..formatNum(rates.xp).." XP/hr)",true)
+			w:footer("Uptime: "..toHMS(os.time()-sessionStart))
 			w:timestamp()
 			w:send()
 			if webhookOpt.test then

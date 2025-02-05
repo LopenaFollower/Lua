@@ -778,33 +778,33 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			return Page[pagename][slidername]
 		end
 		Page[pagename].addTextBox=function(textboxname,textboxdefault,callback)
-			local TextBoxHolder=Instance.new"Frame"
-			local TextBoxTitle=Instance.new"TextLabel"
+			local Holder=Instance.new"Frame"
+			local Title=Instance.new"TextLabel"
 			local TextBox=Instance.new"TextBox"
-			local TextBoxCorner=Instance.new"UICorner"
-			local TextBoxHolderCorner=Instance.new"UICorner"
+			local Corner=Instance.new"UICorner"
+			local HolderCorner=Instance.new"UICorner"
 			local callback=callback or function()end
-			TextBoxHolder.Name="TextBoxHolder"
-			TextBoxHolder.Parent=Home
-			TextBoxHolder.BackgroundColor3=toRGB(0x111111)
-			TextBoxHolder.BorderColor3=toRGB(0x111010)
-			TextBoxHolder.BorderSizePixel=0
-			TextBoxHolder.Position=UDim2.new(.0167785231,0,0,0)
-			TextBoxHolder.Size=UDim2.new(0,288,0,26)
-			TextBoxTitle.Name="TextBoxTitle"
-			TextBoxTitle.Parent=TextBoxHolder
-			TextBoxTitle.BackgroundColor3=toRGB(0x111111)
-			TextBoxTitle.BackgroundTransparency=1
-			TextBoxTitle.BorderColor3=toRGB(0x111111)
-			TextBoxTitle.BorderSizePixel=0
-			TextBoxTitle.Position=UDim2.new(.024305556,0,.07692308,0)
-			TextBoxTitle.Size=UDim2.new(0,195,0,21)
-			TextBoxTitle.Font=Enum.Font.GothamSemibold
-			TextBoxTitle.Text=textboxname
-			TextBoxTitle.TextColor3=toRGB(0xFFFFFF)
-			TextBoxTitle.TextSize=11
-			TextBoxTitle.TextXAlignment=Enum.TextXAlignment.Left
-			TextBox.Parent=TextBoxHolder
+			Holder.Name="TextBoxHolder"
+			Holder.Parent=Home
+			Holder.BackgroundColor3=toRGB(0x111111)
+			Holder.BorderColor3=toRGB(0x111010)
+			Holder.BorderSizePixel=0
+			Holder.Position=UDim2.new(.0167785231,0,0,0)
+			Holder.Size=UDim2.new(0,288,0,26)
+			Title.Name="TextBoxTitle"
+			Title.Parent=Holder
+			Title.BackgroundColor3=toRGB(0x111111)
+			Title.BackgroundTransparency=1
+			Title.BorderColor3=toRGB(0x111111)
+			Title.BorderSizePixel=0
+			Title.Position=UDim2.new(.024305556,0,.07692308,0)
+			Title.Size=UDim2.new(0,195,0,21)
+			Title.Font=Enum.Font.GothamSemibold
+			Title.Text=textboxname
+			Title.TextColor3=toRGB(0xFFFFFF)
+			Title.TextSize=11
+			Title.TextXAlignment=Enum.TextXAlignment.Left
+			TextBox.Parent=Holder
 			TextBox.BackgroundColor3=toRGB(0x50505)
 			TextBox.Position=UDim2.new(.725694418,0,.115384623,0)
 			TextBox.Size=UDim2.new(0,72,0,20)
@@ -814,25 +814,25 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			TextBox.ClearTextOnFocus=false
 			TextBox.TextWrapped=true
 			TextBox.TextSize=9
-			TextBoxCorner.CornerRadius=UDim.new(0,5)
-			TextBoxCorner.Name="TextBoxCorner"
-			TextBoxCorner.Parent=TextBox
-			TextBoxHolderCorner.CornerRadius=UDim.new(0,5)
-			TextBoxHolderCorner.Name="TextBoxHolderCorner"
-			TextBoxHolderCorner.Parent=TextBoxHolder
+			Corner.CornerRadius=UDim.new(0,5)
+			Corner.Name="TextBoxCorner"
+			Corner.Parent=TextBox
+			HolderCorner.CornerRadius=UDim.new(0,5)
+			HolderCorner.Name="TextBoxHolderCorner"
+			HolderCorner.Parent=Holder
 			TextBox.Focused:Connect(function()
-				TextBoxHolder.BackgroundColor3=toRGB(0xA0A0A)
+				Holder.BackgroundColor3=toRGB(0xA0A0A)
 			end)
 			TextBox.FocusLost:Connect(function()
-				TextBoxHolder.BackgroundColor3=toRGB(0x111111)
+				Holder.BackgroundColor3=toRGB(0x111111)
 				pcall(callback,TextBox.Text)
 			end)
 			Page[pagename][textboxname]={}
 			Page[pagename][textboxname].remove=function()
-				TextBoxHolder:Destroy()
+				Holder:Destroy()
 			end
 			Page[pagename][textboxname].setText=function(t)
-				TextBoxTitle.Text=tostring(t)or""
+				Title.Text=tostring(t)or""
 			end
 			Page[pagename][textboxname].setValue=function(t)
 				TextBox.Text=t
