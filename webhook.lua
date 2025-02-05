@@ -91,6 +91,9 @@ function connector:connect(api)
 			embeds.footer.url=trim(u)
 		end
 	end
+	function webhook:timestamp()
+		embeds.timestamp=DateTime.now():ToIsoDate()
+	end
 	function webhook:username(s)
 		payload.username=s
 	end
