@@ -466,7 +466,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 					if v.line1.TextColor3.r==1 then
 						if not chr:FindFirstChild(goal)and plr.Backpack:FindFirstChild(goal)then
 							equipBP(plr.Backpack[goal])
-						else
+						elseif not chr:FindFirstChild(getRod().Name)then
 							equipRod()
 						end
 					end
