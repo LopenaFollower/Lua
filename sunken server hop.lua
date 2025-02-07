@@ -46,7 +46,9 @@ function hop()
 		local body=hs:JSONDecode(res.Body)
 		if body and body.data then
 			for i,v in next,body.data do
-				if type(v)=="table"and tonumber(v.playing)and tonumber(v.maxPlayers)and v.playing+1<v.maxPlayers and v.id~=game.JobId then
+				local p=tonumber(v.playing)
+				local m=tonumber(v.maxPlayers)
+				if type(v)=="table"and p and m and p+1<m and v.id~=game.JobId then
 					table.insert(servers,1,v.id)
 				end
 			end
@@ -54,7 +56,7 @@ function hop()
 		if #servers>0 then
 			ts:TeleportToPlaceInstance(PID,servers[math.random(1,#servers)],plr)
 		end
-		task.wait(2)
+		task.wait(3)
 		hop()
 	end
 end
