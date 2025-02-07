@@ -37,7 +37,8 @@ local togs={
 	oxyg=true,
 	swim=false,
 	fb=false,
-	sunkenchest=false
+	sunkenchest=false,
+	enchant=false
 }
 local cd={
 	cast=true,
@@ -55,7 +56,6 @@ local cd={
 local webhookOpt={
 	enabled=false,
 	test=false,
-	sendInterval=300,
 	url=""
 }
 local rates={
@@ -68,7 +68,13 @@ local vals={
 	acspeed=.1,
 	catch=0,
 	money=pstat.coins.Value,
-	xp=pstat.xp.Value
+	xp=pstat.xp.Value,
+	enchant="none"
+}
+local purchase={
+	["Bait Crate"]={v=false,a=1},
+	["Quality Bait Crate"]={v=false,a=1},
+	["Coral Geode"]={v=false,a=1}
 }
 local totems={
 	["Sundial Totem"]={
@@ -82,6 +88,14 @@ local totems={
 		buyAmount=1,
 		db=false
 	}
+}
+local events={
+	{"Shark Hunt",0,false},
+	{"Megalodon",0,false},
+	{"Depth Serpent",0,false},
+	{"Isonade",0,true},
+	{"Kraken",0,false},
+	{"Orcas",0,false}
 }
 local wps={
 	areas1={
@@ -167,34 +181,26 @@ local coords={
 local appraiseSettings={
 	slot=nil,
 	mutations={
-		["Abyssal"]=false,
-		["Albino"]=false,
-		["Amber"]=false,
-		["Darkened"]=false,
-		["Electric"]=false,
-		["Fossilized"]=false,
-		["Frozen"]=false,
-		["Glossy"]=false,
-		["Greedy"]=false,
-		["Hexed"]=false,
-		["Lunar"]=false,
-		["Midas"]=false,
-		["Mosaic"]=false,
-		["Mythical"]=false,
-		["Negative"]=false,
-		["Scorched"]=false,
-		["Silver"]=false,
-		["Translucent"]=false
+		Abyssal=false,
+		Albino=false,
+		Amber=false,
+		Darkened=false,
+		Electric=false,
+		Fossilized=false,
+		Frozen=false,
+		Glossy=false,
+		Greedy=false,
+		Hexed=false,
+		Lunar=false,
+		Midas=false,
+		Mosaic=false,
+		Mythical=false,
+		Negative=false,
+		Scorched=false,
+		Silver=false,
+		Translucent=false
 	},
 	attributes={Big=false,Giant=false,Shiny=false,Sparkling=false}
-}
-local events={
-	{"Shark Hunt",0,false},
-	{"Megalodon",0,false},
-	{"Depth Serpent",0,false},
-	{"Isonade",0,true},
-	{"Kraken",0,false},
-	{"Orcas",0,false}
 }
 local fzs={
 	["Shark Hunt"]={"Whale Shark","Great White Shark","Great Hammerhead Shark"},
@@ -212,17 +218,18 @@ local sunkenLocs={
 	mushgrove={{2890,130,-997},{2729,130,-1098},{2410,130,-1110},{2266,130,-721}},
 	forsaken={{-2460,130,2047}}
 }
+local enchants={"Abyssal","Blessed","Breezed","Clever","Controlled","Divine","Ghastly","Hasty","Herculean","Insight","Long","Lucky","Mutated","Noir","Quality","Resilient","Scrapper","Sea King","Steady","Storming","Swift","Unbreakable","Wormhole"}
 if not workspace:FindFirstChild"platform"then
 	local p=Instance.new"Part"
 	p.Name="platform"
 	p.Parent=workspace
-	p.Transparency=.5
+	p.Transparency=.75
 	p.Size=Vector3.new(2,.1,2)
 	p.Anchored=true
 	p.CFrame=CFrame.new(0,0,0)
 end
 local platform=workspace:FindFirstChild"platform"
-local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/refs/heads/main/webhook.lua")()
+local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
 local UI=GUI:CreateWindow("0x3b5 Internal Edition","v1.1")
 function notify(t,m,d)
@@ -251,19 +258,19 @@ end
 function tpOnPart(pt,t)
 	local p=pt.Position
 	local h=t and pt.Size.Y/2 or 0
-	local top=t and pt.Size.Y/2+5 or pt.Size.Y/5
+	local top=t and pt.Size.Y/2+5 or pt.Size.Y/4
 	platform.CFrame=CFrame.new(p.X,p.Y+top-3,p.Z)
 	hrp.CFrame=CFrame.new(p.X,p.Y+top,p.Z)
 end
 function removeVelocity()
 	pcall(function()
-		hrp.AssemblyAngularVelocity=Vector3.new(0,0,0)
-		hrp.AssemblyLinearVelocity=Vector3.new(0,0,0)
-		hrp.Velocity=Vector3.new(0,0,0)
+		hrp.AssemblyAngularVelocity=Vector3.zero
+		hrp.AssemblyLinearVelocity=Vector3.zero
+		hrp.Velocity=Vector3.zero
 	end)
 end
 function unequip()
-	for k,v in pairs(chr:GetChildren())do
+	for _,v in pairs(chr:GetChildren())do
 		if v:IsA"Tool"then
 			v.Parent=plr.Backpack
 		end
@@ -292,18 +299,18 @@ function useTotem(name)
 	if totem then
 		repeat task.wait()until not plrGui:FindFirstChild"reel"
 		equipBP(totem)
-		task.wait(.5)
+		task.wait(.25)
 		mouse(0,0,1)
 		mouse(0,0,0)
 		task.wait(.4)
 		equipRod()
 	else
+		if totems[name].buyAmount==0 then return end
 		local pos=hrp.CFrame
-		removeVelocity()
-		hrp.Anchored=true
 		pauseFishing=true
 		task.wait(.1)
 		while task.wait()do
+			removeVelocity()
 			if not plrGui:FindFirstChild"reel"and not plrGui:FindFirstChild"shakeui"then
 				task.wait(.05)
 				local rod=chr:FindFirstChildOfClass"Tool"
@@ -315,22 +322,20 @@ function useTotem(name)
 		end
 		tpTo(name)
 		removeVelocity()
-		task.wait(.2)
 		totems[name].db=true
-		while true do
+		task.wait(.5)
+		while totems[name].db do
+			tpTo(name)
+			removeVelocity()
+			totems[name].db=true
 			cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
 			press(101)
-			task.wait(1.5)
-			if plr.Backpack:FindFirstChild(name)then
-				break
-			end
+			task.wait(1)
 		end
-		totems[name].db=false
 		task.wait(.1)
 		useTotem(name)
 		hrp.CFrame=pos
 		pauseFishing=false
-		hrp.Anchored=false
 	end
 end
 binds.main=game:GetService"RunService".Stepped:Connect(function()
@@ -360,7 +365,10 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		if togs.swim and chr.Head:FindFirstChild"ui"then
 			chr.Head.ui:Destroy()
 		end
-		workspace.world.interactables["Enchant Altar"].ProximityPrompt.HoldDuration=0
+		local ea=workspace.world.interactables:FindFirstChild"Enchant Altar"
+		if ea then
+			ea.ProximityPrompt.HoldDuration=0
+		end
 		plr.Passdown:Destroy()
 	end)
 	if togs.tpw and chr and hum then
@@ -491,9 +499,10 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 					local fp=fishingZones:FindFirstChild(efv)
 					if fp then
 						he=true
-						hum:SetStateEnabled(4,false)
 						removeVelocity()
+						hum:SetStateEnabled(4,false)
 						tpOnPart(fp,v[3])
+						hum:ChangeState"Running"
 						break
 					end
 				end
@@ -501,6 +510,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		end
 		if not he then
 			hum:SetStateEnabled(4,not togs.swim)
+			hrp.Anchored=false
 			if vals.anchor then
 				hrp.CFrame=vals.anchor
 				task.wait(.1)
@@ -558,17 +568,20 @@ binds.jump=game.UserInputService.JumpRequest:Connect(function()
 end)
 binds.over=plrGui.over.ChildAdded:Connect(function(p)
 	if p.Name=="prompt"and p:FindFirstChild"question"then
+		local q=p.question
 		for k,v in pairs(totems)do
-			local q=p.question
 			if q.Text:find(k)and v.db then
-				plrGui.over.prompt.amount.Text=v.buyAmount
-				press(92)
-				task.wait(.01)
-				press(115)
-				task.wait(.02)
-				press(13)
-				task.wait(.01)
-				press(92)
+				p.Position=UDim2.new(0.15,0,0,0)
+				p.amount.Text=v.buyAmount
+				repeat
+					press(92)
+					press(97)
+					task.wait()
+					press(13)
+				until not plrGui.over:FindFirstChild"prompt"
+				mouse(0,0,1)
+				mouse(0,0,0)
+				v.db=false
 			end
 		end
 	end
@@ -587,9 +600,9 @@ binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 					if pad and pad:FindFirstChild"Spawns"then
 						for _,v in pairs(pad:GetDescendants())do
 							if v:IsA"ProximityPrompt"then
+								v.MaxActivationDistance=1000
 								v.RequiresLineOfSight=false
 								v.HoldDuration=0
-								v.MaxActivationDistance=1000
 							end
 						end
 						task.wait(.2)
@@ -599,8 +612,8 @@ binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 							cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
 							for i=0,5 do
 								press(101)
-								press(111)
 								task.wait(.125)
+								press(111)
 							end
 						end
 						sunkenActive=false
@@ -657,18 +670,16 @@ binds.xp=pstat.xp:GetPropertyChangedSignal"Value":Connect(function()
 	rates.xp=math.round(3600/t*c)
 end)
 local Main=UI:addPage("Main",2,true)
-local EvFarm=UI:addPage("Event Farming",2)
 local Waypoints=UI:addPage("Locations",1)
+local EvFarm=UI:addPage("Event Farming",2)
 local Appraisal=UI:addPage("Appraise",4)
+local Enchant=UI:addPage("Enhant",1)
 local ATotem=UI:addPage("Totems",2)
 local Stats=UI:addPage("Stats",1)
 local Webhook=UI:addPage("Webhook",1)
 local Local=UI:addPage("Local Player",2)
 Main.addToggle("Auto Cast",togs.cast,function(v)
 	togs.cast=v
-	if v then
-		cd.cast=true
-	end
 end)
 Main.addToggle("Legit Cast",togs.lcst,function(v)
 	togs.lcst=v
@@ -681,7 +692,7 @@ Main.addToggle("Auto Catch",togs.autocatch,function(v)
 end)
 Main.addSlider("Catch Delay",0,30,function(v)
 	vals.catch=v
-end)
+end).setValue(vals.catch)
 Main.addToggle("Auto Sell",togs.sell,function(v)
 	togs.sell=v
 end)
@@ -700,9 +711,13 @@ end)
 Waypoints.addDropdown("Atlantis",wps.atlantis,nil,function(v)
 	tpTo(v)
 end)
+EvFarm.addToggle("Sunken Treasure",togs.sunkenchest,function(v)
+	togs.sunkenchest=v
+end)
 EvFarm.addLabel("Set the farming priority for each event","Set to -1 to excluded, priority ordered from 0 up to "..(#events-1))
 EvFarm.addToggle("Start Farm",togs.evf,function(v)
 	togs.evf=v
+	hrp.Anchored=false
 end)
 for _,v in pairs(events)do
 	EvFarm.addSlider(v[1],-1,#events-1,function(n)
@@ -712,14 +727,11 @@ for _,v in pairs(events)do
 			end
 		end
 		table.sort(events,function(a,b)return a[2]<b[2]end)
-	end)
+	end).setValue(v[2]-1)
 end
 EvFarm.addLabel("Select a location to farm while there are no events.","Just stand and face at the spot you wish to tp.")
 EvFarm.addButton("Set Anchor",function()
 	vals.anchor=hrp.CFrame
-end)
-EvFarm.addToggle("Sunken Treasure",togs.sunkenchest,function(v)
-	togs.sunkenchest=v
 end)
 Appraisal.addLabel("Equip the item you wish to appraise.","Ensure that it stays at the same hotbar slot.")
 Appraisal.addToggle("Appraise",togs.appraise,function(v)
@@ -757,19 +769,41 @@ for k,v in pairs(appraiseSettings.mutations)do
 		appraiseSettings.mutations[k]=b
 	end)
 end
+Enchant.addToggle("Auto enchant",togs.enchant,function(v)
+	togs.enchant=v
+	if v and rsWorld.cycle.Value=="Night"then
+		repeat
+			tpTo"Keepers Altar"
+			equipBP(plr.Backpack["Enchant Relic"])
+			task.wait(.1)
+			repeat
+				press(101)
+				task.wait()
+			until plrGui.over:FindFirstChild"prompt"or not togs.enchant or rsWorld.cycle.Value=="Day"or pstat.Parent.Rods[getRod().Name].Value==vals.enchant	
+			press(92)
+			press(115)
+			press(13)
+		until pstat.Parent.Rods[getRod().Name].Value==vals.enchant or not togs.enchant or rsWorld.cycle.Value=="Day"
+		mouse(0,0,1)
+		mouse(0,0,0)
+	end
+end)
+Enchant.addDropdown("Enchant",enchants,nil,function(v)
+	vals.enchant=v
+end)
 for k,o in pairs(totems)do
 	ATotem.addToggle("Auto use "..k,o.use,function(v)
 		o.use=v
 	end)
-	ATotem.addSlider("Buy Amount",1,10,function(v)
+	ATotem.addSlider("Buy Amount",0,10,function(v)
 		o.buyAmount=v
-	end)
+	end).setValue(o.buyAmount)
 	if o.during~=nil then
 		ATotem.addDropdown("Use during",{"Day","Night","Always"},nil,function(v)
 			o.during=v
 		end)
 	end
-	ATotem.addLabel("")
+	ATotem.addLabel""
 end
 ATotem.addToggle("Megalodon",togs.sundialmeg,function(v)
 	togs.sundialmeg=v
@@ -792,7 +826,7 @@ Stats.addButton("Reset",function()
 end)
 Stats.addLabel("Money","0/hr","Left")
 Stats.addLabel("XP","0/hr","Left")
-Webhook.addLabel("This webhook serves as an hourly report")
+Webhook.addLabel"This webhook serves as an hourly report"
 Webhook.addTextBox("Url",webhookOpt.url,function(v)
 	webhookOpt.url=v
 end)
@@ -813,6 +847,7 @@ end)
 Local.addToggle("No Swim",togs.swim,function(v)
 	togs.swim=v
 	hum:SetStateEnabled(4,not togs.swim)
+	hum:ChangeState"Running"
 end)
 Local.addToggle("Invis Cam",togs.invcam,function(v)
 	togs.invcam=v
@@ -830,8 +865,7 @@ Local.addToggle("TP Walk",togs.tpw,function(v)
 end)
 Local.addSlider("TPWalk Speed",0,150,function(v)
 	vals.tpws=v
-end)
-UI["Local Player"]["TPWalk Speed"].setValue(vals.tpws)
+end).setValue(vals.tpws)
 Local.addToggle("Auto Click",togs.click,function(v)
 	togs.click=v
 end)
