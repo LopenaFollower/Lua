@@ -48,7 +48,7 @@ function hop()
 			for i,v in next,body.data do
 				local p=tonumber(v.playing)
 				local m=tonumber(v.maxPlayers)
-				if type(v)=="table"and p and m and p+1<m and v.id~=game.JobId then
+				if type(v)=="table"and p and m and p<m and v.id~=game.JobId then
 					table.insert(servers,1,v.id)
 				end
 			end
