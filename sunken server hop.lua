@@ -94,14 +94,14 @@ function searchChests(l)
 							task.wait(.15)
 						end
 					end
-					task.wait(3)
-					hop()
 					break
 				end
 			end
 			task.wait(1.67)
 		end
 	end
+	task.wait(3)
+	hop()
 end
 
 plr.DevCameraOcclusionMode=Enum.DevCameraOcclusionMode.Invisicam
