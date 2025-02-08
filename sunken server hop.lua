@@ -1,7 +1,7 @@
 local PID=game.PlaceId
 if PID~=16732694052 then return else repeat task.wait()until game:IsLoaded()and game.Players.LocalPlayer end
 task.wait(1)
-local waitTimeThreshold,y=5,125
+local waitTimeThreshold,y=7,125
 local qtp=(syn and syn.queue_on_teleport)or queue_on_teleport or(fluxus and fluxus.queue_on_teleport)
 qtp("loadstring(game:HttpGet'https://raw.githubusercontent.com/LopenaFollower/Lua/main/sunken%20server%20hop.lua')()")
 
