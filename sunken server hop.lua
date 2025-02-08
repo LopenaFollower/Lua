@@ -1,8 +1,7 @@
 local PID=game.PlaceId
 if PID~=16732694052 then return else repeat task.wait()until game:IsLoaded()and game.Players.LocalPlayer end
 task.wait(1)
-local waitTimeThreshold=5
-local y=125
+local waitTimeThreshold,y=5,125
 local qtp=(syn and syn.queue_on_teleport)or queue_on_teleport or(fluxus and fluxus.queue_on_teleport)
 qtp("loadstring(game:HttpGet'https://raw.githubusercontent.com/LopenaFollower/Lua/main/sunken%20server%20hop.lua')()")
 
@@ -41,13 +40,11 @@ end
 function hop()
 	if req then
 		warn"Server hopping..."
-		local servers={}
-		local res=req({Url=string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true",PID)})
+		local servers,res={},req({Url=string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true",PID)})
 		local body=hs:JSONDecode(res.Body)
 		if body and body.data then
 			for i,v in next,body.data do
-				local p=tonumber(v.playing)
-				local m=tonumber(v.maxPlayers)
+				local p,m=tonumber(v.playing),tonumber(v.maxPlayers)
 				if type(v)=="table"and p and m and p<m and v.id~=game.JobId then
 					table.insert(servers,1,v.id)
 				end
@@ -56,7 +53,7 @@ function hop()
 		if #servers>0 then
 			ts:TeleportToPlaceInstance(PID,servers[math.random(1,#servers)],plr)
 		end
-		task.wait(3)
+		task.wait(2)
 		hop()
 	end
 end
@@ -102,7 +99,7 @@ function searchChests(l)
 					break
 				end
 			end
-			task.wait(1.7)
+			task.wait(1.67)
 		end
 	end
 end
