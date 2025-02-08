@@ -97,7 +97,8 @@ local events={
 	{"Isonade",0,true},
 	{"Kraken",0,false},
 	{"Orcas",0,false},
-	{"Ancient Orcas",0,false}
+	{"Ancient Orcas",0,false},
+	{"Lovestorm",0,false}
 }
 local wps={
 	areas1={
@@ -211,7 +212,8 @@ local fzs={
 	["Kraken"]={"The Kraken Pool"},
 	["Isonade"]={"Isonade"},
 	["Orcas"]={"Orcas Pool"},
-	["Ancient Orcas"]={"Ancient Orcas Pool"}
+	["Ancient Orcas"]={"Ancient Orcas Pool"},
+	["Lovestorm"]={"Lovestorm Eel"}
 }
 local sunkenLocs={
 	moosewood={{936,130,-159},{693,130,-362},{613,130,498},{285,130,564},{283,130,-159}},
@@ -369,8 +371,8 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			lt.FogEnd=1e4
 			lt.FogStart=0
 		end
-		if togs.swim and chr.Head:FindFirstChild"ui"then
-			chr.Head.ui:Destroy()
+		if chr.Head:FindFirstChild"ui"then
+			--chr.Head.ui:Destroy()
 		end
 		local ea=workspace.world.interactables:FindFirstChild"Enchant Altar"
 		if ea then
