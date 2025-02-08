@@ -349,6 +349,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		chr.temperature.Disabled=togs.temp
 		chr.oxygen.Disabled=togs.oxyg
 		chr["oxygen(peaks)"].Disabled=togs.oxyg
+		UI.Stats.Uptime.setInfo(toHMS(os.time()-sessionStart))
 		UI.Stats.Money.setInfo(formatNum(rates.money).."/hr")
 		UI.Stats.XP.setInfo(formatNum(rates.xp).."/hr")
 		if togs.fb then
@@ -850,6 +851,7 @@ Stats.addButton("Reset",function()
 	rates.money=0
 	rates.xp=0
 end)
+Stats.addLabel("Uptime","0:00:00","Left")
 Stats.addLabel("Money","0/hr","Left")
 Stats.addLabel("XP","0/hr","Left")
 Webhook.addLabel"This webhook serves as an hourly report"
