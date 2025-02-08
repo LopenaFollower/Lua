@@ -38,7 +38,8 @@ local togs={
 	swim=false,
 	fb=false,
 	sunkenchest=false,
-	enchant=false
+	enchant=false,
+	reducelag=false
 }
 local cd={
 	cast=true,
@@ -231,7 +232,7 @@ end
 local platform=workspace:FindFirstChild"platform"
 local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("0x3b5 Internal Edition","v1.1")
+local UI=GUI:CreateWindow("0x3b5 Internal Edition","v1.2")
 function notify(t,m,d)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=t or"";
@@ -378,16 +379,16 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	end
 	if togs.cast and cd.cast and not pauseFishing then
 		cd.cast=false
-		local rod=chr:FindFirstChildOfClass"Tool"
-		if rod and rod:FindFirstChild"events"then
+		local rod=getRod()
+		if rod then
 			if not rod.values.casted.Value then
 				if togs.lcst then
 					mouse(0,0,1)
-					task.wait(.45)
+					task.wait(.4)
 					mouse(0,0,0)
 				else
 					rod.events.cast:FireServer(1)
-					task.wait(.3)
+					task.wait(.25)
 				end
 			end
 		end
@@ -586,6 +587,30 @@ binds.over=plrGui.over.ChildAdded:Connect(function(p)
 		end
 	end
 end)
+binds.chr=chr.DescendantAdded:Connect(function(v)
+	if togs.reducelag then
+		if v:IsA"Model"and v.Name~="Stoke"and v.Parent.Name=="bobber"then
+			task.wait()
+			v:Destroy()
+		end
+	end
+end)
+binds.active=workspace.active.ChildAdded:Connect(function(v)
+	if togs.reducelag then
+		if v:IsA"Model"or(v:IsA"Part"and v.Name=="splash")then
+			task.wait()
+			v:Destroy()
+		end
+	end
+end)
+binds.grandReef=workspace.world.map["Grand Reef"].DescendantAdded:Connect(function(v)
+	if togs.reducelag then
+		if v:IsA"Model"and(v.Name=="Barrel"or v.Name=="Fence"or v.Name=="Curve")or v:IsA"Folder"and(v.Name=="Coral"or v.Name=="Seaweed")or v:IsA"ParticleEmitter"then
+			task.wait()
+			v:Destroy()
+		end
+	end
+end)
 binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 	local l=a:lower()
 	if l:find"sunken treasure"and togs.sunkenchest then
@@ -673,7 +698,7 @@ local Main=UI:addPage("Main",2,true)
 local Waypoints=UI:addPage("Locations",1)
 local EvFarm=UI:addPage("Event Farming",2)
 local Appraisal=UI:addPage("Appraise",4)
-local Enchant=UI:addPage("Enhant",1)
+local Enchant=UI:addPage("Enchant",1)
 local ATotem=UI:addPage("Totems",2)
 local Stats=UI:addPage("Stats",1)
 local Webhook=UI:addPage("Webhook",1)
@@ -719,7 +744,7 @@ EvFarm.addToggle("Start Farm",togs.evf,function(v)
 	togs.evf=v
 	hrp.Anchored=false
 end)
-for _,v in pairs(events)do
+for _,v in pairs({unpack(events)})do
 	EvFarm.addSlider(v[1],-1,#events-1,function(n)
 		for k,j in pairs(events)do
 			if j[1]==v[1]then
@@ -786,6 +811,7 @@ Enchant.addToggle("Auto enchant",togs.enchant,function(v)
 		until pstat.Parent.Rods[getRod().Name].Value==vals.enchant or not togs.enchant or rsWorld.cycle.Value=="Day"
 		mouse(0,0,1)
 		mouse(0,0,0)
+		UI.Enchant["Auto enchant"].setStatus(false)
 	end
 end)
 Enchant.addDropdown("Enchant",enchants,nil,function(v)
@@ -856,6 +882,9 @@ Local.addToggle("Invis Cam",togs.invcam,function(v)
 end)
 Local.addToggle("Fullbright/No blur",togs.fb,function(v)
 	togs.fb=v
+end)
+Local.addToggle("Reduce Lag",togs.reducelag,function(v)
+	togs.reducelag=v
 end)
 Local.addToggle("Inf Jump",togs.infj,function(v)
 	togs.infj=v
