@@ -844,6 +844,7 @@ ATotem.addToggle("Kraken",togs.sundialkraken,function(v)
 		cd.spamsundial=true
 	end
 end)
+Stats.addLabel("Uptime","0:00:00","Left")
 Stats.addButton("Reset",function()
 	vals.money=pstat.coins.Value
 	vals.xp=pstat.xp.Value
@@ -851,7 +852,6 @@ Stats.addButton("Reset",function()
 	rates.money=0
 	rates.xp=0
 end)
-Stats.addLabel("Uptime","0:00:00","Left")
 Stats.addLabel("Money","0/hr","Left")
 Stats.addLabel("XP","0/hr","Left")
 Webhook.addLabel"This webhook serves as an hourly report"
