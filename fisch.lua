@@ -96,7 +96,8 @@ local events={
 	{"Depth Serpent",0,false},
 	{"Isonade",0,true},
 	{"Kraken",0,false},
-	{"Orcas",0,false}
+	{"Orcas",0,false},
+	{"Ancient Orcas",0,false}
 }
 local wps={
 	areas1={
@@ -209,8 +210,8 @@ local fzs={
 	["Depth Serpent"]={"The Depths - Serpent"},
 	["Kraken"]={"The Kraken Pool"},
 	["Isonade"]={"Isonade"},
-	["Orcas"]={"Orcas Pool","Ancient Orcas Pool"}
-}
+	["Orcas"]={"Orcas Pool"},
+	["Ancient Orcas"]={"Ancient Orcas Pool"}
 local sunkenLocs={
 	moosewood={{936,130,-159},{693,130,-362},{613,130,498},{285,130,564},{283,130,-159}},
 	roslit={{-1179,130,565},{-1217,130,201},{-1967,130,980},{-2444,130,266},{-2444,130,-37}},
