@@ -212,6 +212,7 @@ local fzs={
 	["Isonade"]={"Isonade"},
 	["Orcas"]={"Orcas Pool"},
 	["Ancient Orcas"]={"Ancient Orcas Pool"}
+}
 local sunkenLocs={
 	moosewood={{936,130,-159},{693,130,-362},{613,130,498},{285,130,564},{283,130,-159}},
 	roslit={{-1179,130,565},{-1217,130,201},{-1967,130,980},{-2444,130,266},{-2444,130,-37}},
