@@ -116,8 +116,12 @@ if waitTime>waitTimeThreshold and waitTime<=60 then
 end
 if waitTime>60 then
 	print"Chest may have not yet despawned, checking"
+	searchChests"All"
+	task.wait(3)
+	hop()
+else
+	searchChests"All"
 end
-searchChests"All"
 rs.events.anno_top.OnClientEvent:Connect(function(a)
 	if a:lower():find"sunken treasure"then
 		task.wait(.1)
