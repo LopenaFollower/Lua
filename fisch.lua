@@ -213,7 +213,7 @@ local fzs={
 	["Isonade"]={"Isonade"},
 	["Orcas"]={"Orcas Pool"},
 	["Ancient Orcas"]={"Ancient Orcas Pool"},
-	["Lovestorm"]={"Lovestorm Eel"}
+	["Lovestorm"]={"Lovestorm Eel","Lovestorm Eel Supercharged"}
 }
 local sunkenLocs={
 	moosewood={{936,130,-159},{693,130,-362},{613,130,498},{285,130,564},{283,130,-159}},
@@ -370,9 +370,6 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			lt.atmos.Density=0
 			lt.FogEnd=1e4
 			lt.FogStart=0
-		end
-		if chr.Head:FindFirstChild"ui"then
-			--chr.Head.ui:Destroy()
 		end
 		local ea=workspace.world.interactables:FindFirstChild"Enchant Altar"
 		if ea then
@@ -602,6 +599,9 @@ binds.chr=chr.DescendantAdded:Connect(function(v)
 			v:Destroy()
 		end
 	end
+	if v.Name=="ui"and v.Parent==chr.Head then
+		v.Enabled=false
+	end
 end)
 binds.active=workspace.active.ChildAdded:Connect(function(v)
 	if togs.reducelag then
@@ -701,6 +701,16 @@ binds.xp=pstat.xp:GetPropertyChangedSignal"Value":Connect(function()
 	if c<0 then return end
 	local t=os.time()-startTime
 	rates.xp=math.round(3600/t*c)
+end)
+local blacklist={"Trusted","Content Creator","Tester","Contributor","Tester 2","Tester 2","Analytics","Trial Mod","Moderator","Senior Mod","Admin","Developer","Lead","Creator","Holder"}
+binds.plrs=game.Players.PlayerAdded:Connect(function(v)
+	local role=v:GetRoleInGroup(7381705)
+	for i,v in pairs(blacklist)do
+		if v==role then
+			plr:Kick"Staff detected"
+			break
+		end
+	end
 end)
 local Main=UI:addPage("Main",2,true)
 local Waypoints=UI:addPage("Locations",1)
