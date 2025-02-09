@@ -68,6 +68,7 @@ local vals={
 	anchor=nil,
 	acspeed=.1,
 	catch=0,
+	perfect=100,
 	money=pstat.coins.Value,
 	xp=pstat.xp.Value,
 	enchant="none"
@@ -385,7 +386,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	if togs.cast and cd.cast and not pauseFishing then
 		cd.cast=false
 		local rod=getRod()
-		if rod then
+		if rod and rod:FindFirstChild"values"then
 			if not rod.values.casted.Value then
 				if togs.lcst then
 					mouse(0,0,1)
@@ -442,7 +443,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 				end)
 			end
 		end
-		task.wait(.01)
+		task.wait(.5)
 		cd.appraise=true
 	end
 	if togs.luck and cd.luck then
@@ -682,7 +683,7 @@ binds.reel=plrGui.ChildAdded:Connect(function(v)
 			v.bar.playerbar.Size=UDim2.new(1,0,1.3,0)
 			task.wait()
 			if os.time()>=wt+vals.catch then
-				rsEvs["reelfinished "]:FireServer(100,true)
+				rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
 			end
 		until not plrGui:FindFirstChild"reel"
 	end
@@ -733,9 +734,12 @@ end)
 Main.addToggle("Auto Catch",togs.autocatch,function(v)
 	togs.autocatch=v
 end)
-Main.addSlider("Catch Delay",0,30,function(v)
+Main.addSlider("Catch Delay",{min=0,max=30,default=vals.catch},function(v)
 	vals.catch=v
-end).setValue(vals.catch)
+end)
+Main.addSlider("Perfect Catch rate",{min=0,max=100,default=vals.perfect},function(v)
+	vals.perfect=v
+end)
 Main.addToggle("Auto Sell",togs.sell,function(v)
 	togs.sell=v
 end)
@@ -762,15 +766,15 @@ EvFarm.addToggle("Start Farm",togs.evf,function(v)
 	togs.evf=v
 	hrp.Anchored=false
 end)
-for _,v in pairs({unpack(events)})do
-	EvFarm.addSlider(v[1],-1,#events-1,function(n)
+for _,v in pairs(events)do
+	EvFarm.addSlider(v[1],{min=-1,max=#events-1,default=v[2]-1},function(n)
 		for k,j in pairs(events)do
 			if j[1]==v[1]then
 				events[k][2]=n+1
 			end
 		end
 		table.sort(events,function(a,b)return a[2]<b[2]end)
-	end).setValue(v[2]-1)
+	end)
 end
 EvFarm.addLabel("Select a location to farm while there are no events.","Just stand and face at the spot you wish to tp.")
 EvFarm.addButton("Set Anchor",function()
@@ -839,9 +843,9 @@ for k,o in pairs(totems)do
 	ATotem.addToggle("Auto use "..k,o.use,function(v)
 		o.use=v
 	end)
-	ATotem.addSlider("Buy Amount",0,10,function(v)
+	ATotem.addSlider("Buy Amount",{min=0,max=10,default=o.buyAmount},function(v)
 		o.buyAmount=v
-	end).setValue(o.buyAmount)
+	end)
 	if o.during~=nil then
 		ATotem.addDropdown("Use during",{"Day","Night","Always"},nil,function(v)
 			o.during=v
@@ -911,9 +915,9 @@ end)
 Local.addToggle("TP Walk",togs.tpw,function(v)
 	togs.tpw=v
 end)
-Local.addSlider("TPWalk Speed",0,150,function(v)
+Local.addSlider("TPWalk Speed",{min=0,max=150,default=vals.tpws},function(v)
 	vals.tpws=v
-end).setValue(vals.tpws)
+end)
 Local.addToggle("Auto Click",togs.click,function(v)
 	togs.click=v
 end)

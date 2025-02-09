@@ -14,7 +14,7 @@
 --	print("toggle: "..v)
 --end)
 --
---Main:addSlider("Slider",0,100,function(v)
+--Main:addSlider("Slider",{min=0,max=100,default=30,decimals=1},function(v)
 --	print("slider value: "..v)
 --end)
 --
