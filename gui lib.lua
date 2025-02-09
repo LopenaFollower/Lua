@@ -1,136 +1,3 @@
---Credits to Bytes#0001
---Modified by github.com/lopenafollower
---Added features by me (github.com/lopenafollower):
--- * Fixed slider on mobile to detect release.
---
--- * Added a "removeGui" button.
---
--- * Converted TabContainer into a ScrollingFrame
---   to accommodate more pages.
---
--- * Added a "toggledefault" parameter for
---   toggles to set it's initial state.
---   Example: page:addToggle("ToggleName", true, callback)
---   -sets the toggle to be checked when the GUI is loaded.
---
--- * Added PageElement methods.
---
--- * Improved callback handling.
---
--- * Revised the default formats.
---
--- * General tidying up and organization.
---
---Documentation:
---Lib:CreateWindow(windowname,windowinfo,scrollsize)
--- * Creates a Window
--- Parameters:
--- * windowname (string)
--- * windowinfo (string)
--- * scrollsize (number)
---  - Total height of the ScrollingFrame
---
---Page:addPage(pagename,scrollsize,visible,elementspacing)
--- * Adds a Page to a window
--- Parameters:
--- * pagename (string)
--- * scrollsize (number)
---  - Total height of the ScrollingFrame
--- * visible (bool)
---  - Decides the initial page that will
---	be shown upon loading.
--- * elementspacing (number)
---  - The padding between elements.
---
--- Methods:
--- Page:rename(string)
---
---PageElements:addLabel(labelname,labelinfo)
--- * Creates a Label
--- Parameters:
--- * labelname (string)
--- * labelinfo (string)
---
--- Methods:
--- Label:remove()
--- Label:setTitle(string)
--- Label:setInfo(string)
---
---PageElements:addButton(buttonname,callback)
--- * Creates a Button
--- Parameters:
--- * buttonname (string)
--- * callback (function)
---
--- Methods:
--- Button:remove()
--- Button:setText(string)
--- Button:call()
---  - calls the function assigned to the button
---
---PageElements:addToggle(togglename,toggledefault,callback)
--- * Creates a Toggle
--- Parameters:
--- * togglename (string)
--- * toggledefault (bool)
---  - The initial state of the toggle.
--- * callback (function)
---
--- Methods:
--- Toggle:remove()
--- Toggle:setText(string)
--- Toggle:setStatus(boolean)
---
---PageElements:addSlider(slidername,minvalue,maxvalue,callback)
--- * Creates a Slider
--- Parameters:
--- * slidername (string)
--- * minvalue (number)
--- * maxvalue (number)
--- * callback (function)
---
--- Methods:
--- Slider:remove()
--- Slider:setText(string)
--- Slider:setMin(number)
---  - Updates the min value of the slider.
--- Slider:setMax(number)
---  - Updates the max value of the slider
--- Slider:setValue(number)
---
---PageElements:addTextBox(textboxname,textboxdefault,callback)
--- * Creates a Textbox
--- Parameters:
--- * textboxname (string)
--- * textboxdefault (string)
---  - The initial value of the textbox.
--- * callback (function)
---
--- Methods:
--- TextBox:remove()
--- TextBox:setText(string)
--- TextBox:setValue(string)
---
---PageElements:addDropdown(dropdownname,list,scrollsize,callback)
--- * Creates a Dropdown
--- Parameters:
--- * dropdownname (string)
--- * list (table)
--- * scrollsize (number)
---  - Total height of the ScrollingFrame
--- * callback (function)
---
--- Methods:
--- Dropdown:remove()
--- Dropdown:setText(string)
--- Dropdown:setList(list,scrollsize)
---
---PageElements:destroyGui(callback)
--- * Creates a Button
--- Parameters:
--- * callback (function)
---  - will fire the callback and destroy the gui
---
 --Example use:
 --local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
 --local UI=GUI:CreateWindow("Window","info")
@@ -163,43 +30,22 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
---
---Window
---	Main
---		:rename()
---		Label
---			methods
---		Button
---			methods
---		Toggle
---			methods
---		Slider
---			methods
---		TextBox
---			methods
---		Dropdown
---			methods
---	Tab2
---		:rename()
---		Button
---			methods
-local Version=325
-local destroyButton=false
-local destroyCallback=function()end
+local Version=326
+task.spawn(function()
+	print("Gui version: "..Version)
+	loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
+end)
 local UIS=game:GetService"UserInputService"
 local G=game.CoreGui:FindFirstChild"51e6b58a-772cd11d-27fc1803-22496d1a-43580b73"
 if G then
 	G.Running.Value=false
 end
-task.spawn(function()
-	print("Gui version: "..Version)
-	loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
-end)
 function toRGB(n)
 	return Color3.fromRGB(bit32.band(bit32.rshift(n,16),255),bit32.band(bit32.rshift(n,8),255),bit32.band(n,255))
 end
+local destroyButton,destroyCallback,guiFont=false,function()end,Enum.Font.GothamSemibold
 local Lib={}
-function Lib:CreateWindow(windowname,windowinfo,scrollsize)
+function Lib:CreateWindow(windowname,windowinfo)
 	local Gui=Instance.new"ScreenGui"
 	local Frame=Instance.new"Frame"
 	local FrameCorner=Instance.new"UICorner"
@@ -248,13 +94,13 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 	TabContainer.Size=UDim2.new(0,100,0,214)
 	TabContainer.ScrollBarThickness=3
 	TabContainer.ScrollBarImageColor3=toRGB(0x50505)
-	TabContainer.CanvasSize=UDim2.new(0,0,scrollsize or 1e3,0)
+	TabContainer.CanvasSize=UDim2.new(0,0,1,0)
 	TabContainer.Visible=true
 	TabContainerLayout.Name="TabContainer"
 	TabContainerLayout.Parent=TabContainer
 	TabContainerLayout.HorizontalAlignment=Enum.HorizontalAlignment.Center
 	TabContainerLayout.SortOrder=Enum.SortOrder.LayoutOrder
-	TabContainerLayout.Padding=UDim.new(0,5)
+	TabContainerLayout.Padding=UDim.new(0,4)
 	PageContainer.Name="PageContainer"
 	PageContainer.Parent=Frame
 	PageContainer.BackgroundColor3=toRGB(0xF0F0F)
@@ -274,7 +120,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 	Title.BorderSizePixel=0
 	Title.Position=UDim2.new(.0428240746,0,.028070176,0)
 	Title.Size=UDim2.new(0,355,0,33)
-	Title.Font=Enum.Font.GothamSemibold
+	Title.Font=guiFont
 	Title.Text=windowname
 	Title.TextColor3=toRGB(0xFFFFFF)
 	Title.TextSize=14
@@ -306,7 +152,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 	YepTitle.BorderSizePixel=0
 	YepTitle.Position=UDim2.new(1.57894742,0,-.318181813,0)
 	YepTitle.Size=UDim2.new(0,128,0,33)
-	YepTitle.Font=Enum.Font.GothamSemibold
+	YepTitle.Font=guiFont
 	YepTitle.Text=windowinfo or Version
 	YepTitle.TextColor3=toRGB(0xFFFFFF)
 	YepTitle.TextSize=9
@@ -386,7 +232,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 		Tab.Position=UDim2.new(-.025,0,0,0)
 		Tab.Size=UDim2.new(0,106,0,26)
 		Tab.AutoButtonColor=false
-		Tab.Font=Enum.Font.GothamSemibold
+		Tab.Font=guiFont
 		Tab.Text=pagename or"nil"
 		Tab.TextColor3=toRGB(0xFFFFFF)
 		Tab.TextSize=11
@@ -411,6 +257,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 		PageLayout.HorizontalAlignment=Enum.HorizontalAlignment.Center
 		PageLayout.SortOrder=Enum.SortOrder.LayoutOrder
 		PageLayout.Padding=UDim.new(0,elementspacing or 1)
+		TabContainer.CanvasSize=UDim2.new(0,0,#TabContainer:GetChildren()*.13164,0)
 		Tab.MouseButton1Down:Connect(function()
 			Tab.TextSize=9
 			for i,v in pairs(PageFolder:GetChildren())do
@@ -450,88 +297,88 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			end
 		end
 		Page[pagename].addLabel=function(labelname,labelinfo,align)
-			local LabelHolder=Instance.new"Frame"
-			local LabelHolderCorner=Instance.new"UICorner"
-			local LabelTitle=Instance.new"TextLabel"
-			local LabelInfo=Instance.new"TextLabel"
+			local Holder=Instance.new"Frame"
+			local HolderCorner=Instance.new"UICorner"
+			local Title=Instance.new"TextLabel"
+			local Info=Instance.new"TextLabel"
 			local align=align or"Center"
-			LabelHolder.Name="LabelHolder"
-			LabelHolder.Parent=Home
-			LabelHolder.BackgroundColor3=toRGB(0x111111)
-			LabelHolder.BorderColor3=toRGB(0x111111)
-			LabelHolder.BorderSizePixel=0
-			LabelHolder.Position=UDim2.new(.0167785231,0,0,0)
-			LabelHolder.Size=UDim2.new(0,288,0,26)
-			LabelHolderCorner.CornerRadius=UDim.new(0,5)
-			LabelHolderCorner.Name="LabelHolderCorner"
-			LabelHolderCorner.Parent=LabelHolder
-			LabelTitle.Name="LabelTitle"
-			LabelTitle.Parent=LabelHolder
-			LabelTitle.BackgroundColor3=toRGB(0x111111)
-			LabelTitle.BackgroundTransparency=1
-			LabelTitle.BorderColor3=toRGB(0x111111)
-			LabelTitle.BorderSizePixel=0
-			LabelTitle.Size=UDim2.new(0,288,0,15)
-			LabelTitle.Font=Enum.Font.GothamSemibold
-			LabelTitle.Text=labelname or""
-			LabelTitle.TextColor3=toRGB(0xFFFFFF)
-			LabelTitle.TextXAlignment=Enum.TextXAlignment[align]
-			LabelTitle.TextSize=11
-			LabelInfo.Name="LabelInfo"
-			LabelInfo.Parent=LabelHolder
-			LabelInfo.BackgroundColor3=toRGB(0x111111)
-			LabelInfo.BackgroundTransparency=1
-			LabelInfo.BorderColor3=toRGB(0x111111)
-			LabelInfo.BorderSizePixel=0
-			LabelInfo.Position=UDim2.new(0,0,.653846145,0)
-			LabelInfo.Size=UDim2.new(0,288,0,9)
-			LabelInfo.Font=Enum.Font.GothamSemibold
-			LabelInfo.Text=labelinfo or""
-			LabelInfo.TextColor3=toRGB(0xFFFFFF)
-			LabelInfo.TextXAlignment=Enum.TextXAlignment[align]
-			LabelInfo.TextSize=9
-			LabelInfo.TextTransparency=.3
+			Holder.Name="LabelHolder"
+			Holder.Parent=Home
+			Holder.BackgroundColor3=toRGB(0x111111)
+			Holder.BorderColor3=toRGB(0x111111)
+			Holder.BorderSizePixel=0
+			Holder.Position=UDim2.new(.0167785231,0,0,0)
+			Holder.Size=UDim2.new(0,288,0,26)
+			HolderCorner.CornerRadius=UDim.new(0,5)
+			HolderCorner.Name="LabelHolderCorner"
+			HolderCorner.Parent=Holder
+			Title.Name="LabelTitle"
+			Title.Parent=Holder
+			Title.BackgroundColor3=toRGB(0x111111)
+			Title.BackgroundTransparency=1
+			Title.BorderColor3=toRGB(0x111111)
+			Title.BorderSizePixel=0
+			Title.Size=UDim2.new(0,288,0,15)
+			Title.Font=guiFont
+			Title.Text=labelname or""
+			Title.TextColor3=toRGB(0xFFFFFF)
+			Title.TextXAlignment=Enum.TextXAlignment[align]
+			Title.TextSize=11
+			Info.Name="LabelInfo"
+			Info.Parent=Holder
+			Info.BackgroundColor3=toRGB(0x111111)
+			Info.BackgroundTransparency=1
+			Info.BorderColor3=toRGB(0x111111)
+			Info.BorderSizePixel=0
+			Info.Position=UDim2.new(0,0,.653846145,0)
+			Info.Size=UDim2.new(0,288,0,9)
+			Info.Font=guiFont
+			Info.Text=labelinfo or""
+			Info.TextColor3=toRGB(0xFFFFFF)
+			Info.TextXAlignment=Enum.TextXAlignment[align]
+			Info.TextSize=9
+			Info.TextTransparency=.3
 			Page[pagename][labelname]={}
 			Page[pagename][labelname].remove=function()
-				LabelHolder:Destroy()
+				Holder:Destroy()
 			end
 			Page[pagename][labelname].setTitle=function(t)
-				LabelTitle.Text=tostring(t)or""
+				Title.Text=tostring(t)or""
 			end
 			Page[pagename][labelname].setInfo=function(t)
-				LabelInfo.Text=tostring(t)or""
+				Info.Text=tostring(t)or""
 			end
 			return Page[pagename][labelname]
 		end
 		Page[pagename].addButton=function(buttonname,callback)
-			local ButtonHolder=Instance.new"Frame"
-			local ButtonTitle=Instance.new"TextLabel"
+			local Holder=Instance.new"Frame"
+			local Title=Instance.new"TextLabel"
 			local Button=Instance.new"TextButton"
-			local ButtonCorner=Instance.new"UICorner"
-			local ButtonHolderCorner=Instance.new"UICorner"
+			local Corner=Instance.new"UICorner"
+			local HolderCorner=Instance.new"UICorner"
 			local callback=callback or function()end
-			ButtonHolder.Name="ButtonHolder"
-			ButtonHolder.Parent=Home
-			ButtonHolder.BackgroundColor3=toRGB(0x111111)
-			ButtonHolder.BorderColor3=toRGB(0x111111)
-			ButtonHolder.BorderSizePixel=0
-			ButtonHolder.Position=UDim2.new(.0167785231,0,0,0)
-			ButtonHolder.Size=UDim2.new(0,288,0,26)
-			ButtonTitle.Name="ButtonTitle"
-			ButtonTitle.Parent=ButtonHolder
-			ButtonTitle.BackgroundColor3=toRGB(0x111111)
-			ButtonTitle.BackgroundTransparency=1
-			ButtonTitle.BorderColor3=toRGB(0x111111)
-			ButtonTitle.BorderSizePixel=0
-			ButtonTitle.Position=UDim2.new(.024305556,0,0,0)
-			ButtonTitle.Size=UDim2.new(0,195,0,24)
-			ButtonTitle.Font=Enum.Font.GothamSemibold
-			ButtonTitle.Text=buttonname or""
-			ButtonTitle.TextColor3=toRGB(0xFFFFFF)
-			ButtonTitle.TextSize=11
-			ButtonTitle.TextXAlignment=Enum.TextXAlignment.Left
+			Holder.Name="ButtonHolder"
+			Holder.Parent=Home
+			Holder.BackgroundColor3=toRGB(0x111111)
+			Holder.BorderColor3=toRGB(0x111111)
+			Holder.BorderSizePixel=0
+			Holder.Position=UDim2.new(.0167785231,0,0,0)
+			Holder.Size=UDim2.new(0,288,0,26)
+			Title.Name="ButtonTitle"
+			Title.Parent=Holder
+			Title.BackgroundColor3=toRGB(0x111111)
+			Title.BackgroundTransparency=1
+			Title.BorderColor3=toRGB(0x111111)
+			Title.BorderSizePixel=0
+			Title.Position=UDim2.new(.024305556,0,0,0)
+			Title.Size=UDim2.new(0,195,0,24)
+			Title.Font=guiFont
+			Title.Text=buttonname or""
+			Title.TextColor3=toRGB(0xFFFFFF)
+			Title.TextSize=11
+			Title.TextXAlignment=Enum.TextXAlignment.Left
 			Button.Name="Button"
-			Button.Parent=ButtonHolder
+			Button.Parent=Holder
 			Button.BackgroundColor3=toRGB(0x50505)
 			Button.BackgroundTransparency=0
 			Button.BorderColor3=toRGB(0x111111)
@@ -542,11 +389,11 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			Button.Text="btn"
 			Button.TextColor3=toRGB(0xFFFFFF)
 			Button.TextSize=14
-			ButtonCorner.Name="ButtonCorner"
-			ButtonCorner.Parent=Button
-			ButtonHolderCorner.CornerRadius=UDim.new(0,5)
-			ButtonHolderCorner.Name="ButtonHolderCorner"
-			ButtonHolderCorner.Parent=ButtonHolder
+			Corner.Name="ButtonCorner"
+			Corner.Parent=Button
+			HolderCorner.CornerRadius=UDim.new(0,5)
+			HolderCorner.Name="ButtonHolderCorner"
+			HolderCorner.Parent=Holder
 			Button.MouseButton1Down:Connect(function()
 				Button.TextSize=11
 				task.wait(.1)
@@ -555,7 +402,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			end)
 			Page[pagename][buttonname]={}
 			Page[pagename][buttonname].remove=function()
-				ButtonHolder:Destroy()
+				Holder:Destroy()
 			end
 			Page[pagename][buttonname].setText=function(t)
 				Button.Text=tostring(t)or""
@@ -566,92 +413,92 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			return Page[pagename][buttonname]
 		end
 		Page[pagename].addToggle=function(togglename,toggledefault,callback)
-			local ToggleHolder=Instance.new"Frame"
-			local ToggleHolderCorner=Instance.new"UICorner"
-			local ToggleTitle=Instance.new"TextLabel"
-			local ToggleButton=Instance.new"TextButton"
-			local ToggleFrame=Instance.new"Frame"
-			local ToggleFrameCorner=Instance.new"UICorner"
-			local ToggleBall=Instance.new"Frame"
-			local ToggleBallCorner=Instance.new"UICorner"
+			local Holder=Instance.new"Frame"
+			local HolderCorner=Instance.new"UICorner"
+			local Title=Instance.new"TextLabel"
+			local Button=Instance.new"TextButton"
+			local Frame=Instance.new"Frame"
+			local FrameCorner=Instance.new"UICorner"
+			local Ball=Instance.new"Frame"
+			local BallCorner=Instance.new"UICorner"
 			local callback=callback or function()end
-			local ToggleEnabled=toggledefault or false
-			ToggleHolder.Name="ToggleHolder"
-			ToggleHolder.Parent=Home
-			ToggleHolder.BackgroundColor3=toRGB(0x111111)
-			ToggleHolder.BorderColor3=toRGB(0x111111)
-			ToggleHolder.BorderSizePixel=0
-			ToggleHolder.Position=UDim2.new(.0167785231,0,0,0)
-			ToggleHolder.Size=UDim2.new(0,288,0,26)
-			ToggleHolderCorner.CornerRadius=UDim.new(0,5)
-			ToggleHolderCorner.Name="ToggleHolderCorner"
-			ToggleHolderCorner.Parent=ToggleHolder
-			ToggleTitle.Name="ToggleTitle"
-			ToggleTitle.Parent=ToggleHolder
-			ToggleTitle.BackgroundColor3=toRGB(0x111111)
-			ToggleTitle.BackgroundTransparency=1
-			ToggleTitle.BorderColor3=toRGB(0x111111)
-			ToggleTitle.BorderSizePixel=0
-			ToggleTitle.Position=UDim2.new(.024305556,0,0,0)
-			ToggleTitle.Size=UDim2.new(0,195,0,24)
-			ToggleTitle.Font=Enum.Font.GothamSemibold
-			ToggleTitle.Text=togglename or""
-			ToggleTitle.TextColor3=toRGB(0xFFFFFF)
-			ToggleTitle.TextSize=11
-			ToggleTitle.TextXAlignment=Enum.TextXAlignment.Left
-			ToggleButton.Name="ToggleButton"
-			ToggleButton.Parent=ToggleHolder
-			ToggleButton.BackgroundColor3=toRGB(0x111111)
-			ToggleButton.BackgroundTransparency=1
-			ToggleButton.BorderColor3=toRGB(0x111111)
-			ToggleButton.Position=UDim2.new(.802083313,0,1.17375305e-06,0)
-			ToggleButton.Size=UDim2.new(0,57,0,25)
-			ToggleButton.AutoButtonColor=false
-			ToggleButton.Font=Enum.Font.SourceSans
-			ToggleButton.Text=""
-			ToggleButton.TextColor3=toRGB(0)
-			ToggleButton.TextSize=14
-			ToggleFrame.Name="ToggleFrame"
-			ToggleFrame.Parent=ToggleButton
-			ToggleFrame.BackgroundColor3=toRGB(0x50505)
-			ToggleFrame.BorderColor3=toRGB(0x50505)
-			ToggleFrame.Position=UDim2.new(.27192983,0,.12,0)
-			ToggleFrame.Size=UDim2.new(0,34,0,19)
-			ToggleFrameCorner.Name="ToggleFrameCorner"
-			ToggleFrameCorner.Parent=ToggleFrame
-			ToggleBall.Name="ToggleBall"
-			ToggleBall.Parent=ToggleFrame
-			ToggleBall.BackgroundColor3=toRGB(0xFFFFFF)
-			ToggleBall.Position=UDim2.new(.123,0,.158,0)
-			ToggleBall.Size=UDim2.new(0,14,0,12)
-			ToggleBallCorner.CornerRadius=UDim.new(0,100)
-			ToggleBallCorner.Name="ToggleBallCorner"
-			ToggleBallCorner.Parent=ToggleBall
+			local Enabled=toggledefault or false
+			Holder.Name="ToggleHolder"
+			Holder.Parent=Home
+			Holder.BackgroundColor3=toRGB(0x111111)
+			Holder.BorderColor3=toRGB(0x111111)
+			Holder.BorderSizePixel=0
+			Holder.Position=UDim2.new(.0167785231,0,0,0)
+			Holder.Size=UDim2.new(0,288,0,26)
+			HolderCorner.CornerRadius=UDim.new(0,5)
+			HolderCorner.Name="ToggleHolderCorner"
+			HolderCorner.Parent=Holder
+			Title.Name="ToggleTitle"
+			Title.Parent=Holder
+			Title.BackgroundColor3=toRGB(0x111111)
+			Title.BackgroundTransparency=1
+			Title.BorderColor3=toRGB(0x111111)
+			Title.BorderSizePixel=0
+			Title.Position=UDim2.new(.024305556,0,0,0)
+			Title.Size=UDim2.new(0,195,0,24)
+			Title.Font=guiFont
+			Title.Text=togglename or""
+			Title.TextColor3=toRGB(0xFFFFFF)
+			Title.TextSize=11
+			Title.TextXAlignment=Enum.TextXAlignment.Left
+			Button.Name="ToggleButton"
+			Button.Parent=Holder
+			Button.BackgroundColor3=toRGB(0x111111)
+			Button.BackgroundTransparency=1
+			Button.BorderColor3=toRGB(0x111111)
+			Button.Position=UDim2.new(.802083313,0,1.17375305e-06,0)
+			Button.Size=UDim2.new(0,57,0,25)
+			Button.AutoButtonColor=false
+			Button.Font=Enum.Font.SourceSans
+			Button.Text=""
+			Button.TextColor3=toRGB(0)
+			Button.TextSize=14
+			Frame.Name="ToggleFrame"
+			Frame.Parent=Button
+			Frame.BackgroundColor3=toRGB(0x50505)
+			Frame.BorderColor3=toRGB(0x50505)
+			Frame.Position=UDim2.new(.27192983,0,.12,0)
+			Frame.Size=UDim2.new(0,34,0,19)
+			FrameCorner.Name="ToggleFrameCorner"
+			FrameCorner.Parent=Frame
+			Ball.Name="ToggleBall"
+			Ball.Parent=Frame
+			Ball.BackgroundColor3=toRGB(0xFFFFFF)
+			Ball.Position=UDim2.new(.123,0,.158,0)
+			Ball.Size=UDim2.new(0,14,0,12)
+			BallCorner.CornerRadius=UDim.new(0,100)
+			BallCorner.Name="ToggleBallCorner"
+			BallCorner.Parent=Ball
 			local function check()
-				ToggleBall:TweenPosition(UDim2.new(ToggleEnabled and .455 or .123,0,.158,0),"Out","Linear",.075)
-				pcall(callback,ToggleEnabled)
+				Ball:TweenPosition(UDim2.new(Enabled and .455 or .123,0,.158,0),"Out","Linear",.075)
+				pcall(callback,Enabled)
 			end
-			ToggleButton.MouseButton1Down:Connect(function()
-				ToggleEnabled=not ToggleEnabled
+			Button.MouseButton1Down:Connect(function()
+				Enabled=not Enabled
 				check()
 			end)
 			check()
 			Page[pagename][togglename]={}
 			Page[pagename][togglename].remove=function()
-				ToggleHolder:Destroy()
+				Holder:Destroy()
 			end
 			Page[pagename][togglename].setText=function(t)
-				ToggleTitle.Text=tostring(t)or""
+				Title.Text=tostring(t)or""
 			end
 			Page[pagename][togglename].setStatus=function(b)
 				if type(b)=="boolean"then
-					ToggleEnabled=b
+					Enabled=b
 					check()
 				end
 			end
 			return Page[pagename][togglename]
 		end
-		Page[pagename].addSlider=function(slidername,minvalue,maxvalue,callback)
+		Page[pagename].addSlider=function(slidername,options,callback)
 			local Holder=Instance.new"Frame"
 			local Title=Instance.new"TextLabel"
 			local HolderScript=Instance.new"UICorner"
@@ -660,8 +507,9 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			local Trail=Instance.new"Frame"
 			local TrailCorner=Instance.new"UICorner"
 			local Number=Instance.new"TextLabel"
-			local minvalue=math.min(minvalue,maxvalue)
-			local maxvalue=math.max(minvalue,maxvalue)
+			local minvalue=math.min(options.min,options.max)
+			local maxvalue=math.max(options.min,options.max)
+			local precision=options.decimals or 0
 			local callback=callback or function()end
 			Holder.Name="SliderHolder"
 			Holder.Parent=Home
@@ -678,7 +526,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			Title.BorderSizePixel=0
 			Title.Position=UDim2.new(.024305556,0,.15384616,0)
 			Title.Size=UDim2.new(0,239,0,8)
-			Title.Font=Enum.Font.GothamSemibold
+			Title.Font=guiFont
 			Title.Text=slidername
 			Title.TextColor3=toRGB(0xFFFFFF)
 			Title.TextSize=11
@@ -699,7 +547,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			Button.TextColor3=toRGB(0)
 			Button.TextSize=14
 			ButtonCorner.Name="SliderButtonCorner"
-			ButtonCorner.Parent=SliderButton
+			ButtonCorner.Parent=Button
 			Trail.Name="SliderTrail"
 			Trail.Parent=Button
 			Trail.BackgroundColor3=toRGB(0x282828)
@@ -715,22 +563,21 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			Number.BorderSizePixel=0
 			Number.Position=UDim2.new(.885,0,.192,1)
 			Number.Size=UDim2.new(0,33,0,6)
-			Number.Font=Enum.Font.GothamSemibold
+			Number.Font=guiFont
 			Number.Text=minvalue or 0
 			Number.TextColor3=toRGB(0xFFFFFF)
 			Number.TextSize=10
 			Number.TextXAlignment=Enum.TextXAlignment.Left
 			local mouse=game.Players.LocalPlayer:GetMouse()
 			local Value,dragInput,released,held
-			--fixed slider for mobile
 			local function update()
-				Value=math.floor((((tonumber(maxvalue)-tonumber(minvalue))/273)*Trail.AbsoluteSize.X)+tonumber(minvalue))or 0
-				pcall(callback,Value)
 				Trail.Size=UDim2.new(0,math.clamp(mouse.X-Trail.AbsolutePosition.X,0,273),0,7)
+				Value=math.round(10^precision*(((tonumber(maxvalue)-tonumber(minvalue))/273)*Trail.AbsoluteSize.X)+tonumber(minvalue))/10^precision or 0
+				pcall(callback,Value)
 				Number.Text=Value
 			end
 			Button.InputBegan:Connect(function(input)
-				if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+				if not held and input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
 					held=true
 					update()
 					released=input.Changed:Connect(function()
@@ -739,6 +586,8 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 							update()
 							Holder.BackgroundColor3=toRGB(0x111111)
 							released:Disconnect()
+							released=nil
+							dragInput=nil
 						end
 					end)
 				end
@@ -772,6 +621,16 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 				if type(i)=="number"and i<=maxvalue and i>=minvalue then
 					Value=i
 					Number.Text=i
+					Trail.Size=UDim2.new(0,i/(maxvalue-minvalue)*273,0,7)
+					pcall(callback,i)
+				end
+			end
+			if options.default~=nil then
+				local i=tonumber(options.default)
+				if type(i)=="number"and i<=maxvalue and i>=minvalue then
+					Value=i
+					Number.Text=i
+					Trail.Size=UDim2.new(0,i/(maxvalue-minvalue)*273,0,7)
 					pcall(callback,i)
 				end
 			end
@@ -799,7 +658,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			Title.BorderSizePixel=0
 			Title.Position=UDim2.new(.024305556,0,.07692308,0)
 			Title.Size=UDim2.new(0,195,0,21)
-			Title.Font=Enum.Font.GothamSemibold
+			Title.Font=guiFont
 			Title.Text=textboxname
 			Title.TextColor3=toRGB(0xFFFFFF)
 			Title.TextSize=11
@@ -808,7 +667,7 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			TextBox.BackgroundColor3=toRGB(0x50505)
 			TextBox.Position=UDim2.new(.725694418,0,.115384623,0)
 			TextBox.Size=UDim2.new(0,72,0,20)
-			TextBox.Font=Enum.Font.GothamSemibold
+			TextBox.Font=guiFont
 			TextBox.Text=textboxdefault or""
 			TextBox.TextColor3=toRGB(0xFFFFFF)
 			TextBox.ClearTextOnFocus=false
@@ -841,133 +700,133 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 			return Page[pagename][textboxname]
 		end
 		Page[pagename].addDropdown=function(dropdownname,list,scrollsize,callback)
-			local DropdownHolder=Instance.new"Frame"
-			local DropdownHolderCorner=Instance.new"UICorner"
-			local DropdownTitle=Instance.new"TextLabel"
-			local DropdownButton=Instance.new"TextButton"
-			local DropdownIcon=Instance.new"ImageLabel"
-			local DropdownContainer=Instance.new"Frame"
-			local DropdownContainerCorner=Instance.new"UICorner"
-			local DropdownOptionContainer=Instance.new"ScrollingFrame"
-			local DropdownOptionContainerLayout=Instance.new"UIListLayout"
+			local Holder=Instance.new"Frame"
+			local HolderCorner=Instance.new"UICorner"
+			local Title=Instance.new"TextLabel"
+			local Button=Instance.new"TextButton"
+			local Icon=Instance.new"ImageLabel"
+			local Container=Instance.new"Frame"
+			local ContainerCorner=Instance.new"UICorner"
+			local OptionContainer=Instance.new"ScrollingFrame"
+			local OptionContainerLayout=Instance.new"UIListLayout"
 			local callback=callback or function()end
-			local DropDownEnabled=false
-			DropdownHolder.Name="DropdownHolder"
-			DropdownHolder.Parent=Home
-			DropdownHolder.BackgroundColor3=toRGB(0x111111)
-			DropdownHolder.BorderColor3=toRGB(0x111111)
-			DropdownHolder.BorderSizePixel=0
-			DropdownHolder.Position=UDim2.new(.0167785231,0,0,0)
-			DropdownHolder.Size=UDim2.new(0,288,0,26)
-			DropdownHolderCorner.CornerRadius=UDim.new(0,5)
-			DropdownHolderCorner.Name="DropdownHolderCorner"
-			DropdownHolderCorner.Parent=DropdownHolder
-			DropdownTitle.Name="DropdownTitle"
-			DropdownTitle.Parent=DropdownHolder
-			DropdownTitle.BackgroundColor3=toRGB(0x111111)
-			DropdownTitle.BackgroundTransparency=1
-			DropdownTitle.BorderColor3=toRGB(0x111111)
-			DropdownTitle.BorderSizePixel=0
-			DropdownTitle.Position=UDim2.new(.024305556,0,0,0)
-			DropdownTitle.Size=UDim2.new(0,195,0,24)
-			DropdownTitle.Font=Enum.Font.GothamSemibold
-			DropdownTitle.Text=dropdownname
-			DropdownTitle.TextColor3=toRGB(0xFFFFFF)
-			DropdownTitle.TextSize=11
-			DropdownTitle.TextXAlignment=Enum.TextXAlignment.Left
-			DropdownButton.Name="DropdownButton"
-			DropdownButton.Parent=DropdownHolder
-			DropdownButton.BackgroundColor3=toRGB(0xFFFFFF)
-			DropdownButton.BackgroundTransparency=1
-			DropdownButton.Size=UDim2.new(0,288,0,26)
-			DropdownButton.Font=Enum.Font.SourceSans
-			DropdownButton.Text=""
-			DropdownButton.TextColor3=toRGB(0)
-			DropdownButton.TextSize=14
-			DropdownIcon.Name="DropdownIcon"
-			DropdownIcon.Parent=DropdownButton
-			DropdownIcon.BackgroundTransparency=1
-			DropdownIcon.Position=UDim2.new(.885416687,0,.192307711,0)
-			DropdownIcon.Size=UDim2.new(0,24,0,16)
-			DropdownIcon.Image="rbxassetid://3944690667"
-			DropdownIcon.ScaleType=Enum.ScaleType.Fit
-			DropdownContainer.Name="DropdownContainer"
-			DropdownContainer.Parent=DropdownHolder
-			DropdownContainer.Active=true
-			DropdownContainer.BackgroundColor3=toRGB(0x111111)
-			DropdownContainer.BorderColor3=toRGB(0x111111)
-			DropdownContainer.BorderSizePixel=0
-			DropdownContainer.ClipsDescendants=true
-			DropdownContainer.Position=UDim2.new(0,0,1.34615386,0)
-			DropdownContainer.Size=UDim2.new(0,288,0,4)
-			DropdownContainer.Visible=false
-			DropdownContainerCorner.CornerRadius=UDim.new(0,6)
-			DropdownContainerCorner.Name="DropdownContainerCorner"
-			DropdownContainerCorner.Parent=DropdownContainer
-			DropdownOptionContainer.Name="DropdownOptionContainer"
-			DropdownOptionContainer.Parent=DropdownContainer
-			DropdownOptionContainer.Active=true
-			DropdownOptionContainer.BackgroundColor3=toRGB(0x111111)
-			DropdownOptionContainer.BackgroundTransparency=1
-			DropdownOptionContainer.BorderColor3=toRGB(0x111111)
-			DropdownOptionContainer.BorderSizePixel=0
-			DropdownOptionContainer.Position=UDim2.new(0,0,.0782608688,0)
-			DropdownOptionContainer.Size=UDim2.new(0,288,0,8)
-			DropdownOptionContainer.Visible=false
-			DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #list*.2375,0)
-			DropdownOptionContainer.ScrollBarThickness=5
-			DropdownOptionContainerLayout.Name="DropdownOptionContainerLayout"
-			DropdownOptionContainerLayout.Parent=DropdownOptionContainer
-			DropdownOptionContainerLayout.HorizontalAlignment=Enum.HorizontalAlignment.Center
-			DropdownOptionContainerLayout.SortOrder=Enum.SortOrder.LayoutOrder
-			DropdownOptionContainerLayout.Padding=UDim.new(0,5)
+			local Enabled=false
+			Holder.Name="DropdownHolder"
+			Holder.Parent=Home
+			Holder.BackgroundColor3=toRGB(0x111111)
+			Holder.BorderColor3=toRGB(0x111111)
+			Holder.BorderSizePixel=0
+			Holder.Position=UDim2.new(.0167785231,0,0,0)
+			Holder.Size=UDim2.new(0,288,0,26)
+			HolderCorner.CornerRadius=UDim.new(0,5)
+			HolderCorner.Name="DropdownHolderCorner"
+			HolderCorner.Parent=Holder
+			Title.Name="DropdownTitle"
+			Title.Parent=Holder
+			Title.BackgroundColor3=toRGB(0x111111)
+			Title.BackgroundTransparency=1
+			Title.BorderColor3=toRGB(0x111111)
+			Title.BorderSizePixel=0
+			Title.Position=UDim2.new(.024305556,0,0,0)
+			Title.Size=UDim2.new(0,195,0,24)
+			Title.Font=guiFont
+			Title.Text=dropdownname
+			Title.TextColor3=toRGB(0xFFFFFF)
+			Title.TextSize=11
+			Title.TextXAlignment=Enum.TextXAlignment.Left
+			Button.Name="DropdownButton"
+			Button.Parent=Holder
+			Button.BackgroundColor3=toRGB(0xFFFFFF)
+			Button.BackgroundTransparency=1
+			Button.Size=UDim2.new(0,288,0,26)
+			Button.Font=Enum.Font.SourceSans
+			Button.Text=""
+			Button.TextColor3=toRGB(0)
+			Button.TextSize=14
+			Icon.Name="DropdownIcon"
+			Icon.Parent=Button
+			Icon.BackgroundTransparency=1
+			Icon.Position=UDim2.new(.885416687,0,.192307711,0)
+			Icon.Size=UDim2.new(0,24,0,16)
+			Icon.Image="rbxassetid://3944690667"
+			Icon.ScaleType=Enum.ScaleType.Fit
+			Container.Name="DropdownContainer"
+			Container.Parent=Holder
+			Container.Active=true
+			Container.BackgroundColor3=toRGB(0x111111)
+			Container.BorderColor3=toRGB(0x111111)
+			Container.BorderSizePixel=0
+			Container.ClipsDescendants=true
+			Container.Position=UDim2.new(0,0,1.34615386,0)
+			Container.Size=UDim2.new(0,288,0,4)
+			Container.Visible=false
+			ContainerCorner.CornerRadius=UDim.new(0,6)
+			ContainerCorner.Name="DropdownContainerCorner"
+			ContainerCorner.Parent=Container
+			OptionContainer.Name="DropdownOptionContainer"
+			OptionContainer.Parent=Container
+			OptionContainer.Active=true
+			OptionContainer.BackgroundColor3=toRGB(0x111111)
+			OptionContainer.BackgroundTransparency=1
+			OptionContainer.BorderColor3=toRGB(0x111111)
+			OptionContainer.BorderSizePixel=0
+			OptionContainer.Position=UDim2.new(0,0,.0782608688,0)
+			OptionContainer.Size=UDim2.new(0,288,0,8)
+			OptionContainer.Visible=false
+			OptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #list*.2375,0)
+			OptionContainer.ScrollBarThickness=5
+			OptionContainerLayout.Name="DropdownOptionContainerLayout"
+			OptionContainerLayout.Parent=OptionContainer
+			OptionContainerLayout.HorizontalAlignment=Enum.HorizontalAlignment.Center
+			OptionContainerLayout.SortOrder=Enum.SortOrder.LayoutOrder
+			OptionContainerLayout.Padding=UDim.new(0,5)
 			local function makeelements(bool)
 				for i,v in pairs(Home:GetChildren())do
-					if v:IsA"Frame"and v~=DropdownHolder then
+					if v:IsA"Frame"and v~=Holder then
 						v.Visible=bool
 					end
 				end
 			end
-			DropdownButton.MouseButton1Down:Connect(function()
-				if DropDownEnabled then
-					DropDownEnabled=false
-					DropdownIcon.ImageColor3=toRGB(0xFFFFFF)
-					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
+			Button.MouseButton1Down:Connect(function()
+				if Enabled then
+					Enabled=false
+					Icon.ImageColor3=toRGB(0xFFFFFF)
+					OptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
 					task.wait(.2)
-					DropdownOptionContainer.Visible=false
-					DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.3)
+					OptionContainer.Visible=false
+					Container:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.3)
 					task.wait(.3)
 					makeelements(true)
-					DropdownContainer.Visible=false
+					Container.Visible=false
 					task.wait(.09)
-					DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.1)
-					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
+					Container:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.1)
+					OptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
 				else
-					DropDownEnabled=true
+					Enabled=true
 					makeelements(false)
-					DropdownContainer.Visible=true
-					DropdownContainer:TweenSize(UDim2.new(0,288,0,115),"Out","Linear",.3)
-					DropdownIcon.ImageColor3=toRGB(0x89F6FF)
+					Container.Visible=true
+					Container:TweenSize(UDim2.new(0,288,0,115),"Out","Linear",.3)
+					Icon.ImageColor3=toRGB(0x89F6FF)
 					task.wait(.3)
-					DropdownOptionContainer.Visible=true
-					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,106),"Out","Linear",.2)
+					OptionContainer.Visible=true
+					OptionContainer:TweenSize(UDim2.new(0,288,0,106),"Out","Linear",.2)
 					task.wait(.09)
 					Home.CanvasPosition=Vector2.new(0,0)
-					DropdownContainer:TweenSize(UDim2.new(0,288,0,115),"Out","Linear",.1)
-					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,106),"Out","Linear",.1)
+					Container:TweenSize(UDim2.new(0,288,0,115),"Out","Linear",.1)
+					OptionContainer:TweenSize(UDim2.new(0,288,0,106),"Out","Linear",.1)
 				end
 			end)
 			for i,v in pairs(list)do
 				local Option=Instance.new"TextButton"
 				local OptionCorner=Instance.new"UICorner"
 				Option.Name="Option"
-				Option.Parent=DropdownOptionContainer
+				Option.Parent=OptionContainer
 				Option.BackgroundColor3=toRGB(0xF0F0F)
 				Option.BorderColor3=toRGB(0xF0F0F)
 				Option.Position=UDim2.new(.017361112,0,0,0)
 				Option.Size=UDim2.new(0,283,0,22)
 				Option.AutoButtonColor=false
-				Option.Font=Enum.Font.GothamSemibold
+				Option.Font=guiFont
 				Option.Text=v
 				Option.TextColor3=toRGB(0xFFFFFF)
 				Option.TextSize=10
@@ -989,45 +848,45 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 					Option.TextColor3=toRGB(0x89F6FF)
 				end)
 				Option.MouseButton1Down:Connect(function()
-					DropDownEnabled=false
-					DropdownIcon.ImageColor3=toRGB(0xFFFFFF)
-					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
+					Enabled=false
+					Icon.ImageColor3=toRGB(0xFFFFFF)
+					OptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
 					task.wait(.2)
-					DropdownOptionContainer.Visible=false
-					DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.3)
+					OptionContainer.Visible=false
+					Container:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.3)
 					pcall(callback,v)
 					task.wait(.3)
 					makeelements(true)
-					DropdownContainer.Visible=false
-					DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.1)
-					DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
+					Container.Visible=false
+					Container:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.1)
+					OptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
 				end)
 			end
 			Page[pagename][dropdownname]={}
 			Page[pagename][dropdownname].remove=function()
-				DropdownHolder:Destroy()
+				Holder:Destroy()
 			end
 			Page[pagename][dropdownname].setText=function(t)
-				DropdownTitle.Text=tostring(t)or""
+				Title.Text=tostring(t)or""
 			end
 			Page[pagename][dropdownname].setList=function(newlist,scrollsize)
-				for i,v in pairs(DropdownOptionContainer:GetChildren())do
-					if v.Name=="Option"and v~=DropdownOptionContainerLayout then
+				for i,v in pairs(OptionContainer:GetChildren())do
+					if v.Name=="Option"and v~=OptionContainerLayout then
 						v:Destroy()
 					end
 				end
-				DropdownOptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #list*.2375,0)
+				OptionContainer.CanvasSize=UDim2.new(0,0,scrollsize or #list*.2375,0)
 				for i,v in pairs(newlist)do
 					local Option=Instance.new"TextButton"
 					local OptionCorner=Instance.new"UICorner"
 					Option.Name="Option"
-					Option.Parent=DropdownOptionContainer
+					Option.Parent=OptionContainer
 					Option.BackgroundColor3=toRGB(0xF0F0F)
 					Option.BorderColor3=toRGB(0xF0F0F)
 					Option.Position=UDim2.new(.017361112,0,0,0)
 					Option.Size=UDim2.new(0,283,0,22)
 					Option.AutoButtonColor=false
-					Option.Font=Enum.Font.GothamSemibold
+					Option.Font=guiFont
 					Option.Text=v
 					Option.TextColor3=toRGB(0xFFFFFF)
 					Option.TextSize=10
@@ -1049,18 +908,18 @@ function Lib:CreateWindow(windowname,windowinfo,scrollsize)
 						Option.TextColor3=toRGB(0x89F6FF)
 					end)
 					Option.MouseButton1Down:Connect(function()
-						DropDownEnabled=false
-						DropdownIcon.ImageColor3=toRGB(0xFFFFFF)
-						DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
+						Enabled=false
+						Icon.ImageColor3=toRGB(0xFFFFFF)
+						OptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.2)
 						task.wait(.2)
-						DropdownOptionContainer.Visible=false
-						DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.3)
+						OptionContainer.Visible=false
+						Container:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.3)
 						pcall(callback,v)
 						task.wait(.3)
 						makeelements(true)
-						DropdownContainer.Visible=false
-						DropdownContainer:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.1)
-						DropdownOptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
+						Container.Visible=false
+						Container:TweenSize(UDim2.new(0,288,0,4),"Out","Linear",.1)
+						OptionContainer:TweenSize(UDim2.new(0,288,0,8),"Out","Linear",.1)
 					end)
 				end
 			end
