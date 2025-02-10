@@ -766,7 +766,7 @@ EvFarm.addToggle("Start Farm",togs.evf,function(v)
 	togs.evf=v
 	hrp.Anchored=false
 end)
-for _,v in pairs(events)do
+for _,v in pairs({unpack(events)})do
 	EvFarm.addSlider(v[1],{min=-1,max=#events-1,default=v[2]-1},function(n)
 		for k,j in pairs(events)do
 			if j[1]==v[1]then
