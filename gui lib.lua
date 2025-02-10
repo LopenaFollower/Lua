@@ -30,7 +30,7 @@
 --Tab2:destroyGui(function()
 --	print("goodbye")
 --end)
-local Version=326
+local Version=327
 task.spawn(function()
 	print("Gui version: "..Version)
 	loadstring(game:HttpGetAsync"https://raw.githubusercontent.com/LopenaFollower/Lua/main/anti%20afk.lua")()
@@ -507,8 +507,8 @@ function Lib:CreateWindow(windowname,windowinfo)
 			local Trail=Instance.new"Frame"
 			local TrailCorner=Instance.new"UICorner"
 			local Number=Instance.new"TextLabel"
-			local minvalue=math.min(options.min,options.max)
-			local maxvalue=math.max(options.min,options.max)
+			local minvalue=tonumber(math.min(options.min,options.max))
+			local maxvalue=tonumber(math.max(options.min,options.max))
 			local precision=options.decimals or 0
 			local callback=callback or function()end
 			Holder.Name="SliderHolder"
@@ -571,8 +571,9 @@ function Lib:CreateWindow(windowname,windowinfo)
 			local mouse=game.Players.LocalPlayer:GetMouse()
 			local Value,dragInput,released,held
 			local function update()
+				local p=10^precision
 				Trail.Size=UDim2.new(0,math.clamp(mouse.X-Trail.AbsolutePosition.X,0,273),0,7)
-				Value=math.round(10^precision*(((tonumber(maxvalue)-tonumber(minvalue))/273)*Trail.AbsoluteSize.X)+tonumber(minvalue))/10^precision or 0
+				Value=math.round(p*((maxvalue-minvalue)/273*Trail.AbsoluteSize.X)+minvalue)/p or 0
 				pcall(callback,Value)
 				Number.Text=Value
 			end
@@ -586,8 +587,7 @@ function Lib:CreateWindow(windowname,windowinfo)
 							update()
 							Holder.BackgroundColor3=toRGB(0x111111)
 							released:Disconnect()
-							released=nil
-							dragInput=nil
+							released,dragInput=nil,nil
 						end
 					end)
 				end
@@ -616,23 +616,18 @@ function Lib:CreateWindow(windowname,windowinfo)
 			Page[pagename][slidername].setMax=function(n)
 				maxvalue=tonumber(n)
 			end
-			Page[pagename][slidername].setValue=function(n)
+			local function setVal(n)
 				local i=tonumber(n)
 				if type(i)=="number"and i<=maxvalue and i>=minvalue then
 					Value=i
 					Number.Text=i
-					Trail.Size=UDim2.new(0,i/(maxvalue-minvalue)*273,0,7)
+					Trail.Size=UDim2.new(0,(i-minvalue)/(maxvalue-minvalue)*273,0,7)
 					pcall(callback,i)
 				end
 			end
+			Page[pagename][slidername].setValue=setVal
 			if options.default~=nil then
-				local i=tonumber(options.default)
-				if type(i)=="number"and i<=maxvalue and i>=minvalue then
-					Value=i
-					Number.Text=i
-					Trail.Size=UDim2.new(0,i/(maxvalue-minvalue)*273,0,7)
-					pcall(callback,i)
-				end
+				setVal(options.default)
 			end
 			return Page[pagename][slidername]
 		end
