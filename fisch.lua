@@ -39,7 +39,9 @@ local togs={
 	fb=false,
 	sunkenchest=false,
 	enchant=false,
-	reducelag=false
+	rl_parts=false,
+	seralaser=false,
+	rmvfish=false
 }
 local cd={
 	cast=true,
@@ -303,7 +305,7 @@ end
 function useTotem(name)
 	local totem=plr.Backpack:FindFirstChild(name)
 	if totem then
-		repeat task.wait()until not plrGui:FindFirstChild"reel"
+		repeat task.wait()until not plrGui:FindFirstChild"reel"and not plrGui:FindFirstChild"shakeui"
 		equipBP(totem)
 		task.wait(.25)
 		mouse(0,0,1)
@@ -369,8 +371,11 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			lt.underwaterbl.Enabled=false
 			lt.underwatercc.Enabled=false
 			lt.atmos.Density=0
-			lt.FogEnd=1e4
-			lt.FogStart=0
+			lt.Brightness=2
+			lt.ClockTime=14
+			lt.FogEnd=1e5
+			lt.GlobalShadows=false
+			lt.OutdoorAmbient=Color3.fromRGB(128,128,128)
 		end
 		local ea=workspace.world.interactables:FindFirstChild"Enchant Altar"
 		if ea then
@@ -443,7 +448,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 				end)
 			end
 		end
-		task.wait(.5)
+		task.wait(.1)
 		cd.appraise=true
 	end
 	if togs.luck and cd.luck then
@@ -520,9 +525,9 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			hrp.Anchored=false
 			if vals.anchor then
 				hrp.CFrame=vals.anchor
-				task.wait(.1)
 			end
 		end
+		task.wait(.1)
 		cd.evf=true
 	end
 	if cd.spamsundial then
@@ -594,7 +599,7 @@ binds.over=plrGui.over.ChildAdded:Connect(function(p)
 	end
 end)
 binds.chr=chr.DescendantAdded:Connect(function(v)
-	if togs.reducelag then
+	if togs.rmvfish then
 		if v:IsA"Model"and v.Name~="Stoke"and v.Parent.Name=="bobber"then
 			task.wait()
 			v:Destroy()
@@ -605,16 +610,25 @@ binds.chr=chr.DescendantAdded:Connect(function(v)
 	end
 end)
 binds.active=workspace.active.ChildAdded:Connect(function(v)
-	if togs.reducelag then
+	if togs.rmvfish then
 		if v:IsA"Model"or(v:IsA"Part"and v.Name=="splash")then
 			task.wait()
 			v:Destroy()
 		end
 	end
 end)
+binds.debrisfx=workspace.active.debrisfx.ChildAdded:Connect(function(v)
+	if togs.seralaser then
+		if v:IsA"Model"and(v.Name=="SeraphicProp")then
+			task.wait()
+			v:Destroy()
+		end
+	end
+end)
 binds.grandReef=workspace.world.map["Grand Reef"].DescendantAdded:Connect(function(v)
-	if togs.reducelag then
-		if v:IsA"Model"and(v.Name=="Barrel"or v.Name=="Fence"or v.Name=="Curve")or v:IsA"Folder"and(v.Name=="Coral"or v.Name=="Seaweed")or v:IsA"ParticleEmitter"then
+	if togs.rl_parts then
+		local p=v.Parent
+		if v:IsA"Model"and(v.Name=="Barrel"or v.Name=="Fence"or v.Name=="Curve")or p:IsA"Folder"and(p.Name=="Coral"or p.Name=="Seaweed")or v:IsA"ParticleEmitter"then
 			task.wait()
 			v:Destroy()
 		end
@@ -721,6 +735,7 @@ local Enchant=UI:addPage("Enchant",1)
 local ATotem=UI:addPage("Totems",2)
 local Stats=UI:addPage("Stats",1)
 local Webhook=UI:addPage("Webhook",1)
+local Perf=UI:addPage("Performance",1)
 local Local=UI:addPage("Local Player",2)
 Main.addToggle("Auto Cast",togs.cast,function(v)
 	togs.cast=v
@@ -887,6 +902,26 @@ Webhook.addButton("Test Webhook",function()
 		webhookOpt.test=true
 	end
 end)
+Perf.addToggle("Fullbright/No blur",togs.fb,function(v)
+	togs.fb=v
+end)
+Perf.addToggle("Remove unnecessary parts",togs.rl_parts,function(v)
+	togs.rl_parts=v
+	if v then
+		for _,p in pairs(workspace.world.map["Grand Reef"]:GetDescendants())do
+			if v:IsA"Model"and(v.Name=="Barrel"or v.Name=="Fence"or v.Name=="Curve")or v:IsA"Folder"and(v.Name=="Coral"or v.Name=="Seaweed")or v:IsA"ParticleEmitter"then
+				task.wait()
+				v:Destroy()
+			end
+		end
+	end
+end)
+Perf.addToggle("Hide seraphic laser",togs.seralaser,function(v)
+	togs.seralaser=v
+end)
+Perf.addToggle("Remove fish model",togs.rmvfish,function(v)
+	togs.rmvfish=v
+end)
 Local.addToggle("Disable Temperature",togs.temp,function(v)
 	togs.temp=v
 end)
@@ -902,12 +937,6 @@ Local.addToggle("Invis Cam",togs.invcam,function(v)
 	togs.invcam=v
 	plr.CameraMaxZoomDistance=300
 	plr.DevCameraOcclusionMode=v and Enum.DevCameraOcclusionMode.Invisicam or Enum.DevCameraOcclusionMode.Zoom
-end)
-Local.addToggle("Fullbright/No blur",togs.fb,function(v)
-	togs.fb=v
-end)
-Local.addToggle("Reduce Lag",togs.reducelag,function(v)
-	togs.reducelag=v
 end)
 Local.addToggle("Inf Jump",togs.infj,function(v)
 	togs.infj=v
@@ -931,13 +960,7 @@ Local.addButton("Rejoin",function()
 end)
 Main.destroyGui(function()
 	running=false
-	for _,v in pairs(binds)do
-		v:Disconnect()
-	end
-	for i,v in pairs(togs)do
-		togs[i]=false
-	end
-	for i,v in pairs(cd)do
-		cd[i]=false
-	end
+	for _,v in pairs(binds)do v:Disconnect()end
+	for i,v in pairs(togs)do togs[i]=false end
+	for i,v in pairs(cd)do cd[i]=false end
 end)
