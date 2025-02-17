@@ -399,7 +399,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 					mouse(0,0,0)
 				else
 					rod.events.cast:FireServer(1)
-					task.wait(.25)
+					task.wait(.2)
 				end
 			end
 		end
@@ -695,10 +695,13 @@ binds.reel=plrGui.ChildAdded:Connect(function(v)
 		local wt=os.time()
 		repeat
 			v.bar.playerbar.Size=UDim2.new(1,0,1.3,0)
-			task.wait()
 			if os.time()>=wt+vals.catch then
-				rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
+				if v.bar.progress.bar.Size.X.Scale<0.99 then
+					rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
+				end
+				break
 			end
+			task.wait()
 		until not plrGui:FindFirstChild"reel"
 	end
 end)
@@ -717,7 +720,7 @@ binds.xp=pstat.xp:GetPropertyChangedSignal"Value":Connect(function()
 	local t=os.time()-startTime
 	rates.xp=math.round(3600/t*c)
 end)
-local blacklist={"Trusted","Content Creator","Tester","Contributor","Tester 2","Tester 2","Analytics","Trial Mod","Moderator","Senior Mod","Admin","Developer","Lead","Creator","Holder"}
+local blacklist={"Trusted","Content Creator","Tester","Contributor","Tester 2","Analytics","Trial Mod","Moderator","Senior Mod","Admin","Developer","Lead","Creator","Holder"}
 binds.plrs=game.Players.PlayerAdded:Connect(function(v)
 	local role=v:GetRoleInGroup(7381705)
 	for i,v in pairs(blacklist)do
@@ -749,7 +752,7 @@ end)
 Main.addToggle("Auto Catch",togs.autocatch,function(v)
 	togs.autocatch=v
 end)
-Main.addSlider("Catch Delay",{min=0,max=30,default=vals.catch},function(v)
+Main.addSlider("Catch Delay",{min=0,max=60,default=vals.catch,decimals=2},function(v)
 	vals.catch=v
 end)
 Main.addSlider("Perfect Catch rate",{min=0,max=100,default=vals.perfect},function(v)
