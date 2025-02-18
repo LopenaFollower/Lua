@@ -8,16 +8,19 @@ local plrGui=plr.PlayerGui
 local running=true
 local fishingZones=workspace.zones.fishing
 local lt=game:GetService"Lighting"
-local vi=game:GetService"VirtualInputManager"
+local us=game:GetService"UserInputService"
 local rs=game:GetService"ReplicatedStorage"
-local rsEvs=rs.events
+local vi=game:GetService"VirtualInputManager"
 local pstat=rs.playerstats[plr.Name].Stats
+local rsEvs=rs.events
 local rsWorld=rs.world
 local cam=workspace.CurrentCamera
-local auroraActive,sunkenActive
+local auroraActive,sunkenActive,plrListDD
 local pauseFishing=false
 local startTime=os.time()
 local sessionStart=os.time()
+local plrNames={}
+local statGuis={}
 local binds={}
 local togs={
 	cast=false,
@@ -73,7 +76,12 @@ local vals={
 	perfect=100,
 	money=pstat.coins.Value,
 	xp=pstat.xp.Value,
-	enchant="none"
+	enchant="none",
+	crateType="",
+	crateAmnt=1,
+	totemType="",
+	totemAmnt=1,
+	pRod=""
 }
 local purchase={
 	["Bait Crate"]={v=false,a=1},
@@ -236,6 +244,9 @@ if not workspace:FindFirstChild"platform"then
 	p.Anchored=true
 	p.CFrame=CFrame.new(0,0,0)
 end
+for _,v in pairs(game.Players:GetPlayers())do
+	table.insert(plrNames,v.Name)
+end
 local platform=workspace:FindFirstChild"platform"
 local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
@@ -315,38 +326,10 @@ function useTotem(name)
 		mouse(0,0,0)
 		task.wait(.4)
 		equipRod()
-	else
-		if totems[name].buyAmount==0 then return end
-		local pos=hrp.CFrame
-		pauseFishing=true
-		task.wait(.1)
-		while task.wait()do
-			removeVelocity()
-			if not plrGui:FindFirstChild"reel"and not plrGui:FindFirstChild"shakeui"then
-				task.wait(.05)
-				local rod=chr:FindFirstChildOfClass"Tool"
-				if rod and rod:FindFirstChild"events"then
-					rod.events.reset:FireServer()
-				end
-				break
-			end
-		end
-		tpTo(name)
-		removeVelocity()
-		totems[name].db=true
-		task.wait(.5)
-		while totems[name].db do
-			tpTo(name)
-			removeVelocity()
-			totems[name].db=true
-			cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
-			press(101)
-			task.wait(1)
-		end
+	elseif totems[name].buyAmount>0 then
+		rsEvs.purchase:FireServer(name,"item",nil,totems[name].buyAmount)
 		task.wait(.1)
 		useTotem(name)
-		hrp.CFrame=pos
-		pauseFishing=false
 	end
 end
 binds.main=game:GetService"RunService".Stepped:Connect(function()
@@ -359,9 +342,9 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		chr.temperature.Disabled=togs.temp
 		chr.oxygen.Disabled=togs.oxyg
 		chr["oxygen(peaks)"].Disabled=togs.oxyg
-		UI.Stats.Uptime.setInfo(toHMS(os.time()-sessionStart))
-		UI.Stats.Money.setInfo(formatNum(rates.money).."/hr")
-		UI.Stats.XP.setInfo(formatNum(rates.xp).."/hr")
+		UI["Session Stats"].Uptime.setInfo(toHMS(os.time()-sessionStart))
+		UI["Session Stats"].Money.setInfo(formatNum(rates.money).."/hr")
+		UI["Session Stats"].XP.setInfo(formatNum(rates.xp).."/hr")
 		if togs.fb then
 			lt.brightness.Enabled=true
 			lt.cc.Enabled=false
@@ -695,13 +678,10 @@ binds.reel=plrGui.ChildAdded:Connect(function(v)
 		local wt=os.time()
 		repeat
 			v.bar.playerbar.Size=UDim2.new(1,0,1.3,0)
-			if os.time()>=wt+vals.catch then
-				if v.bar.progress.bar.Size.X.Scale<0.99 then
-					rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
-				end
-				break
-			end
 			task.wait()
+			if os.time()>=wt+vals.catch then
+				rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
+			end
 		until not plrGui:FindFirstChild"reel"
 	end
 end)
@@ -736,7 +716,9 @@ local EvFarm=UI:addPage("Event Farming",2)
 local Appraisal=UI:addPage("Appraise",4)
 local Enchant=UI:addPage("Enchant",1)
 local ATotem=UI:addPage("Totems",2)
-local Stats=UI:addPage("Stats",1)
+local Shop=UI:addPage("Shop",2)
+local Stats=UI:addPage("Session Stats",1)
+local PlayerInfo=UI:addPage("Player Stats",1)
 local Webhook=UI:addPage("Webhook",1)
 local Perf=UI:addPage("Performance",1)
 local Local=UI:addPage("Local Player",2)
@@ -779,7 +761,7 @@ end)
 EvFarm.addToggle("Sunken Treasure",togs.sunkenchest,function(v)
 	togs.sunkenchest=v
 end)
-EvFarm.addLabel("Set the farming priority for each event","Set to -1 to excluded, priority ordered from 0 up to "..(#events-1))
+EvFarm.addLabel("Set the farming priority for each event","Set to -1 to excluded,priority ordered from 0 up to "..(#events-1))
 EvFarm.addToggle("Start Farm",togs.evf,function(v)
 	togs.evf=v
 	hrp.Anchored=false
@@ -883,6 +865,30 @@ ATotem.addToggle("Kraken",togs.sundialkraken,function(v)
 		cd.spamsundial=true
 	end
 end)
+Shop.addDropdown("Crates",{"Festive Bait Crate","Bait Crate","Carbon Crate","Quality Bait Crate","Common Crate","Coral Geode","Volcanic Geode"},nil,function(v)
+	vals.crateType=v
+end)
+Shop.addTextBox("Crates amount",vals.crateAmnt,function(v)
+	vals.crateAmnt=tonumber(v)
+end)
+Shop.addButton("Buy crates",function()
+	rsEvs.purchase:FireServer(vals.crateType,"fish",nil,vals.crateAmnt)
+end)
+Shop.addDropdown("Totems",{"Aurora Totem","Eclipse Totem","Meteor Totem","Smokescreen Totem","Sundial Totem","Tempest Totem","Windset Totem","Zeus Storm Totem"},nil,function(v)
+	vals.totemType=v
+end)
+Shop.addTextBox("Totem amount",vals.totemAmnt,function(v)
+	vals.totemAmnt=tonumber(v)
+end)
+Shop.addButton("Buy totems",function()
+	rsEvs.purchase:FireServer(vals.totemType,"item",nil,vals.totemAmnt)
+end)
+Shop.addDropdown("Rods",{"Heaven's Rod","Kraken Rod","Rod Of The Depths","Trident Rod","Zeus Rod"},nil,function(v)
+	vals.pRod=v
+end)
+Shop.addButton("Buy rod",function()
+	rsEvs.purchase:FireServer(vals.pRod,"rod",nil,1)
+end)
 Stats.addLabel("Uptime","0:00:00","Left")
 Stats.addButton("Reset",function()
 	vals.money=pstat.coins.Value
@@ -893,6 +899,211 @@ Stats.addButton("Reset",function()
 end)
 Stats.addLabel("Money","0/hr","Left")
 Stats.addLabel("XP","0/hr","Left")
+local statsToDisplay={
+	{"Bestiary Pages Completed","tracker_bestiaryCompletions",1},
+	{"Catch Streak","tracker_streak",1},
+	{"Treasure Chests opened","tracker_treasurechests",1},
+	{"Coins","coins",1},
+	{"Angler quests completed","tracker_anglerquests",1},
+	{"Quests completed","tracker_quests",1},
+	{"Crab Cages opened","tracker_crabcagesopened",1},
+	{"Deaths","tracker_deaths",1},
+	{"Deaths [via Meteors]","tracker_deathsviameteors",1},
+	{"Fish Caught [Exotic]","tracker_exoticcaught",1},
+	{"Fish Caught [Mutation]","tracker_mutationcaught",1},
+	{"Fish Caught [Mythical]","tracker_mythicalcaught",1},
+	{"Fish Caught [Secret]","tracker_secretcaught",1},
+	{"Fish Caught [Shiny]","tracker_shinycaught",1},
+	{"Fish Caught [Sparkling]","tracker_sparklingcaught",1},
+	{"Fish Caught [Total]","tracker_fishcaught",1},
+	{"Largest fish caught [kg]","tracker_largest",1},
+	{"Locations Discovered","tracker_locationsdiscovered",1},
+	{"Perfect Catches","tracker_perfectcatches",1},
+	{"Level","level",1},
+	{"Player XP","xp",1},
+	{"Reels Snapped","tracker_reelsbroken",1},
+	{"Rods Enchanted","tracker_enchanted",1},
+	{"Set Spawn location","spawnlocation",0},
+	{"Playtime","tracker_timeplayed",2},
+	{"Times Joined","tracker_timesjoined",1},
+	{"Totems used [Aurora]","tracker_auroratotemsused",1},
+	{"Totems used [Avalanche]","tracker_avalanchetotemsused",1},
+	{"Totems used [Blizzard]","tracker_blizzardtotemsused",1},
+	{"Totems used [Eclipse]","tracker_eclipsetotemsused",1},
+	{"Totems used [Meteor]","tracker_meteortotemsused",1},
+	{"Totems used [Poseidon]","tracker_poseidonwrathtotemsused",1},
+	{"Totems used [Smokescreen]","tracker_smokescreentotemsused",1},
+	{"Totems used [Sundial]","tracker_sundialtotemsused",1},
+	{"Totems used [Tempest]","tracker_tempesttotemsused",1},
+	{"Totems used [Windset]","tracker_windsettotemsused",1},
+	{"Totems used [Zeus]","tracker_zeusstormtotemsused",1}
+}
+plrListDD=PlayerInfo.addDropdown("Show Player's Stats/Inventory",plrNames,nil,function(v)
+	local p=game.Players:FindFirstChild(v)
+	if not p then
+		notify("Not found","Player not found.")
+		return
+	end
+	local tracker={}
+	local Gui=Instance.new"ScreenGui"
+	local Frame=Instance.new"Frame"
+	local Close=Instance.new"TextButton"
+	local CloseCorner=Instance.new"UICorner"
+	local XImg=Instance.new"ImageLabel"
+	local Title=Instance.new"TextLabel"
+	local ScrollFrame=Instance.new"ScrollingFrame"
+	local PageFolder=Instance.new"Folder"
+	local ListLayout=Instance.new"UIListLayout"
+	Gui.Parent=game.CoreGui
+	Frame.Parent=Gui
+	Frame.Size=UDim2.new(0,400,0,300)
+	Frame.Position=UDim2.new(0.5,-150,0.5,-100)
+	Frame.BackgroundColor3=Color3.fromRGB(15,15,15)
+	Frame.BorderSizePixel=0
+	Frame.Active=true
+	Frame.Draggable=true
+	Close.Parent=Frame
+	Close.Size=UDim2.new(0,15,0,15)
+	Close.Position=UDim2.new(1,-20,0,5)
+	Close.Text=""
+	Close.TextSize=10
+	Close.TextColor3=Color3.new(1,1,1)
+	Close.BackgroundColor3=Color3.new(1,0,0)
+	Close.BorderSizePixel=0
+	Close.TextXAlignment=Enum.TextXAlignment.Center
+	CloseCorner.Parent=Close
+	CloseCorner.CornerRadius=UDim.new(0,4)
+	XImg.Parent=Close
+	XImg.BackgroundTransparency=1
+	XImg.Position=UDim2.new(0,2,0,2)
+	XImg.Size=UDim2.new(0,11,0,11)
+	XImg.ScaleType=Enum.ScaleType.Fit
+	XImg.ImageColor3=Color3.fromRGB(0,0,0)
+	XImg.Image="rbxassetid://5054663650"
+	Close.MouseButton1Click:Connect(function()
+		Gui:Destroy()
+		for _,v in pairs(tracker)do v:Disconnect()end
+	end)
+	Title.Parent=Frame
+	Title.Size=UDim2.new(0,15,0,15)
+	Title.Position=UDim2.new(0,3,0,4)
+	Title.TextXAlignment=Enum.TextXAlignment.Left
+	Title.Text=p.DisplayName.."'s Stats/Inventory:"
+	Title.TextSize=10
+	Title.TextColor3=Color3.new(1,1,1)
+	Title.BackgroundColor3=Color3.fromRGB(15,15,15)
+	Title.BorderSizePixel=0
+	ScrollFrame.Parent=Frame
+	ScrollFrame.Size=UDim2.new(1,-10,1,-40)
+	ScrollFrame.Position=UDim2.new(0,5,0,25)
+	ScrollFrame.BackgroundColor3 =Color3.fromRGB(15,15,15)
+	ScrollFrame.BorderSizePixel=1
+	ScrollFrame.CanvasSize=UDim2.new(0,0,#statsToDisplay*.1,0)
+	ScrollFrame.ScrollBarThickness=8
+	ListLayout.Parent=ScrollFrame
+	ListLayout.Padding=UDim.new(0,5)
+	table.insert(statGuis,function()
+		Gui:Destroy()
+		for _,v in pairs(tracker)do v:Disconnect()end
+	end)
+	local statCount=0
+	local function addLabel(txt,val,type)
+		if type==1 then
+			val=formatNum(math.round(val))
+		elseif type==2 then
+			val=string.format("%d:%02d:%02d",math.floor(val/3600)+0,math.floor((val%3600)/60),val%60)
+		end
+		local textColor=statCount%2>0 and Color3.fromRGB(173,173,173)or Color3.fromRGB(220,220,220)
+		local holder=Instance.new"Frame"
+		local label=Instance.new"TextLabel"
+		local dash=Instance.new"TextLabel"
+		local value=Instance.new"TextLabel"
+		holder.Parent=ScrollFrame
+		holder.Size=UDim2.new(1,-15,0,25) 
+		holder.BackgroundTransparency=1
+		label.Parent=holder
+		label.Size=UDim2.new(.7,0,1,0)
+		label.Position=UDim2.new(0,0,0,0)
+		label.Text=txt
+		label.TextSize=14
+		label.Font=Enum.Font.SourceSans
+		label.TextColor3=textColor
+		label.BackgroundTransparency=1
+		label.TextXAlignment=Enum.TextXAlignment.Left
+		label.TextWrapped=true 
+		dash.Parent=holder
+		dash.Size=UDim2.new(0,10,1,0)
+		dash.Position=UDim2.new(0.7,0,0,0)
+		dash.Text="-"
+		dash.TextSize=14
+		dash.Font=Enum.Font.SourceSans
+		dash.TextColor3=textColor
+		dash.BackgroundTransparency=1
+		value.Parent=holder
+		value.Size=UDim2.new(0.3,-15,1,0)
+		value.Position=UDim2.new(0.7,15,0,0)
+		value.Text=val
+		value.TextSize=14
+		value.Font=Enum.Font.SourceSans
+		value.TextColor3=textColor
+		value.BackgroundTransparency=1
+		value.TextXAlignment=Enum.TextXAlignment.Right
+		value.ClipsDescendants=true
+		return function(nv)
+			if type==1 then
+				nv=formatNum(math.round(nv))
+			elseif type==2 then
+				nv=string.format("%d:%02d:%02d",math.floor(nv/3600),math.floor((nv%3600)/60),nv%60)
+			end
+			value.Text=nv
+		end
+	end
+	local sF=rs.playerstats:FindFirstChild(p.Name)
+	if sF and sF:FindFirstChild("Stats") then
+		local sS=sF.Stats
+		for _,sI in pairs(statsToDisplay)do
+			local sV=sS:FindFirstChild(sI[2])
+			if sV then
+				local label=addLabel(sI[1],sV.Value,sI[3])
+				statCount=statCount+1
+				tracker[sI[2]]=sV:GetPropertyChangedSignal"Value":Connect(function()
+					label(sS[sI[2]].Value)
+				end)
+			else
+				addLabel(sI[1],"nil")
+			end
+		end
+	else
+		addLabel("Error","Could not find player stats")
+	end
+	local dragging,dragInput,dragStart,startPos
+	local function update(e)
+		local delta=e.Position-dragStart
+		Frame.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y)
+	end
+	Frame.InputBegan:Connect(function(e)
+		if e.UserInputType==Enum.UserInputType.MouseButton1 or e.UserInputType==Enum.UserInputType.Touch then
+			dragging=true
+			dragStart=e.Position
+			startPos=Frame.Position
+			e.Changed:Connect(function()
+				if e.UserInputState==Enum.UserInputState.End then
+					dragging=false
+				end
+			end)
+		end
+	end)
+	Frame.InputChanged:Connect(function(e)
+		if e.UserInputType==Enum.UserInputType.MouseMovement or e.UserInputType==Enum.UserInputType.Touch then
+			dragInput=e
+		end
+	end)
+	us.InputChanged:Connect(function(e)
+		if e==dragInput and dragging then
+			update(e)
+		end
+	end)
+end)
 Webhook.addLabel"This webhook serves as an hourly report"
 Webhook.addTextBox("Url",webhookOpt.url,function(v)
 	webhookOpt.url=v
@@ -964,6 +1175,7 @@ end)
 Main.destroyGui(function()
 	running=false
 	for _,v in pairs(binds)do v:Disconnect()end
+	for _,v in pairs(statGuis)do pcall(function()v()end)end
 	for i,v in pairs(togs)do togs[i]=false end
 	for i,v in pairs(cd)do cd[i]=false end
 end)
