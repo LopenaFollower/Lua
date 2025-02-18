@@ -328,7 +328,7 @@ function useTotem(name)
 		equipRod()
 	elseif totems[name].buyAmount>0 then
 		rsEvs.purchase:FireServer(name,"item",nil,totems[name].buyAmount)
-		task.wait(.1)
+		task.wait(.5)
 		useTotem(name)
 	end
 end
@@ -709,6 +709,19 @@ binds.plrs=game.Players.PlayerAdded:Connect(function(v)
 			break
 		end
 	end
+	plrNames={}
+	for _,p in pairs(game.Players:GetPlayers())do
+		table.insert(plrNames,p.Name)
+	end
+	plrListDD.setList(plrNames)
+end)
+binds.plrslv=game.Players.PlayerRemoving:Connect(function(v)
+	task.wait(.1)
+	plrNames={}
+	for _,p in pairs(game.Players:GetPlayers())do
+		table.insert(plrNames,p.Name)
+	end
+	plrListDD.setList(plrNames)
 end)
 local Main=UI:addPage("Main",2,true)
 local Waypoints=UI:addPage("Locations",1)
@@ -821,7 +834,9 @@ Enchant.addToggle("Auto enchant",togs.enchant,function(v)
 	if v and rsWorld.cycle.Value=="Night"then
 		repeat
 			tpTo"Keepers Altar"
-			equipBP(plr.Backpack["Enchant Relic"])
+			if not chr:FindFirstChild"Enchant Relic"then
+				equipBP(plr.Backpack["Enchant Relic"])
+			end
 			task.wait(.1)
 			repeat
 				press(101)
@@ -916,12 +931,12 @@ local statsToDisplay={
 	{"Fish Caught [Shiny]","tracker_shinycaught",1},
 	{"Fish Caught [Sparkling]","tracker_sparklingcaught",1},
 	{"Fish Caught [Total]","tracker_fishcaught",1},
+	{"Perfect Catches","tracker_perfectcatches",1},
+	{"Reels Snapped","tracker_reelsbroken",1},
 	{"Largest fish caught [kg]","tracker_largest",1},
 	{"Locations Discovered","tracker_locationsdiscovered",1},
-	{"Perfect Catches","tracker_perfectcatches",1},
 	{"Level","level",1},
 	{"Player XP","xp",1},
-	{"Reels Snapped","tracker_reelsbroken",1},
 	{"Rods Enchanted","tracker_enchanted",1},
 	{"Set Spawn location","spawnlocation",0},
 	{"Playtime","tracker_timeplayed",2},
