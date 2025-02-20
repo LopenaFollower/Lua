@@ -959,7 +959,9 @@ plrListDD=PlayerInfo.addDropdown("Show Player's Stats/Inventory",plrNames,nil,fu
 		notify("Not found","Player not found.")
 		return
 	end
+	local pD=p.DisplayName
 	local tracker={}
+	local GuiActive=true
 	local Gui=Instance.new"ScreenGui"
 	local Frame=Instance.new"Frame"
 	local Close=Instance.new"TextButton"
@@ -1003,7 +1005,7 @@ plrListDD=PlayerInfo.addDropdown("Show Player's Stats/Inventory",plrNames,nil,fu
 	Title.Size=UDim2.new(0,15,0,15)
 	Title.Position=UDim2.new(0,3,0,4)
 	Title.TextXAlignment=Enum.TextXAlignment.Left
-	Title.Text=p.DisplayName.."'s Stats/Inventory:"
+	Title.Text=pD.."'s Stats/Inventory:"
 	Title.TextSize=10
 	Title.TextColor3=Color3.new(1,1,1)
 	Title.BackgroundColor3=Color3.fromRGB(15,15,15)
@@ -1116,6 +1118,15 @@ plrListDD=PlayerInfo.addDropdown("Show Player's Stats/Inventory",plrNames,nil,fu
 	us.InputChanged:Connect(function(e)
 		if e==dragInput and dragging then
 			update(e)
+		end
+	end)
+	pcall(function()
+		while task.wait(1)and GuiActive do
+			if not game.Players:FindFirstChild(v)then
+				Title.Text=pD.."'s Stats/Inventory: (Player Left)"
+				for _,v in pairs(tracker)do v:Disconnect()end
+				break
+			end
 		end
 	end)
 end)
