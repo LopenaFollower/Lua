@@ -563,13 +563,16 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	end
 	if togs.cast and togs.rodspam and cd.rodspam and(os.time()-lastReel)>1 then
 		cd.rodspam=false
-		local rod=getRod()
-		rod.events.breakbobber:FireServer()
-		rod.events.reset:FireServer()
-		getRod().Parent=plr.Backpack
-		task.wait(.1)
-		equipRod()
-		lastReel=os.time()
+		for i=0,1 do
+			lastReel=os.time()
+			getRod().events.breakbobber:FireServer()
+			getRod().events.reset:FireServer()
+			getRod().Parent=plr.Backpack
+			task.wait(.2)
+			equipRod()
+			getRod().events.cast:FireServer(1)
+			task.wait(.45)
+		end
 		cd.rodspam=true
 	end
 end)
@@ -706,8 +709,8 @@ binds.reel=plrGui.ChildAdded:Connect(function(v)
 			rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
 			getRod().Parent=plr.Backpack
 			getRod().Parent=chr
-			lastReel=os.time()
 			task.wait()
+			lastReel=os.time()
 			v:Destroy()
 		end
 	end
