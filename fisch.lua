@@ -17,6 +17,7 @@ local rsWorld=rs.world
 local cam=workspace.CurrentCamera
 local auroraActive,sunkenActive,plrListDD
 local pauseFishing=false
+local lastReel=os.time()
 local startTime=os.time()
 local sessionStart=os.time()
 local plrNames={}
@@ -44,7 +45,8 @@ local togs={
 	enchant=false,
 	rl_parts=false,
 	seralaser=false,
-	rmvfish=false
+	rmvfish=false,
+	rodspam=false
 }
 local cd={
 	cast=true,
@@ -57,7 +59,8 @@ local cd={
 	evf=true,
 	click=true,
 	spamsundial=true,
-	webhook=true
+	webhook=true,
+	rodspam=true
 }
 local webhookOpt={
 	enabled=false,
@@ -555,6 +558,20 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		end
 		cd.webhook=true
 	end
+	if togs.rodspam then
+		rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
+	end
+	if togs.cast and togs.rodspam and cd.rodspam and(os.time()-lastReel)>1 then
+		cd.rodspam=false
+		local rod=getRod()
+		rod.events.breakbobber:FireServer()
+		rod.events.reset:FireServer()
+		getRod().Parent=plr.Backpack
+		task.wait(.1)
+		equipRod()
+		lastReel=os.time()
+		cd.rodspam=true
+	end
 end)
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	if togs.infj and hum then
@@ -675,14 +692,24 @@ binds.cycle=rsWorld.cycle.Changed:Connect(function()
 end)
 binds.reel=plrGui.ChildAdded:Connect(function(v)
 	if v.Name=="reel"and togs.autocatch then
-		local wt=os.time()
-		repeat
+		if not togs.rodspam then
+			local wt=os.time()
+			repeat
+				v.bar.playerbar.Size=UDim2.new(1,0,1.3,0)
+				task.wait()
+				if os.time()>=wt+vals.catch then
+					rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
+				end
+			until not plrGui:FindFirstChild"reel"
+		else
 			v.bar.playerbar.Size=UDim2.new(1,0,1.3,0)
+			rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
+			getRod().Parent=plr.Backpack
+			getRod().Parent=chr
+			lastReel=os.time()
 			task.wait()
-			if os.time()>=wt+vals.catch then
-				rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
-			end
-		until not plrGui:FindFirstChild"reel"
+			v:Destroy()
+		end
 	end
 end)
 binds.weather=rsWorld.weather.Changed:Connect(function()
@@ -740,6 +767,17 @@ Main.addToggle("Auto Cast",togs.cast,function(v)
 end)
 Main.addToggle("Legit Cast",togs.lcst,function(v)
 	togs.lcst=v
+end)
+Main.addToggle("Cast Spam",togs.rodspam,function(v)
+	togs.rodspam=v
+	if v then
+		for _,n in pairs(plrGui:GetChildren())do
+			if n.Name=="reel"then
+				task.wait()
+				n:Destroy()
+			end
+		end
+	end
 end)
 Main.addToggle("Auto Shake",togs.shake,function(v)
 	togs.shake=v
