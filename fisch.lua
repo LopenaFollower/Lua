@@ -342,9 +342,11 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		hum=chr.Humanoid
 		hrp=chr.HumanoidRootPart
 		plrGui=plr.PlayerGui
-		chr.temperature.Disabled=togs.temp
-		chr.oxygen.Disabled=togs.oxyg
-		chr["oxygen(peaks)"].Disabled=togs.oxyg
+		local folder=chr.Resources
+		folder.temperature.Disabled=togs.temp
+		folder["temperature(heat)"].Disabled=togs.temp
+		folder.oxygen.Disabled=togs.oxyg
+		folder["oxygen(peaks)"].Disabled=togs.oxyg
 		UI["Session Stats"].Uptime.setInfo(toHMS(os.time()-sessionStart))
 		UI["Session Stats"].Money.setInfo(formatNum(rates.money).."/hr")
 		UI["Session Stats"].XP.setInfo(formatNum(rates.xp).."/hr")
@@ -561,7 +563,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	if togs.rodspam then
 		rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
 	end
-	if togs.cast and togs.rodspam and cd.rodspam and(os.time()-lastReel)>1 then
+	if togs.cast and togs.rodspam and cd.rodspam and(os.time()-lastReel)>2 then
 		cd.rodspam=false
 		for i=0,1 do
 			lastReel=os.time()
@@ -708,8 +710,8 @@ binds.reel=plrGui.ChildAdded:Connect(function(v)
 			v.bar.playerbar.Size=UDim2.new(1,0,1.3,0)
 			rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
 			getRod().Parent=plr.Backpack
-			getRod().Parent=chr
 			task.wait()
+			getRod().Parent=chr
 			lastReel=os.time()
 			v:Destroy()
 		end
