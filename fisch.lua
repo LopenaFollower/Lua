@@ -153,6 +153,16 @@ local wps={
 		"Zeus Trial",
 		"Kraken Pool"
 	},
+	veil={
+		"Volcanic Vents1",
+		"Volcanic Vents2",
+		"Challenger's Deep1",
+		"Challenger's Deep2",
+		"Abyssal Zenith",
+		"Large Gate",
+		"Calm Zone",
+		"Veil of the Forsaken"
+	},
 	items={
 		"Rod Of The Depths"
 	}
@@ -193,7 +203,15 @@ local coords={
 	["Zeus Trial"]={-4296,-627,2682},
 	["Kraken Pool"]={-4375,-996,2049},
 	["Aurora Totem"]={-1812,-137,-3282},
-	["Sundial Totem"]={-1149,137,-1077}
+	["Sundial Totem"]={-1149,137,-1077},
+	["Volcanic Vents1"]={-3472,-2258,3848},
+	["Volcanic Vents2"]={-3196,-2039,4031},
+	["Challenger's Deep1"]={-760,-3283,-702},
+	["Challenger's Deep2"]={726,-3361,-1580},
+	["Abyssal Zenith"]={-13496,-11050,144},
+	["Large Gate"]={-4332,-11183,3228},
+	["Calm Zone"]={-4317,-11185,3678},
+	["Veil of the Forsaken"]={-2342,-11184,7095}
 }
 local appraiseSettings={
 	slot=nil,
@@ -342,14 +360,6 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		hum=chr.Humanoid
 		hrp=chr.HumanoidRootPart
 		plrGui=plr.PlayerGui
-		local folder=chr.Resources
-		folder.temperature.Disabled=togs.temp
-		folder["temperature(heat)"].Disabled=togs.temp
-		folder.oxygen.Disabled=togs.oxyg
-		folder["oxygen(peaks)"].Disabled=togs.oxyg
-		UI["Session Stats"].Uptime.setInfo(toHMS(os.time()-sessionStart))
-		UI["Session Stats"].Money.setInfo(formatNum(rates.money).."/hr")
-		UI["Session Stats"].XP.setInfo(formatNum(rates.xp).."/hr")
 		if togs.fb then
 			lt.brightness.Enabled=true
 			lt.cc.Enabled=false
@@ -365,6 +375,14 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			lt.GlobalShadows=false
 			lt.OutdoorAmbient=Color3.fromRGB(128,128,128)
 		end
+		local folder=chr.Resources
+		folder.temperature.Disabled=togs.temp
+		folder["temperature(heat)"].Disabled=togs.temp
+		folder.oxygen.Disabled=togs.oxyg
+		folder["oxygen(peaks)"].Disabled=togs.oxyg
+		UI["Session Stats"].Uptime.setInfo(toHMS(os.time()-sessionStart))
+		UI["Session Stats"].Money.setInfo(formatNum(rates.money).."/hr")
+		UI["Session Stats"].XP.setInfo(formatNum(rates.xp).."/hr")
 		local ea=workspace.world.interactables:FindFirstChild"Enchant Altar"
 		if ea then
 			ea.ProximityPrompt.HoldDuration=0
@@ -812,6 +830,9 @@ Waypoints.addDropdown("Northern Expedition",wps.north,nil,function(v)
 	tpTo(v)
 end)
 Waypoints.addDropdown("Atlantis",wps.atlantis,nil,function(v)
+	tpTo(v)
+end)
+Waypoints.addDropdown("Mariana's Veil",wps.veil,nil,function(v)
 	tpTo(v)
 end)
 EvFarm.addToggle("Sunken Treasure",togs.sunkenchest,function(v)
