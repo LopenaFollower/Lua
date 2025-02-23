@@ -245,7 +245,8 @@ local fzs={
 	["Isonade"]={"Isonade"},
 	["Orcas"]={"Orcas Pool"},
 	["Ancient Orcas"]={"Ancient Orcas Pool"},
-	["Lovestorm"]={"Lovestorm Eel","Lovestorm Eel Supercharged"}
+	["Lovestorm"]={"Lovestorm Eel","Lovestorm Eel Supercharged"},
+	["Scylla"]={"Forsaken Veil - Scylla"}
 }
 local sunkenLocs={
 	moosewood={{936,130,-159},{693,130,-362},{613,130,498},{285,130,564},{283,130,-159}},
