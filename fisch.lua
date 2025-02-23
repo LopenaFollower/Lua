@@ -112,7 +112,8 @@ local events={
 	{"Kraken",0,false},
 	{"Orcas",0,false},
 	{"Ancient Orcas",0,false},
-	{"Lovestorm",0,false}
+	{"Lovestorm",0,false},
+	{"Scylla",0,false}
 }
 local wps={
 	areas1={
