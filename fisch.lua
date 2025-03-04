@@ -856,7 +856,7 @@ end)
 Main.addToggle("Auto Equip Rod",togs.equiprod,function(v)
 	togs.equiprod=v
 end)
-Main.addToggle("Cast Spam",togs.rodspam,function(v)
+Main.addToggle("Fast Reel",togs.rodspam,function(v)
 	togs.rodspam=v
 	if v then
 		for _,n in pairs(plrGui:GetChildren())do
