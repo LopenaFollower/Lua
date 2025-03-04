@@ -15,9 +15,12 @@ local pstat=rs.playerstats[plr.Name].Stats
 local rsEvs=rs.events
 local rsWorld=rs.world
 local cam=workspace.CurrentCamera
-local auroraActive,sunkenActive,plrListDD
+local auroraActive,sunkenActive,plrListDD,browhat
 local pauseFishing=false
-local lastReel=os.time()
+local firstReel=true
+local lastReel
+local RSanchor
+local resetCycle=false
 local startTime=os.time()
 local sessionStart=os.time()
 local plrNames={}
@@ -113,7 +116,8 @@ local events={
 	{"Orcas",0,false},
 	{"Ancient Orcas",0,false},
 	{"Lovestorm",0,false},
-	{"Scylla",0,false}
+	{"Scylla",0,false},
+	{"Whales",0,false}
 }
 local wps={
 	areas1={
@@ -247,7 +251,8 @@ local fzs={
 	["Orcas"]={"Orcas Pool"},
 	["Ancient Orcas"]={"Ancient Orcas Pool"},
 	["Lovestorm"]={"Lovestorm Eel","Lovestorm Eel Supercharged"},
-	["Scylla"]={"Forsaken Veil - Scylla"}
+	["Scylla"]={"Forsaken Veil - Scylla"},
+	["Whales"]={"Whales Pool"}
 }
 local sunkenLocs={
 	moosewood={{936,130,-159},{693,130,-362},{613,130,498},{285,130,564},{283,130,-159}},
@@ -282,7 +287,7 @@ function notify(t,m,d)
 	})
 end
 function toHMS(s)
-	return string.format("%02i:%02i:%02i",s/3600,s/60%60,s%60)
+	return string.format("%02i:%02i:%02i",s//3600,s//60%60,s%60)
 end
 function formatNum(n)
 	return tostring(math.floor(n)):reverse():gsub("(%d%d%d)","%1,"):gsub(",(%-?)$","%1"):reverse()
@@ -322,14 +327,14 @@ function equipBP(v)
 	rs.packages.Net["RE/Backpack/Equip"]:FireServer(v)
 end
 function getRod()
-	for _,v in pairs(chr:GetChildren())do
-		if v:IsA"Tool"and v.Name:lower():find"rod"then
-			return v
-		end
-	end
-	for _,v in pairs(plr.Backpack:GetChildren())do
-		if v.Name:lower():find"rod"then
-			return v
+	local rn=pstat.rod.Value
+	return chr:FindFirstChild(rn)or plr.Backpack:FindFirstChild(rn)
+end
+function castRod()
+	local rod=getRod()
+	if rod and rod:FindFirstChild"values"then
+		if not rod.values.casted.Value then
+			rod.events.cast:FireServer(0)
 		end
 	end
 end
@@ -341,13 +346,9 @@ function useTotem(name)
 	if totem then
 		repeat task.wait()until not plrGui:FindFirstChild"reel"and not plrGui:FindFirstChild"shakeui"
 		equipBP(totem)
-		task.wait(.25)
-		mouse(0,0,1)
-		mouse(0,0,0)
-		task.wait(.1)
-		mouse(0,0,1)
-		mouse(0,0,0)
-		task.wait(.4)
+		task.wait(.2)
+		totem:Activate()
+		task.wait(.2)
 		equipRod()
 	elseif totems[name].buyAmount>0 then
 		rsEvs.purchase:FireServer(name,"item",nil,totems[name].buyAmount)
@@ -385,6 +386,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		UI["Session Stats"].Uptime.setInfo(toHMS(os.time()-sessionStart))
 		UI["Session Stats"].Money.setInfo(formatNum(rates.money).."/hr")
 		UI["Session Stats"].XP.setInfo(formatNum(rates.xp).."/hr")
+		rsEvs.afk:FireServer(false)
 		local ea=workspace.world.interactables:FindFirstChild"Enchant Altar"
 		if ea then
 			ea.ProximityPrompt.HoldDuration=0
@@ -396,7 +398,48 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			chr:TranslateBy(hum.MoveDirection*vals.tpws/5)
 		end
 	end
-	if togs.cast and cd.cast and not pauseFishing then
+	if not resetCycle then
+		if togs.rodspam then
+			for _,v in pairs(hum.Animator:GetPlayingAnimationTracks())do
+				if v.Animation.AnimationId=="rbxassetid://113972107465696"then
+					getRod().Parent=plr.Backpack
+					task.wait(.05)
+					getRod().Parent=chr
+					break
+				end
+			end
+		end
+		if togs.cast and togs.rodspam and not firstReel and cd.rodspam then
+			cd.rodspam=false
+			castRod()
+			task.wait(.3)
+			rsEvs["reelfinished "]:FireServer(100,true)
+			cd.rodspam=true
+		end
+	end
+	if not firstReel and togs.rodspam and RSanchor and togs.cast then
+		if os.clock()-lastReel>3.6 and not resetCycle then
+			resetCycle=true
+		end
+		hrp.CFrame=RSanchor
+		removeVelocity()
+	end
+	if resetCycle and cd.resCyc then
+		cd.resCyc=false
+		for i=0,2 do
+			task.wait(1)
+			getRod().Parent=plr.Backpack
+		end
+		getRod().Parent=chr
+		castRod()
+		getRod().Parent=plr.Backpack
+		task.wait(.5)
+		getRod().Parent=chr
+		resetCycle=false
+		firstReel=true
+		cd.resCyc=true
+	end
+	if togs.cast and cd.cast and not pauseFishing and not(togs.rodspam and not firstReel)then
 		cd.cast=false
 		local rod=getRod()
 		if rod and rod:FindFirstChild"values"then
@@ -406,7 +449,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 					task.wait(.4)
 					mouse(0,0,0)
 				else
-					rod.events.cast:FireServer(1)
+					rod.events.cast:FireServer(0)
 					task.wait(.2)
 				end
 			end
@@ -533,9 +576,9 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			hrp.Anchored=false
 			if vals.anchor then
 				hrp.CFrame=vals.anchor
+				task.wait(.1)
 			end
 		end
-		task.wait(.1)
 		cd.evf=true
 	end
 	if cd.spamsundial then
@@ -579,23 +622,6 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			task.wait(5)
 		end
 		cd.webhook=true
-	end
-	if togs.rodspam then
-		rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
-	end
-	if togs.cast and togs.rodspam and cd.rodspam and(os.time()-lastReel)>2 then
-		cd.rodspam=false
-		for i=0,1 do
-			lastReel=os.time()
-			getRod().events.breakbobber:FireServer()
-			getRod().events.reset:FireServer()
-			getRod().Parent=plr.Backpack
-			task.wait(.2)
-			equipRod()
-			getRod().events.cast:FireServer(1)
-			task.wait(.45)
-		end
-		cd.rodspam=true
 	end
 end)
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
@@ -716,25 +742,43 @@ binds.cycle=rsWorld.cycle.Changed:Connect(function()
 	cd.spamsundial=true
 end)
 binds.reel=plrGui.ChildAdded:Connect(function(v)
-	if v.Name=="reel"and togs.autocatch then
+	if v.Name=="reel"then
 		if not togs.rodspam then
-			local wt=os.time()
 			repeat
 				v.bar.playerbar.Size=UDim2.new(1,0,1.3,0)
 				task.wait()
-				if os.time()>=wt+vals.catch then
-					rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
-				end
+				rsEvs["reelfinished "]:FireServer(100,true)
 			until not plrGui:FindFirstChild"reel"
 		else
 			v.bar.playerbar.Size=UDim2.new(1,0,1.3,0)
-			rsEvs["reelfinished "]:FireServer(100,math.random(1,100)<=vals.perfect)
-			getRod().Parent=plr.Backpack
-			task.wait()
-			getRod().Parent=chr
-			lastReel=os.time()
-			v:Destroy()
+			if firstReel then
+				firstReel=false
+				lastReel=os.clock()
+				RSanchor=hrp.CFrame
+				getRod().Parent=plr.Backpack
+				getRod().Parent=chr
+				task.wait()
+				v:Destroy()
+				task.wait(.6)
+				castRod()
+			else
+				task.wait()
+				local t=os.clock()-lastReel
+				lastReel=os.clock()
+				v:Destroy()
+				for _,r in pairs(hrp:GetChildren())do
+					if r.Name=="reeling"then
+						r:Destroy()
+					end
+				end
+			end
 		end
+	end
+end)
+binds.cfr=hrp:GetPropertyChangedSignal"CFrame":Connect(function()
+	if not firstReel and togs.rodspam and RSanchor and togs.cast then
+		hrp.CFrame=RSanchor
+		removeVelocity()
 	end
 end)
 binds.weather=rsWorld.weather.Changed:Connect(function()
@@ -787,8 +831,13 @@ local PlayerInfo=UI:addPage("Player Stats",1)
 local Webhook=UI:addPage("Webhook",1)
 local Perf=UI:addPage("Performance",1)
 local Local=UI:addPage("Local Player",2)
+local Debug=UI:addPage("Debug",2)
 Main.addToggle("Auto Cast",togs.cast,function(v)
 	togs.cast=v
+	RSanchor=nil
+	if v and togs.rodspam then
+		firstReel=true
+	end
 end)
 Main.addToggle("Legit Cast",togs.lcst,function(v)
 	togs.lcst=v
@@ -1094,7 +1143,7 @@ plrListDD=PlayerInfo.addDropdown("Show Player's Stats/Inventory",plrNames,nil,fu
 		if type==1 then
 			val=formatNum(math.round(val))
 		elseif type==2 then
-			val=string.format("%d:%02d:%02d",math.floor(val/3600)+0,math.floor((val%3600)/60),val%60)
+			val=string.format("%d:%02d:%02d",val//3600,(val%3600)//60,val%60)
 		end
 		local textColor=statCount%2>0 and Color3.fromRGB(173,173,173)or Color3.fromRGB(220,220,220)
 		local holder=Instance.new"Frame"
@@ -1136,7 +1185,7 @@ plrListDD=PlayerInfo.addDropdown("Show Player's Stats/Inventory",plrNames,nil,fu
 			if type==1 then
 				nv=formatNum(math.round(nv))
 			elseif type==2 then
-				nv=string.format("%d:%02d:%02d",math.floor(nv/3600),math.floor((nv%3600)/60),nv%60)
+				nv=string.format("%d:%02d:%02d",nv//3600,(nv%3600)//60,nv%60)
 			end
 			value.Text=nv
 		end
@@ -1259,10 +1308,33 @@ end)
 Local.addTextBox("Click Speed(seconds)",vals.acspeed,function(v)
 	vals.acspeed=tonumber(v)
 end)
+Local.addToggle("Walk on Water",false,function(v)
+	for _,c in pairs(fishingZones:GetChildren())do
+		if c:IsA"BasePart"then
+			c.CanCollide=v
+		end
+	end
+end)
 Local.addButton("Rejoin",function()
 	plr:Kick"Rejoining..."
 	task.wait()
 	game:GetService"TeleportService":Teleport(game.PlaceId,plr)
+end)
+Debug.addButton("Finish Reel",function()
+	rsEvs["reelfinished "]:FireServer(100,true)
+end)
+Debug.addButton("Count Fish",function()
+	local fishList=rs.resources.items.fish
+	local c=0
+	for _,v in pairs(plr.Backpack:GetChildren())do
+		if fishList:FindFirstChild(v.Name)then
+			c+=1
+		end
+	end
+	notify("Fish Count: "..tostring(c))
+end)
+Debug.addButton("Unequip Rod",function()
+	getRod().Parent=plr.Backpack
 end)
 Main.destroyGui(function()
 	running=false
