@@ -49,7 +49,8 @@ local togs={
 	rl_parts=false,
 	seralaser=false,
 	rmvfish=false,
-	rodspam=false
+	rodspam=false,
+	equiprod=false
 }
 local cd={
 	cast=true,
@@ -63,7 +64,8 @@ local cd={
 	click=true,
 	spamsundial=true,
 	webhook=true,
-	rodspam=true
+	rodspam=true,
+	equiprod=true
 }
 local webhookOpt={
 	enabled=false,
@@ -278,7 +280,7 @@ end
 local platform=workspace:FindFirstChild"platform"
 local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("0x3b5 Internal Edition","v1.2")
+local UI=GUI:CreateWindow("0x3b5 Internal Edition","v2")
 function notify(t,m,d)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=t or"";
@@ -397,6 +399,15 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		if hum.MoveDirection.Magnitude>0 then
 			chr:TranslateBy(hum.MoveDirection*vals.tpws/5)
 		end
+	end
+	if togs.equiprod and cd.equiprod then
+		cd.equiprod=false
+		local held=chr:FindFirstChild(pstat.rod.Value)
+		if not held then
+			equipRod()
+		end
+		task.wait(.3)
+		cd.equiprod=true
 	end
 	if not resetCycle then
 		if togs.rodspam then
@@ -841,6 +852,9 @@ Main.addToggle("Auto Cast",togs.cast,function(v)
 end)
 Main.addToggle("Legit Cast",togs.lcst,function(v)
 	togs.lcst=v
+end)
+Main.addToggle("Auto Equip Rod",togs.equiprod,function(v)
+	togs.equiprod=v
 end)
 Main.addToggle("Cast Spam",togs.rodspam,function(v)
 	togs.rodspam=v
