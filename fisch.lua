@@ -455,7 +455,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		end
 	end
 	if not firstReel and togs.rodspam and RSanchor and togs.cast then
-		if os.clock()-lastReel>2.8 and not resetCycle then
+		if os.clock()-lastReel>3 and not resetCycle then
 			resetCycle=true
 		end
 		hrp.CFrame=RSanchor
