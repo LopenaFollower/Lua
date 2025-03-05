@@ -65,7 +65,8 @@ local cd={
 	spamsundial=true,
 	webhook=true,
 	rodspam=true,
-	equiprod=true
+	equiprod=true,
+	resCyc=true
 }
 local webhookOpt={
 	enabled=false,
@@ -280,7 +281,7 @@ end
 local platform=workspace:FindFirstChild"platform"
 local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("0x3b5 Internal Edition","v2")
+local UI=GUI:CreateWindow("0x3b5 Internal Edition","v2.1")
 function notify(t,m,d)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=t or"";
@@ -301,12 +302,22 @@ function press(key)
 	vi:SendKeyEvent(1,key,0,game)
 	vi:SendKeyEvent(0,key,0,game)
 end
+function nearest(folder)
+	local n,d=nil,math.huge
+	for _,v in pairs(folder:GetChildren())do
+		local cd=(hrp.Position-v.Position).Magnitude
+		if n==nil or cd<d then
+			d=cd
+			n=v
+		end
+	end
+	return n
+end
 function tpTo(name)
 	hrp.CFrame=CFrame.new(unpack(coords[name]))
 end	
 function tpOnPart(pt,t)
 	local p=pt.Position
-	local h=t and pt.Size.Y/2 or 0
 	local top=t and pt.Size.Y/2+5 or pt.Size.Y/4
 	platform.CFrame=CFrame.new(p.X,p.Y+top-3,p.Z)
 	hrp.CFrame=CFrame.new(p.X,p.Y+top,p.Z)
@@ -400,6 +411,21 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			chr:TranslateBy(hum.MoveDirection*vals.tpws/5)
 		end
 	end
+	if resetCycle and cd.resCyc then
+		cd.resCyc=false
+		for i=0,2 do
+			task.wait(1)
+			getRod().Parent=plr.Backpack
+		end
+		getRod().Parent=chr
+		castRod()
+		getRod().Parent=plr.Backpack
+		task.wait(.5)
+		getRod().Parent=chr
+		resetCycle=false
+		firstReel=true
+		cd.resCyc=true
+	end
 	if togs.equiprod and cd.equiprod then
 		cd.equiprod=false
 		local held=chr:FindFirstChild(pstat.rod.Value)
@@ -429,26 +455,11 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		end
 	end
 	if not firstReel and togs.rodspam and RSanchor and togs.cast then
-		if os.clock()-lastReel>3.6 and not resetCycle then
+		if os.clock()-lastReel>2.8 and not resetCycle then
 			resetCycle=true
 		end
 		hrp.CFrame=RSanchor
 		removeVelocity()
-	end
-	if resetCycle and cd.resCyc then
-		cd.resCyc=false
-		for i=0,2 do
-			task.wait(1)
-			getRod().Parent=plr.Backpack
-		end
-		getRod().Parent=chr
-		castRod()
-		getRod().Parent=plr.Backpack
-		task.wait(.5)
-		getRod().Parent=chr
-		resetCycle=false
-		firstReel=true
-		cd.resCyc=true
 	end
 	if togs.cast and cd.cast and not pauseFishing and not(togs.rodspam and not firstReel)then
 		cd.cast=false
@@ -848,6 +859,9 @@ Main.addToggle("Auto Cast",togs.cast,function(v)
 	RSanchor=nil
 	if v and togs.rodspam then
 		firstReel=true
+		lastReel=os.clock()
+		RSanchor=nil
+		resetCycle=false
 	end
 end)
 Main.addToggle("Legit Cast",togs.lcst,function(v)
