@@ -799,8 +799,11 @@ binds.reel=plrGui.ChildAdded:Connect(function(v)
 end)
 binds.cfr=hrp:GetPropertyChangedSignal"CFrame":Connect(function()
 	if not firstReel and togs.rodspam and RSanchor and togs.cast then
+		hrp.Anchored=true
 		hrp.CFrame=RSanchor
 		removeVelocity()
+		task.wait()
+		hrp.Anchored=false
 	end
 end)
 binds.weather=rsWorld.weather.Changed:Connect(function()
@@ -856,7 +859,6 @@ local Local=UI:addPage("Local Player",2)
 local Debug=UI:addPage("Debug",2)
 Main.addToggle("Auto Cast",togs.cast,function(v)
 	togs.cast=v
-	RSanchor=nil
 	if v and togs.rodspam then
 		firstReel=true
 		lastReel=os.clock()
