@@ -17,6 +17,7 @@ local rsWorld=rs.world
 local cam=workspace.CurrentCamera
 local auroraActive,sunkenActive,plrListDD,browhat
 local pauseFishing=false
+local usingTtm=false
 local firstReel=true
 local lastReel
 local RSanchor
@@ -281,7 +282,7 @@ end
 local platform=workspace:FindFirstChild"platform"
 local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("0x3b5 Internal Edition","v2.1")
+local UI=GUI:CreateWindow("0x3b5 Internal Edition","v2.2")
 function notify(t,m,d)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=t or"";
@@ -312,6 +313,13 @@ function nearest(folder)
 		end
 	end
 	return n
+end
+function updAnchor()
+	if togs.rodspam then
+		RSanchor=hrp.CFrame
+	else
+		RSanchor=nil
+	end
 end
 function tpTo(name)
 	hrp.CFrame=CFrame.new(unpack(coords[name]))
@@ -357,12 +365,14 @@ end
 function useTotem(name)
 	local totem=plr.Backpack:FindFirstChild(name)
 	if totem then
+		usingTtm=true
 		repeat task.wait()until not plrGui:FindFirstChild"reel"and not plrGui:FindFirstChild"shakeui"
 		equipBP(totem)
 		task.wait(.2)
 		totem:Activate()
 		task.wait(.2)
 		equipRod()
+		usingTtm=false
 	elseif totems[name].buyAmount>0 then
 		rsEvs.purchase:FireServer(name,"item",nil,totems[name].buyAmount)
 		task.wait(.5)
@@ -429,54 +439,56 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	if togs.equiprod and cd.equiprod then
 		cd.equiprod=false
 		local held=chr:FindFirstChild(pstat.rod.Value)
-		if not held then
+		if not held and not usingTtm then
 			equipRod()
 		end
 		task.wait(.3)
 		cd.equiprod=true
 	end
-	if not resetCycle then
-		if togs.rodspam then
-			for _,v in pairs(hum.Animator:GetPlayingAnimationTracks())do
-				if v.Animation.AnimationId=="rbxassetid://113972107465696"then
-					getRod().Parent=plr.Backpack
-					task.wait(.05)
-					getRod().Parent=chr
-					break
+	if not pauseFishing then
+		if not resetCycle then
+			if togs.rodspam then
+				for _,v in pairs(hum.Animator:GetPlayingAnimationTracks())do
+					if v.Animation.AnimationId=="rbxassetid://113972107465696"then
+						getRod().Parent=plr.Backpack
+						task.wait(.05)
+						getRod().Parent=chr
+						break
+					end
 				end
 			end
-		end
-		if togs.cast and togs.rodspam and not firstReel and cd.rodspam then
-			cd.rodspam=false
-			castRod()
-			task.wait(.3)
-			rsEvs["reelfinished "]:FireServer(100,true)
-			cd.rodspam=true
-		end
-	end
-	if not firstReel and togs.rodspam and RSanchor and togs.cast then
-		if os.clock()-lastReel>3 and not resetCycle then
-			resetCycle=true
-		end
-		hrp.CFrame=RSanchor
-		removeVelocity()
-	end
-	if togs.cast and cd.cast and not pauseFishing and not(togs.rodspam and not firstReel)then
-		cd.cast=false
-		local rod=getRod()
-		if rod and rod:FindFirstChild"values"then
-			if not rod.values.casted.Value then
-				if togs.lcst then
-					mouse(0,0,1)
-					task.wait(.4)
-					mouse(0,0,0)
-				else
-					rod.events.cast:FireServer(0)
-					task.wait(.2)
-				end
+			if togs.cast and togs.rodspam and not firstReel and cd.rodspam then
+				cd.rodspam=false
+				castRod()
+				task.wait(.3)
+				rsEvs["reelfinished "]:FireServer(100,true)
+				cd.rodspam=true
 			end
 		end
-		cd.cast=true
+		if not firstReel and togs.rodspam and RSanchor and togs.cast then
+			if os.clock()-lastReel>2.9 and not resetCycle then
+				resetCycle=true
+			end
+			hrp.CFrame=RSanchor
+			removeVelocity()
+		end
+		if togs.cast and cd.cast and not(togs.rodspam and not firstReel)then
+			cd.cast=false
+			local rod=getRod()
+			if rod and rod:FindFirstChild"values"then
+				if not rod.values.casted.Value then
+					if togs.lcst then
+						mouse(0,0,1)
+						task.wait(.4)
+						mouse(0,0,0)
+					else
+						rod.events.cast:FireServer(0)
+						task.wait(.2)
+					end
+				end
+			end
+			cd.cast=true
+		end
 	end
 	if togs.shake and plrGui:FindFirstChild"shakeui"and plrGui.shakeui.safezone:FindFirstChild"button"then
 		local btn=plrGui.shakeui.safezone.button
@@ -588,6 +600,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 						hum:SetStateEnabled(4,false)
 						tpOnPart(fp,v[3])
 						hum:ChangeState"Running"
+						updAnchor()
 						break
 					end
 				end
@@ -711,12 +724,13 @@ binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 	local l=a:lower()
 	if l:find"sunken treasure"and togs.sunkenchest then
 		sunkenActive=true
-		task.wait(.1)
+		pauseFishing=true
+		task.wait(.5)
 		for k,v in pairs(sunkenLocs)do
 			if l:find(k)then
 				for _,p in pairs(v)do
 					hrp.CFrame=CFrame.new(unpack(p))
-					task.wait(1.2)
+					task.wait(1.25)
 					local pad=workspace.ActiveChestsFolder:FindFirstChild"Pad"
 					if pad and pad:FindFirstChild"Spawns"then
 						for _,v in pairs(pad:GetDescendants())do
@@ -726,14 +740,14 @@ binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 								v.HoldDuration=0
 							end
 						end
-						task.wait(.2)
+						task.wait(.25)
 						for _,c in pairs(pad.Spawns:GetChildren())do
 							hrp.CFrame=c.CFrame
 							removeVelocity()
 							cam.CFrame=hrp.CFrame*CFrame.Angles(-2,0,0)
 							for i=0,5 do
 								press(101)
-								task.wait(.125)
+								task.wait(.1)
 								press(111)
 							end
 						end
@@ -776,7 +790,7 @@ binds.reel=plrGui.ChildAdded:Connect(function(v)
 			if firstReel then
 				firstReel=false
 				lastReel=os.clock()
-				RSanchor=hrp.CFrame
+				updAnchor()
 				getRod().Parent=plr.Backpack
 				getRod().Parent=chr
 				task.wait()
