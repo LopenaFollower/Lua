@@ -119,9 +119,19 @@ local events={
 	{"Kraken",0,false},
 	{"Orcas",0,false},
 	{"Ancient Orcas",0,false},
-	{"Lovestorm",0,false},
 	{"Scylla",0,false},
 	{"Whales",0,false}
+}
+local fzs={
+	["Shark Hunt"]={"Whale Shark","Great White Shark","Great Hammerhead Shark"},
+	["Megalodon"]={"Megalodon Default"},
+	["Depth Serpent"]={"The Depths - Serpent"},
+	["Kraken"]={"The Kraken Pool"},
+	["Isonade"]={"Isonade"},
+	["Orcas"]={"Orcas Pool"},
+	["Ancient Orcas"]={"Ancient Orcas Pool"},
+	["Scylla"]={"Forsaken Veil - Scylla"},
+	["Whales"]={"Whales Pool"}
 }
 local wps={
 	areas1={
@@ -245,18 +255,6 @@ local appraiseSettings={
 		Translucent=false
 	},
 	attributes={Big=false,Giant=false,Shiny=false,Sparkling=false}
-}
-local fzs={
-	["Shark Hunt"]={"Whale Shark","Great White Shark","Great Hammerhead Shark"},
-	["Megalodon"]={"Megalodon Default"},
-	["Depth Serpent"]={"The Depths - Serpent"},
-	["Kraken"]={"The Kraken Pool"},
-	["Isonade"]={"Isonade"},
-	["Orcas"]={"Orcas Pool"},
-	["Ancient Orcas"]={"Ancient Orcas Pool"},
-	["Lovestorm"]={"Lovestorm Eel","Lovestorm Eel Supercharged"},
-	["Scylla"]={"Forsaken Veil - Scylla"},
-	["Whales"]={"Whales Pool"}
 }
 local sunkenLocs={
 	moosewood={{936,130,-159},{693,130,-362},{613,130,498},{285,130,564},{283,130,-159}},
