@@ -275,7 +275,7 @@ end
 local platform=workspace:FindFirstChild"platform"
 local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("0x3b5 Internal Edition","v1.3.3")
+local UI=GUI:CreateWindow("0x3b5 Internal Edition","v1.3.4")
 function notify(t,m,d)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=t or"";
@@ -364,7 +364,7 @@ function useTotem(name)
 		repeat task.wait()until not(plrGui:FindFirstChild"shakeui"or getRod().values.casted.Value)
 		equipBP(totem)
 		repeat task.wait()until chr:FindFirstChild(name)
-		totem:Activate()
+		chr:FindFirstChild(name):Activate()
 		task.wait(.1)
 		equipRod()
 		usingTtm=false
@@ -424,10 +424,17 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		for i=0,2 do
 			task.wait(1)
 			getRod().Parent=plr.Backpack
+			pcall(function()
+				chr:FindFirstChildWhichIsA"Tool".Parent=plr.Backpack
+			end)
 		end
 		getRod().Parent=chr
 		castRod()
 		getRod().Parent=plr.Backpack
+		local rod=rs.playerstats[plr.Name].Stats.rod.Value
+		rs.packages.Net["RE/Rod/Equip"]:FireServer("Flimsy Rod")
+		task.wait()
+		rs.packages.Net["RE/Rod/Equip"]:FireServer(rod)
 		task.wait(.5)
 		getRod().Parent=chr
 		resetCycle=false
@@ -1342,21 +1349,17 @@ Perf.addToggle("Remove unnecessary parts",togs.rl_parts,function(v)
 		end
 	end
 end)
-Perf.addToggle("Hide seraphic laser",togs.seralaser,function(v)
+Perf.addToggle("Hide Seraphic Laser",togs.seralaser,function(v)
 	togs.seralaser=v
 end)
-Perf.addToggle("Remove fish model",togs.rmvfish,function(v)
+Perf.addToggle("Remove Fish Model",togs.rmvfish,function(v)
 	togs.rmvfish=v
 end)
-Perf.addButton("Remove fish models",function()
-	local fishList = game:GetService("ReplicatedStorage").resources.items.fish:GetChildren()
-	local backpack = game:GetService("Players").LocalPlayer.Backpack
-
-	for _, item in pairs(backpack:GetChildren()) do
-		for _, fish in pairs(fishList) do
-			if item.Name == fish.Name then
-				item:Destroy()
-			end
+Perf.addButton("Visual Clear Inventory",function()
+	local fishList = game:GetService("ReplicatedStorage").resources.items.fish
+	for _,v in pairs(plr.Backpack:GetChildren())do
+		if fishList:FindFirstChild(v.Name)and not v.Name:lower():find"crate"then
+			v:Destroy()
 		end
 	end
 end)
