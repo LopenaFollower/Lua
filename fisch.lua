@@ -275,7 +275,7 @@ end
 local platform=workspace:FindFirstChild"platform"
 local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("0x3b5 Internal Edition","v1.3.2")
+local UI=GUI:CreateWindow("0x3b5 Internal Edition","v1.3.3")
 function notify(t,m,d)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=t or"";
@@ -369,9 +369,11 @@ function useTotem(name)
 		equipRod()
 		usingTtm=false
 	elseif totems[name].buyAmount>0 then
-		rsEvs.purchase:FireServer(name,"item",nil,totems[name].buyAmount)
+		if not(plr.Backpack:FindFirstChild(name)or chr:FindFirstChild(name))then
+			rsEvs.purchase:FireServer(name,"item",nil,totems[name].buyAmount)
+		end
 		repeat task.wait()until chr:FindFirstChild(name)
-		task.wait(.1)
+		task.wait(.25)
 		useTotem(name)
 	end
 end
@@ -1345,6 +1347,18 @@ Perf.addToggle("Hide seraphic laser",togs.seralaser,function(v)
 end)
 Perf.addToggle("Remove fish model",togs.rmvfish,function(v)
 	togs.rmvfish=v
+end)
+Perf.addButton("Remove fish models",function()
+	local fishList = game:GetService("ReplicatedStorage").resources.items.fish:GetChildren()
+	local backpack = game:GetService("Players").LocalPlayer.Backpack
+
+	for _, item in pairs(backpack:GetChildren()) do
+		for _, fish in pairs(fishList) do
+			if item.Name == fish.Name then
+				item:Destroy()
+			end
+		end
+	end
 end)
 Perf.addButton("Remove Particle Emitters",function()
 	for _,v in pairs(game:GetDescendants())do
