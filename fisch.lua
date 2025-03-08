@@ -275,7 +275,7 @@ end
 local platform=workspace:FindFirstChild"platform"
 local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("0x3b5 Internal Edition","v2.3.1")
+local UI=GUI:CreateWindow("0x3b5 Internal Edition","v1.3.2")
 function notify(t,m,d)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=t or"";
@@ -361,7 +361,7 @@ function useTotem(name)
 	local totem=plr.Backpack:FindFirstChild(name)
 	if totem then
 		usingTtm=true
-		repeat task.wait()until not(plrGui:FindFirstChild"reel"or plrGui:FindFirstChild"shakeui"or getRod().values.casted.Value)
+		repeat task.wait()until not(plrGui:FindFirstChild"shakeui"or getRod().values.casted.Value)
 		equipBP(totem)
 		repeat task.wait()until chr:FindFirstChild(name)
 		totem:Activate()
@@ -441,7 +441,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 		task.wait(.3)
 		cd.equiprod=true
 	end
-	if not pauseFishing then
+	if not pauseFishing and not usingTtm then
 		if not resetCycle then
 			if togs.rodspam and cd.test then
 				cd.test=false
@@ -464,7 +464,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			end
 		end
 		if not firstReel and togs.rodspam and RSanchor and togs.cast then
-			if os.clock()-lastReel>3.3 and not resetCycle then
+			if os.clock()-lastReel>3.4 and not resetCycle then
 				resetCycle=true
 			end
 			hrp.CFrame=RSanchor
