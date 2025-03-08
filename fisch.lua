@@ -275,7 +275,7 @@ end
 local platform=workspace:FindFirstChild"platform"
 local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("0x3b5 Internal Edition","v2.2.1")
+local UI=GUI:CreateWindow("0x3b5 Internal Edition","v2.3.1")
 function notify(t,m,d)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=t or"";
@@ -307,9 +307,9 @@ function nearest(folder)
 	end
 	return n
 end
-function updAnchor()
+function updAnchor(g)
 	if togs.rodspam then
-		RSanchor=hrp.CFrame
+		RSanchor=g or hrp.CFrame
 	else
 		RSanchor=nil
 	end
@@ -321,7 +321,9 @@ function tpOnPart(pt,t)
 	local p=pt.Position
 	local top=t and pt.Size.Y/2+5 or pt.Size.Y/4
 	platform.CFrame=CFrame.new(p.X,p.Y+top-3,p.Z)
-	hrp.CFrame=CFrame.new(p.X,p.Y+top,p.Z)
+	local d=CFrame.new(p.X,p.Y+top,p.Z)
+	hrp.CFrame=d
+	return d
 end
 function removeVelocity()
 	pcall(function()
@@ -594,9 +596,8 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 						he=true
 						removeVelocity()
 						hum:SetStateEnabled(4,false)
-						tpOnPart(fp,v[3])
+						updAnchor(tpOnPart(fp,v[3]))
 						hum:ChangeState"Running"
-						updAnchor()
 						break
 					end
 				end
@@ -607,6 +608,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			hrp.Anchored=false
 			if vals.anchor then
 				hrp.CFrame=vals.anchor
+				updAnchor(vals.anchor)
 				task.wait(.1)
 			end
 		end
