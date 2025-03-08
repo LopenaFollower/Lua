@@ -1,5 +1,5 @@
 local x=game.PlaceId
-if x^2-131579468225600*x-16732694052*x+2201678985343820114131200~=0 then return else repeat task.wait()until game:IsLoaded()and game.Players.LocalPlayer end
+if(x-131579468225600)*(x-16732694052)~=0 then return else repeat task.wait()until game:IsLoaded()and game.Players.LocalPlayer end
 local plr=game.Players.LocalPlayer
 local chr=plr.Character
 local hum=chr:FindFirstChildWhichIsA"Humanoid"
@@ -15,13 +15,12 @@ local pstat=rs.playerstats[plr.Name].Stats
 local rsEvs=rs.events
 local rsWorld=rs.world
 local cam=workspace.CurrentCamera
-local auroraActive,sunkenActive,plrListDD,browhat
+local auroraActive,sunkenActive,plrListDD,RSanchor
 local pauseFishing=false
 local usingTtm=false
 local firstReel=true
-local lastReel
-local RSanchor
 local resetCycle=false
+local lastReel=os.clock()
 local startTime=os.time()
 local sessionStart=os.time()
 local plrNames={}
@@ -67,7 +66,8 @@ local cd={
 	webhook=true,
 	rodspam=true,
 	equiprod=true,
-	resCyc=true
+	resCyc=true,
+	test=true
 }
 local webhookOpt={
 	enabled=false,
@@ -92,11 +92,6 @@ local vals={
 	totemType="",
 	totemAmnt=1,
 	pRod=""
-}
-local purchase={
-	["Bait Crate"]={v=false,a=1},
-	["Quality Bait Crate"]={v=false,a=1},
-	["Coral Geode"]={v=false,a=1}
 }
 local totems={
 	["Sundial Totem"]={
@@ -280,7 +275,7 @@ end
 local platform=workspace:FindFirstChild"platform"
 local WHC=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/webhook.lua")()
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow("0x3b5 Internal Edition","v2.2")
+local UI=GUI:CreateWindow("0x3b5 Internal Edition","v2.2.1")
 function notify(t,m,d)
 	game.StarterGui:SetCore("SendNotification",{
 		Title=t or"";
@@ -351,7 +346,7 @@ function getRod()
 end
 function castRod()
 	local rod=getRod()
-	if rod and rod:FindFirstChild"values"then
+	if rod then
 		if not rod.values.casted.Value then
 			rod.events.cast:FireServer(0)
 		end
@@ -364,16 +359,17 @@ function useTotem(name)
 	local totem=plr.Backpack:FindFirstChild(name)
 	if totem then
 		usingTtm=true
-		repeat task.wait()until not plrGui:FindFirstChild"reel"and not plrGui:FindFirstChild"shakeui"
+		repeat task.wait()until not(plrGui:FindFirstChild"reel"or plrGui:FindFirstChild"shakeui"or getRod().values.casted.Value)
 		equipBP(totem)
-		task.wait(.2)
+		repeat task.wait()until chr:FindFirstChild(name)
 		totem:Activate()
-		task.wait(.2)
+		task.wait(.1)
 		equipRod()
 		usingTtm=false
 	elseif totems[name].buyAmount>0 then
 		rsEvs.purchase:FireServer(name,"item",nil,totems[name].buyAmount)
-		task.wait(.5)
+		repeat task.wait()until chr:FindFirstChild(name)
+		task.wait(.1)
 		useTotem(name)
 	end
 end
@@ -445,7 +441,8 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 	end
 	if not pauseFishing then
 		if not resetCycle then
-			if togs.rodspam then
+			if togs.rodspam and cd.test then
+				cd.test=false
 				for _,v in pairs(hum.Animator:GetPlayingAnimationTracks())do
 					if v.Animation.AnimationId=="rbxassetid://113972107465696"then
 						getRod().Parent=plr.Backpack
@@ -454,6 +451,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 						break
 					end
 				end
+				cd.test=true
 			end
 			if togs.cast and togs.rodspam and not firstReel and cd.rodspam then
 				cd.rodspam=false
@@ -464,7 +462,7 @@ binds.main=game:GetService"RunService".Stepped:Connect(function()
 			end
 		end
 		if not firstReel and togs.rodspam and RSanchor and togs.cast then
-			if os.clock()-lastReel>2.9 and not resetCycle then
+			if os.clock()-lastReel>3.3 and not resetCycle then
 				resetCycle=true
 			end
 			hrp.CFrame=RSanchor
@@ -718,6 +716,18 @@ binds.grandReef=workspace.world.map["Grand Reef"].DescendantAdded:Connect(functi
 		end
 	end
 end)
+binds.pl=workspace.world.map["Roslit Bay"].Cave.Plants.ChildAdded:Connect(function(v)
+	if togs.rl_parts and(v:IsA"MeshPart"or v:IsA"Model")then
+		task.wait()
+		v:Destroy()
+	end
+end)
+binds.abyss=workspace.world.map["Roslit Bay"].Cave.Abyss.ChildAdded:Connect(function(v)
+	if togs.rl_parts and(v:IsA"Folder"or v:IsA"Model"or v.Name=="Meshes/Stalagmites_Cylinder"or v.Name=="RoundRock")then
+		task.wait()
+		v:Destroy()
+	end
+end)
 binds.anno=rsEvs.anno_top.OnClientEvent:Connect(function(a)
 	local l=a:lower()
 	if l:find"sunken treasure"and togs.sunkenchest then
@@ -788,7 +798,6 @@ binds.reel=plrGui.ChildAdded:Connect(function(v)
 			if firstReel then
 				firstReel=false
 				lastReel=os.clock()
-				updAnchor()
 				getRod().Parent=plr.Backpack
 				getRod().Parent=chr
 				task.wait()
@@ -811,11 +820,8 @@ binds.reel=plrGui.ChildAdded:Connect(function(v)
 end)
 binds.cfr=hrp:GetPropertyChangedSignal"CFrame":Connect(function()
 	if not firstReel and togs.rodspam and RSanchor and togs.cast then
-		hrp.Anchored=true
 		hrp.CFrame=RSanchor
 		removeVelocity()
-		task.wait()
-		hrp.Anchored=false
 	end
 end)
 binds.weather=rsWorld.weather.Changed:Connect(function()
@@ -856,7 +862,7 @@ binds.plrslv=game.Players.PlayerRemoving:Connect(function(v)
 	end
 	plrListDD.setList(plrNames)
 end)
-local Main=UI:addPage("Main",2,true)
+local Main=UI:addPage("Main",1.6,true)
 local Waypoints=UI:addPage("Locations",1)
 local EvFarm=UI:addPage("Event Farming",2)
 local Appraisal=UI:addPage("Appraise",4)
@@ -876,6 +882,7 @@ Main.addToggle("Auto Cast",togs.cast,function(v)
 		lastReel=os.clock()
 		RSanchor=nil
 		resetCycle=false
+		updAnchor()
 	end
 end)
 Main.addToggle("Legit Cast",togs.lcst,function(v)
@@ -892,6 +899,9 @@ Main.addToggle("Fast Reel",togs.rodspam,function(v)
 				task.wait()
 				n:Destroy()
 			end
+		end
+		if togs.cast then
+			updAnchor()
 		end
 	end
 end)
@@ -1118,6 +1128,7 @@ plrListDD=PlayerInfo.addDropdown("Show Player's Stats/Inventory",plrNames,nil,fu
 	end
 	local pD=p.DisplayName
 	local tracker={}
+	local bds={}
 	local GuiActive=true
 	local Gui=Instance.new"ScreenGui"
 	local Frame=Instance.new"Frame"
@@ -1157,6 +1168,7 @@ plrListDD=PlayerInfo.addDropdown("Show Player's Stats/Inventory",plrNames,nil,fu
 	Close.MouseButton1Click:Connect(function()
 		Gui:Destroy()
 		for _,v in pairs(tracker)do v:Disconnect()end
+		for _,v in pairs(bds)do v:Disconnect()end
 	end)
 	Title.Parent=Frame
 	Title.Size=UDim2.new(0,15,0,15)
@@ -1255,7 +1267,7 @@ plrListDD=PlayerInfo.addDropdown("Show Player's Stats/Inventory",plrNames,nil,fu
 		local delta=e.Position-dragStart
 		Frame.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y)
 	end
-	Frame.InputBegan:Connect(function(e)
+	bds.ib=Frame.InputBegan:Connect(function(e)
 		if e.UserInputType==Enum.UserInputType.MouseButton1 or e.UserInputType==Enum.UserInputType.Touch then
 			dragging=true
 			dragStart=e.Position
@@ -1267,12 +1279,12 @@ plrListDD=PlayerInfo.addDropdown("Show Player's Stats/Inventory",plrNames,nil,fu
 			end)
 		end
 	end)
-	Frame.InputChanged:Connect(function(e)
+	bds.ic=Frame.InputChanged:Connect(function(e)
 		if e.UserInputType==Enum.UserInputType.MouseMovement or e.UserInputType==Enum.UserInputType.Touch then
 			dragInput=e
 		end
 	end)
-	us.InputChanged:Connect(function(e)
+	bds.uc=us.InputChanged:Connect(function(e)
 		if e==dragInput and dragging then
 			update(e)
 		end
@@ -1282,6 +1294,7 @@ plrListDD=PlayerInfo.addDropdown("Show Player's Stats/Inventory",plrNames,nil,fu
 			if not game.Players:FindFirstChild(v)then
 				Title.Text=pD.."'s Stats/Inventory: (Player Left)"
 				for _,v in pairs(tracker)do v:Disconnect()end
+				for _,v in pairs(bds)do v:Disconnect()end
 				break
 			end
 		end
@@ -1311,6 +1324,18 @@ Perf.addToggle("Remove unnecessary parts",togs.rl_parts,function(v)
 				v:Destroy()
 			end
 		end
+		for _,p in pairs(workspace.world.map["Roslit Bay"].Cave.Plants:GetChildren())do
+			if v:IsA"MeshPart"or v:IsA"Model"then
+				task.wait()
+				v:Destroy()
+			end
+		end
+		for _,p in pairs(workspace.world.map["Roslit Bay"].Cave.Abyss:GetChildren())do
+			if v:IsA"Folder"or v:IsA"Model"or v.Name=="Meshes/Stalagmites_Cylinder"or v.Name=="RoundRock"then
+				task.wait()
+				v:Destroy()
+			end
+		end
 	end
 end)
 Perf.addToggle("Hide seraphic laser",togs.seralaser,function(v)
@@ -1318,6 +1343,13 @@ Perf.addToggle("Hide seraphic laser",togs.seralaser,function(v)
 end)
 Perf.addToggle("Remove fish model",togs.rmvfish,function(v)
 	togs.rmvfish=v
+end)
+Perf.addButton("Remove Particle Emitters",function()
+	for _,v in pairs(game:GetDescendants())do
+		if v:IsA"ParticleEmitter"then
+			v.Enabled=false
+		end
+	end
 end)
 Local.addToggle("Disable Temperature",togs.temp,function(v)
 	togs.temp=v
