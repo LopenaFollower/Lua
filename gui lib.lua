@@ -164,7 +164,7 @@ function Lib:CreateWindow(windowname,windowinfo)
 	Status.Value=true
 	Status.Changed:Connect(function(v)
 		if not v then
-			destroyCallback()
+			pcall(destroyCallback)
 			Gui:Destroy()
 		end
 	end)
