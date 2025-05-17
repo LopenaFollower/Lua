@@ -7,7 +7,9 @@ local tog={
 	moonlit=false,
 	harvest=false,
 	tpw=false,
-	infj=false
+	infj=false,
+	wander=false,
+	hideplants=false
 }
 local seeds={
 	{"Carrot",false},
@@ -29,17 +31,31 @@ local seeds={
 	{"Mushroom",false},
 	{"Pepper",false},
 	{"Cacao",false},
+	{"Beanstalk",false},
 }
 local cd={
 	harvest=true,
 	seeds=true,
 	sell=true,
-	moonlit=true
+	moonlit=true,
+	wander=true,
+	hideplants=true
 }
 local vals={
-	tpws=5
+	tpws=5,
+	harvestmode="Aura"
 }
 local binds={}
+if not workspace:FindFirstChild"platform"then
+	local p=Instance.new"Part"
+	p.Name="platform"
+	p.Parent=workspace
+	p.Transparency=1
+	p.Size=Vector3.new(1,.1,1)
+	p.Anchored=true
+	p.CFrame=CFrame.new(0,0,0)
+end
+local platform=workspace:FindFirstChild"platform"
 local vi=game:GetService"VirtualInputManager"
 local rs=game:GetService"ReplicatedStorage"
 local GE=rs.GameEvents
@@ -54,9 +70,6 @@ local UI=GUI:CreateWindow"Garden"
 function mouse(x,y,d,l)
 	vi:SendMouseButtonEvent(x,y,0,d,l or game,0)
 end
-function vec2d(v3)
-	return Vector2.new(v3.x,v3.z)
-end
 binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 	pcall(function()
 		plr=game.Players.LocalPlayer
@@ -69,15 +82,20 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 			chr:TranslateBy(hum.MoveDirection*vals.tpws/5)
 		end
 	end
+	if tog.moonlit and cd.moonlit then
+		cd.moonlit=false
+		GE.NightQuestRemoteEvent:FireServer"SubmitAllPlants"
+		task.wait(.2)
+		cd.moonlit=true
+	end
 	if tog.sell and cd.sell then
 		if#plr.Backpack:GetChildren()>199 then
 			cd.sell=false
 			local pos=hrp.CFrame
-			hrp.CFrame=workspace.Tutorial_Points.Tutorial_Point_2.CFrame
-			task.wait(.1)
-			repeat 
-				GE.Sell_Inventory:FireServer()
+			repeat
+				hrp.CFrame=workspace.Tutorial_Points.Tutorial_Point_2.CFrame
 				task.wait(.1)
+				GE.Sell_Inventory:FireServer()
 			until not tog.sell or#plr.Backpack:GetChildren()<200
 			hrp.CFrame=pos
 			cd.sell=true
@@ -85,24 +103,28 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 	end
 	if tog.harvest and cd.harvest then
 		cd.harvest=false
-		local count=0
 		pcall(function()
-			for _,v in pairs(UserFarm.Important.Plants_Physical:GetDescendants())do
-				if count>75 then break end
-				if v:IsA"ProximityPrompt"and(v.Parent.Position-hrp.Position).Magnitude<25 then
-					fireproximityprompt(v)
-					count+=1
+			if vals.harvestmode=="Aura"then
+				for _,v in pairs(UserFarm.Important.Plants_Physical:GetDescendants())do
+					if v:IsA"ProximityPrompt"and(v.Parent.Position-hrp.Position).Magnitude<15 then
+						fireproximityprompt(v)
+					end
+				end
+				task.wait(.1)
+			else
+				local ps=UserFarm.Important.Plants_Physical:GetChildren()
+				local fs=ps[math.random(1,#ps)].Fruits:GetChildren()
+				local f=fs[math.random(1,#fs)]
+				for _,v in pairs(f:GetChildren())do
+					local p=v:FindFirstChildWhichIsA"ProximityPrompt"
+					if p then
+						fireproximityprompt(p)
+						break
+					end
 				end
 			end
 		end)
-		task.wait(.1)
 		cd.harvest=true
-	end
-	if tog.moonlit and cd.moonlit then
-		cd.moonlit=false
-		GE.NightQuestRemoteEvent:FireServer"SubmitAllPlants"
-		task.wait(.2)
-		cd.moonlit=true
 	end
 	if cd.seeds then
 		cd.seeds=false
@@ -115,8 +137,49 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 				end
 			end
 		end)
-		task.wait(.2	)
+		task.wait(.5)
 		cd.seeds=true
+	end
+	if tog.wander and cd.wander and#plr.Backpack:GetChildren()<200 then
+		cd.wander=false
+		local timeout=false
+		local p,s=UserFarm.PetArea.Position,UserFarm.PetArea.Size
+		local goal=nil
+		local ps=UserFarm.Important.Plants_Physical:GetChildren()
+		pcall(function()
+			local fs=ps[math.random(1,#ps)].Fruits:GetChildren()
+			for _,v in pairs(fs[math.random(1,#fs)]:GetChildren())do
+				local p=v:FindFirstChildWhichIsA"ProximityPrompt"
+				if p then
+					goal=p.Parent.Position
+					break
+				end
+			end
+			hum:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+			game.TweenService:Create(hrp,TweenInfo.new(math.random(1,3),Enum.EasingStyle.Linear),{CFrame=CFrame.new(goal.X,goal.Y,goal.Z)}):Play()
+			task.spawn(function()
+				task.wait(5)
+				timeout=true
+			end)
+			repeat
+				task.wait()
+				platform.CFrame=hrp.CFrame-Vector3.new(0,2,0)
+			until(goal-hrp.Position).Magnitude<2 or timeout
+		end)
+		cd.wander=true
+	end
+	if cd.hideplants then
+		cd.hideplants=false
+		for _,v in pairs(UserFarm.Important.Plants_Physical:GetChildren())do
+			for _,i in pairs(v:GetChildren())do
+				if"number"==type(tonumber(i.Name))and(i:IsA"BasePart"or i:IsA"MeshPart")then
+					i.CanCollide=false
+					i.Transparency=tog.hideplants and 1 or 0
+				end
+			end
+		end
+		task.wait(1)
+		cd.hideplants=true
 	end
 end)
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
@@ -125,9 +188,12 @@ binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	end
 end)
 local Main=UI:addPage("Main",1,true,1)
-local Seeds=UI:addPage("Seeds",2.475)
-local Local=UI:addPage("Local Player",2.475)
-Main.addToggle("Harvest Aura",tog.harvest,function(v)
+local Seeds=UI:addPage("Seeds",2.6)
+local Local=UI:addPage("Local Player",1)
+Main.addDropdown("Harvest Mode",{"Aura","Random"},nil,function(v)
+	vals.harvestmode=v
+end)
+Main.addToggle("Harvest",tog.harvest,function(v)
 	tog.harvest=v
 end)
 Main.addToggle("Auto Sell",tog.sell,function(v)
@@ -145,6 +211,12 @@ Main.addButton("Manual Sell",function()
 end)
 Main.addToggle("Give Moonlit Fruits",tog.moonlit,function(v)
 	tog.moonlit=v
+end)
+Main.addToggle("Wander",tog.wander,function(v)
+	tog.wander=v
+end)
+Main.addToggle("Render Plants",not tog.hideplants,function(v)
+	tog.hideplants=not v
 end)
 for _,v in pairs({unpack(seeds)})do
 	Seeds.addToggle(v[1],false,function(n)
@@ -168,6 +240,7 @@ Local.addToggle("Invis Cam",false,function(v)
 	plr.CameraMaxZoomDistance=300
 	plr.DevCameraOcclusionMode=v and Enum.DevCameraOcclusionMode.Invisicam or Enum.DevCameraOcclusionMode.Zoom
 end)
+Local.addButton("Inf Yield",loadstring(game:HttpGet"https://infyiff.github.io/resources/IY_FE.txt"))
 Local.destroyGui(function()
 	for i,v in pairs(binds)do v:Disconnect()end
 	for i,v in pairs(tog)do tog[i]=false end
