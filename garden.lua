@@ -11,7 +11,8 @@ local tog={
 	wander=false,
 	hideplants=false,
 	eggs=false,
-	feed=false
+	feed=false,
+	esp=false
 }
 local seeds={
 	{"Carrot",false},
@@ -60,15 +61,25 @@ local cd={
 	harvest=true,
 	seeds=true,
 	gears=true,
+	evshop=true,
 	sell=true,
 	moonlit=true,
 	wander=true,
 	hideplants=true,
-	eggs=true
+	eggs=true,
+	esp=true
 }
 local vals={
 	tpws=5,
-	harvestmode="Aura"
+	harvestmode="Aura",
+	esp={
+		gold=false,
+		rgb=false,
+		shock=false,
+		wet=false,
+		moonlit=false,
+		celestial=false
+	}
 }
 local binds={}
 if not workspace:FindFirstChild"platform"then
@@ -93,6 +104,25 @@ local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollow
 local UI=GUI:CreateWindow"Garden"
 function mouse(x,y,d,l)
 	vi:SendMouseButtonEvent(x,y,0,d,l or game,0)
+end
+function esp(v)
+	if v:IsA"BasePart"and"MeshPart"~=v.ClassName and not v:FindFirstChild"sdaisdada"then
+		local a=nil
+		if"UnionOperation"==v.ClassName or v.Shape==Enum.PartType.Ball then
+			a=Instance.new("SphereHandleAdornment",v)
+			a.Radius=v.Size.X/2
+		else
+			a=Instance.new("BoxHandleAdornment",v)
+			a.Size=v.Size
+			a.CFrame=CFrame.Angles(v.CFrame:ToOrientation())
+		end
+		a.Name="sdaisdada"
+		a.Adornee=v
+		a.AlwaysOnTop=true
+		a.ZIndex=0
+		a.Transparency=.35
+		a.Color=v.BrickColor
+	end
 end
 binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 	pcall(function()
@@ -254,6 +284,23 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 			fireproximityprompt(p)
 		end
 	end
+	if tog.esp and cd.esp then
+		cd.esp=false
+		for _,v in pairs(UserFarm.Important.Plants_Physical:GetChildren())do
+			for _,f in pairs(v.Fruits:GetChildren())do
+				local var=f.Variant.Value
+				if"Gold"==var and vals.esp.gold or"Rainbow"==var and vals.esp.rgb or f:GetAttribute"Wet"and vals.esp.wet or f:GetAttribute"Shocked"and vals.esp.shock or f:GetAttribute"Moonlit"and vals.esp.moonlit or f:GetAttribute"Celestial"and vals.esp.celestial then
+					for _,p in pairs(f:GetChildren())do
+						if"number"==type(tonumber(p.Name))and p:IsA"BasePart"then
+							esp(p)
+						end
+					end
+				end
+			end
+		end
+		task.wait(1)
+		cd.esp=true
+	end
 end)
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
 	if tog.infj and hum then
@@ -263,7 +310,8 @@ end)
 local Main=UI:addPage("Main",1,true)
 local Seeds=UI:addPage("Seeds",2.6)
 local Gears=UI:addPage("Gears",1.05)
-local EvShop=UI:addPage("Gears",1.05)
+local EvShop=UI:addPage("Event Shop",1.15)
+local Esp=UI:addPage("ESP",1)
 local Pets=UI:addPage("Pets",1)
 local Local=UI:addPage("Local Player",1)
 Main.addDropdown("Harvest Mode",{"Aura","Random"},nil,function(v)
@@ -329,6 +377,33 @@ for _,v in pairs({unpack(event)})do
 		end
 	end)
 end
+Esp.addToggle("Enable",tog.esp,function(v)
+	tog.esp=v
+	for _,e in pairs(UserFarm.Important.Plants_Physical:GetDescendants())do
+		if e.Name=="sdaisdada"then
+			e:Destroy()
+		end
+	end
+end)
+Esp.addLabel"Filters"
+Esp.addToggle("Gold",vals.esp.gold,function(v)
+	vals.esp.gold=v
+end)
+Esp.addToggle("Rainbow",vals.esp.rgb,function(v)
+	vals.esp.rgb=v
+end)
+Esp.addToggle("Shocked",vals.esp.shock,function(v)
+	vals.esp.shock=v
+end)
+Esp.addToggle("Wet",vals.esp.wet,function(v)
+	vals.esp.wet=v
+end)
+Esp.addToggle("Moonlit",vals.esp.moonlit,function(v)
+	vals.esp.moonlit=v
+end)
+Esp.addToggle("Celestial",vals.esp.celestial,function(v)
+	vals.esp.celestial=v
+end)
 Pets.addToggle("Buy Eggs",tog.eggs,function(v)
 	tog.eggs=v
 	if v then
@@ -367,6 +442,11 @@ local args = {
 	buffer.fromstring("\002")
 }
 --game:GetService("ReplicatedStorage"):WaitForChild("ByteNetReliable"):FireServer(unpack(args)) -- daily quest
+local args = {
+	"HatchPet",
+	workspace:WaitForChild("Farm"):WaitForChild("Farm"):WaitForChild("Important"):WaitForChild("Objects_Physical"):WaitForChild("PetEgg")
+}
+--game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("PetEggService"):FireServer(unpack(args))
 --[[
 make moonlit submit smarter
 harvest filters
