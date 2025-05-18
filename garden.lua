@@ -9,7 +9,9 @@ local tog={
 	tpw=false,
 	infj=false,
 	wander=false,
-	hideplants=false
+	hideplants=false,
+	eggs=false,
+	feed=false
 }
 local seeds={
 	{"Carrot",false},
@@ -33,13 +35,25 @@ local seeds={
 	{"Cacao",false},
 	{"Beanstalk",false},
 }
+local gears={
+	{"Watering Can",false},
+	{"Trowel",false},
+	{"Recall Wrench",false},
+	{"Basic Sprinkler",false},
+	{"Advanced Sprinkler",false},
+	{"Godly Sprinkler",false},
+	{"Lightning Rod",false},
+	{"Master Sprinkler",false},
+}
 local cd={
 	harvest=true,
 	seeds=true,
+	gears=true,
 	sell=true,
 	moonlit=true,
 	wander=true,
-	hideplants=true
+	hideplants=true,
+	eggs=true
 }
 local vals={
 	tpws=5,
@@ -47,11 +61,10 @@ local vals={
 }
 local binds={}
 if not workspace:FindFirstChild"platform"then
-	local p=Instance.new"Part"
+	local p=Instance.new("Part",workspace)
 	p.Name="platform"
-	p.Parent=workspace
 	p.Transparency=1
-	p.Size=Vector3.new(1,.1,1)
+	p.Size=Vector3.new(3,.1,3)
 	p.Anchored=true
 	p.CFrame=CFrame.new(0,0,0)
 end
@@ -94,7 +107,7 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 			local pos=hrp.CFrame
 			repeat
 				hrp.CFrame=workspace.Tutorial_Points.Tutorial_Point_2.CFrame
-				task.wait(.1)
+				task.wait()
 				GE.Sell_Inventory:FireServer()
 			until not tog.sell or#plr.Backpack:GetChildren()<200
 			hrp.CFrame=pos
@@ -106,7 +119,7 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 		pcall(function()
 			if vals.harvestmode=="Aura"then
 				for _,v in pairs(UserFarm.Important.Plants_Physical:GetDescendants())do
-					if v:IsA"ProximityPrompt"and(v.Parent.Position-hrp.Position).Magnitude<15 then
+					if v:IsA"ProximityPrompt"and(v.Parent.Position-hrp.Position).Magnitude<17 then
 						fireproximityprompt(v)
 					end
 				end
@@ -128,17 +141,27 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 	end
 	if cd.seeds then
 		cd.seeds=false
-		pcall(function()
-			for k,v in pairs(seeds)do
-				if v[2]then
-					for i=0,5 do
-						GE.BuySeedStock:FireServer(v[1])
-					end
+		for k,v in pairs(seeds)do
+			if v[2]then
+				for i=0,5 do
+					GE.BuySeedStock:FireServer(v[1])
 				end
 			end
-		end)
+		end
 		task.wait(.5)
 		cd.seeds=true
+	end
+	if cd.gears then
+		cd.gears=false
+		for k,v in pairs(gears)do
+			if v[2]then
+				for i=0,5 do
+					GE.BuyGearStock:FireServer(v[1])
+				end
+			end
+		end
+		task.wait(1)
+		cd.gears=true
 	end
 	if tog.wander and cd.wander and#plr.Backpack:GetChildren()<200 then
 		cd.wander=false
@@ -151,35 +174,62 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 			for _,v in pairs(fs[math.random(1,#fs)]:GetChildren())do
 				local p=v:FindFirstChildWhichIsA"ProximityPrompt"
 				if p then
-					goal=p.Parent.Position
+					goal=p.Parent.Position+Vector3.new(0,4,0)
 					break
 				end
 			end
-			hum:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
-			game.TweenService:Create(hrp,TweenInfo.new(math.random(1,3),Enum.EasingStyle.Linear),{CFrame=CFrame.new(goal.X,goal.Y,goal.Z)}):Play()
+			game.TweenService:Create(hrp,TweenInfo.new(.5,Enum.EasingStyle.Linear),{CFrame=CFrame.new(goal.X,goal.Y,goal.Z)}):Play()
 			task.spawn(function()
 				task.wait(5)
 				timeout=true
 			end)
 			repeat
 				task.wait()
-				platform.CFrame=hrp.CFrame-Vector3.new(0,2,0)
+				platform.CFrame=hrp.CFrame-Vector3.new(0,2.1,0)
 			until(goal-hrp.Position).Magnitude<2 or timeout
 		end)
 		cd.wander=true
 	end
-	if cd.hideplants then
+	if tog.hideplants and cd.hideplants then
 		cd.hideplants=false
 		for _,v in pairs(UserFarm.Important.Plants_Physical:GetChildren())do
 			for _,i in pairs(v:GetChildren())do
 				if"number"==type(tonumber(i.Name))and(i:IsA"BasePart"or i:IsA"MeshPart")then
 					i.CanCollide=false
-					i.Transparency=tog.hideplants and 1 or 0
+					i.Transparency=1
+				end
+				if i.Name=="Branches"then
+					for _,k in pairs(i:GetDescendants())do
+						if k:IsA"BasePart"or k:IsA"MeshPart"then
+							k.CanCollide=false
+							k.Transparency=1
+						end
+					end
 				end
 			end
 		end
-		task.wait(1)
+		task.wait(.25)
 		cd.hideplants=true
+	end
+	if tog.eggs and cd.eggs then
+		cd.eggs=false
+		for i=1,3 do
+			GE.BuyPetEgg:FireServer(i)
+		end
+		task.wait(1)
+		cd.eggs=true
+	end
+	if tog.feed then
+		local p=nil
+		for _,v in pairs(workspace:GetChildren())do
+			p="Part"==v.Name and v:FindFirstChild"ProximityPrompt"
+			if p then break end
+		end
+		p.HoldDuration=0
+		p.MaxActivationDistance=10^100
+		if p.Enabled then
+			fireproximityprompt(p)
+		end
 	end
 end)
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
@@ -187,8 +237,10 @@ binds.jump=game.UserInputService.JumpRequest:Connect(function()
 		hum:ChangeState"Jumping"
 	end
 end)
-local Main=UI:addPage("Main",1,true,1)
+local Main=UI:addPage("Main",1,true)
 local Seeds=UI:addPage("Seeds",2.6)
+local Gears=UI:addPage("Gears",1.05)
+local Pets=UI:addPage("Pets",1)
 local Local=UI:addPage("Local Player",1)
 Main.addDropdown("Harvest Mode",{"Aura","Random"},nil,function(v)
 	vals.harvestmode=v
@@ -217,6 +269,14 @@ Main.addToggle("Wander",tog.wander,function(v)
 end)
 Main.addToggle("Render Plants",not tog.hideplants,function(v)
 	tog.hideplants=not v
+	for _,k in pairs(UserFarm.Important.Plants_Physical:GetChildren())do
+		for _,i in pairs(k:GetChildren())do
+			if"number"==type(tonumber(i.Name))and(i:IsA"BasePart"or i:IsA"MeshPart")then
+				i.CanCollide=false
+				i.Transparency=v and 0 or 1
+			end
+		end
+	end
 end)
 for _,v in pairs({unpack(seeds)})do
 	Seeds.addToggle(v[1],false,function(n)
@@ -227,6 +287,26 @@ for _,v in pairs({unpack(seeds)})do
 		end
 	end)
 end
+for _,v in pairs({unpack(gears)})do
+	Gears.addToggle(v[1],false,function(n)
+		for k,j in pairs(gears)do
+			if j[1]==v[1]then
+				gears[k][2]=n
+			end
+		end
+	end)
+end
+Pets.addToggle("Buy Eggs",tog.eggs,function(v)
+	tog.eggs=v
+	if v then
+		for i=1,3 do
+			GE.BuyPetEgg:FireServer(i)
+		end
+	end
+end)
+Pets.addToggle("Feed",tog.feed,function(v)
+	tog.feed=v
+end)
 Local.addToggle("Inf Jump",tog.infj,function(v)
 	tog.infj=v
 end)
@@ -250,3 +330,17 @@ local args = {
 	"Carrot"
 }
 --game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Plant_RE"):FireServer(unpack(args))
+local args = {
+	buffer.fromstring("\002")
+}
+--game:GetService("ReplicatedStorage"):WaitForChild("ByteNetReliable"):FireServer(unpack(args)) -- daily quest
+--[[
+make moonlit submit smarter
+harvest filters
+	- weight
+	- mutatuon
+	- type
+auto place/hatch eggs
+auto place one-time plants
+pet feeding(if possible)
+]]
