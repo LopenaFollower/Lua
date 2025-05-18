@@ -45,6 +45,17 @@ local gears={
 	{"Lightning Rod",false},
 	{"Master Sprinkler",false},
 }
+local event={
+	{"Mysterious Crate",false},
+	{"Night Egg",false},
+	{"Night Seed Pack",false},
+	{"Blood Banana",false},
+	{"Moon Melon",false},
+	{"Star Caller",false},
+	{"Blood Hedgehod",false},
+	{"Blood Kiwi",false},
+	{"Blood Owl",false},
+}
 local cd={
 	harvest=true,
 	seeds=true,
@@ -163,6 +174,18 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 		task.wait(1)
 		cd.gears=true
 	end
+	if cd.evshop then
+		cd.evshop=false
+		for k,v in pairs(event)do
+			if v[2]then
+				for i=0,5 do
+					GE.BuyEventShopStock:FireServer(v[1])
+				end
+			end
+		end
+		task.wait(1)
+		cd.evshop=true
+	end
 	if tog.wander and cd.wander and#plr.Backpack:GetChildren()<200 then
 		cd.wander=false
 		local timeout=false
@@ -240,6 +263,7 @@ end)
 local Main=UI:addPage("Main",1,true)
 local Seeds=UI:addPage("Seeds",2.6)
 local Gears=UI:addPage("Gears",1.05)
+local EvShop=UI:addPage("Gears",1.05)
 local Pets=UI:addPage("Pets",1)
 local Local=UI:addPage("Local Player",1)
 Main.addDropdown("Harvest Mode",{"Aura","Random"},nil,function(v)
@@ -292,6 +316,15 @@ for _,v in pairs({unpack(gears)})do
 		for k,j in pairs(gears)do
 			if j[1]==v[1]then
 				gears[k][2]=n
+			end
+		end
+	end)
+end
+for _,v in pairs({unpack(event)})do
+	EvShop.addToggle(v[1],false,function(n)
+		for k,j in pairs(event)do
+			if j[1]==v[1]then
+				event[k][2]=n
 			end
 		end
 	end)
