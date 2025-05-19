@@ -12,7 +12,8 @@ local tog={
 	hideplants=false,
 	eggs=false,
 	feed=false,
-	esp=false
+	esp=false,
+	daily=false
 }
 local seeds={
 	{"Carrot",false},
@@ -53,7 +54,7 @@ local event={
 	{"Blood Banana",false},
 	{"Moon Melon",false},
 	{"Star Caller",false},
-	{"Blood Hedgehod",false},
+	{"Blood Hedgehog",false},
 	{"Blood Kiwi",false},
 	{"Blood Owl",false},
 }
@@ -67,7 +68,8 @@ local cd={
 	wander=true,
 	hideplants=true,
 	eggs=true,
-	esp=true
+	esp=true,
+	daily=true
 }
 local vals={
 	tpws=5,
@@ -78,7 +80,10 @@ local vals={
 		shock=false,
 		wet=false,
 		moonlit=false,
-		celestial=false
+		bloodlit=false,
+		celestial=false,
+		frozen=false,
+		chilled=false
 	}
 }
 local binds={}
@@ -273,33 +278,51 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 		cd.eggs=true
 	end
 	if tog.feed then
-		local p=nil
-		for _,v in pairs(workspace:GetChildren())do
-			p="Part"==v.Name and v:FindFirstChild"ProximityPrompt"
-			if p then break end
+		local p={}
+		for _,v in pairs(workspace.PetsPhysical:GetChildren())do
+			if v:GetAttribute"OWNER"==plr.Name then
+				table.insert(p,v:GetAttribute"UUID")
+			end
 		end
-		p.HoldDuration=0
-		p.MaxActivationDistance=10^100
-		if p.Enabled then
-			fireproximityprompt(p)
-		end
+		GE.ActivePetService:FireServer("Feed",p[math.random(1,#p)])
+		pcall(function()
+			p=workspace.Part.ProximityPrompt
+			p.HoldDuration=0
+			p.MaxActivationDistance=math.huge
+		end)
 	end
 	if tog.esp and cd.esp then
 		cd.esp=false
 		for _,v in pairs(UserFarm.Important.Plants_Physical:GetChildren())do
-			for _,f in pairs(v.Fruits:GetChildren())do
-				local var=f.Variant.Value
-				if"Gold"==var and vals.esp.gold or"Rainbow"==var and vals.esp.rgb or f:GetAttribute"Wet"and vals.esp.wet or f:GetAttribute"Shocked"and vals.esp.shock or f:GetAttribute"Moonlit"and vals.esp.moonlit or f:GetAttribute"Celestial"and vals.esp.celestial then
-					for _,p in pairs(f:GetChildren())do
-						if"number"==type(tonumber(p.Name))and p:IsA"BasePart"then
-							esp(p)
+			pcall(function()
+				for _,f in pairs(v.Fruits:GetChildren())do
+					local var=f.Variant.Value
+					if"Gold"==var and vals.esp.gold or
+					"Rainbow"==var and vals.esp.rgb or
+					f:GetAttribute"Wet"and vals.esp.wet or
+					f:GetAttribute"Shocked"and vals.esp.shock or
+					f:GetAttribute"Moonlit"and vals.esp.moonlit or
+					f:GetAttribute"Bloodlit"and vals.esp.bloodlit or
+					f:GetAttribute"Celestial"and vals.esp.celestial or
+					f:GetAttribute"Frozen"and vals.esp.frozen or
+					f:GetAttribute"Chilled"and vals.esp.chilled then
+						for _,p in pairs(f:GetChildren())do
+							if"number"==type(tonumber(p.Name))and p:IsA"BasePart"then
+								esp(p)
+							end
 						end
 					end
 				end
-			end
+			end)
 		end
 		task.wait(1)
 		cd.esp=true
+	end
+	if tog.daily then
+		cd.daily=false
+		rs.ByteNetReliable:FireServer(buffer.fromstring("\002"))
+		task.wait(1)
+		cd.daily=true
 	end
 end)
 binds.jump=game.UserInputService.JumpRequest:Connect(function()
@@ -311,7 +334,7 @@ local Main=UI:addPage("Main",1,true)
 local Seeds=UI:addPage("Seeds",2.6)
 local Gears=UI:addPage("Gears",1.05)
 local EvShop=UI:addPage("Event Shop",1.15)
-local Esp=UI:addPage("ESP",1)
+local Esp=UI:addPage("ESP",1.5)
 local Pets=UI:addPage("Pets",1)
 local Local=UI:addPage("Local Player",1)
 Main.addDropdown("Harvest Mode",{"Aura","Random"},nil,function(v)
@@ -398,8 +421,17 @@ end)
 Esp.addToggle("Wet",vals.esp.wet,function(v)
 	vals.esp.wet=v
 end)
+Esp.addToggle("Chilled",vals.esp.chilled,function(v)
+	vals.esp.chilled=v
+end)
+Esp.addToggle("Frozen",vals.esp.frozen,function(v)
+	vals.esp.frozen=v
+end)
 Esp.addToggle("Moonlit",vals.esp.moonlit,function(v)
 	vals.esp.moonlit=v
+end)
+Esp.addToggle("Bloodlit",vals.esp.bloodlit,function(v)
+	vals.esp.bloodlit=v
 end)
 Esp.addToggle("Celestial",vals.esp.celestial,function(v)
 	vals.esp.celestial=v
@@ -430,8 +462,13 @@ Local.addToggle("Invis Cam",false,function(v)
 end)
 Local.addButton("Inf Yield",loadstring(game:HttpGet"https://infyiff.github.io/resources/IY_FE.txt"))
 Local.destroyGui(function()
-	for i,v in pairs(binds)do v:Disconnect()end
 	for i,v in pairs(tog)do tog[i]=false end
+	for _,v in pairs(binds)do v:Disconnect()end
+	for _,v in pairs(UserFarm.Important.Plants_Physical:GetDescendants())do
+		if v.Name=="sdaisdada"then
+			v:Destroy()
+		end
+	end
 end)
 local args = {
 	vector.create(20.227279663085938, 0.1355254054069519, 55.632606506347656),
@@ -439,9 +476,10 @@ local args = {
 }
 --game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Plant_RE"):FireServer(unpack(args))
 local args = {
-	buffer.fromstring("\002")
+	"CreateEgg",
+	vector.create(-12.166780471801758, 0.1355251669883728, 50.8125)
 }
---game:GetService("ReplicatedStorage"):WaitForChild("ByteNetReliable"):FireServer(unpack(args)) -- daily quest
+--game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("PetEggService"):FireServer(unpack(args))
 local args = {
 	"HatchPet",
 	workspace:WaitForChild("Farm"):WaitForChild("Farm"):WaitForChild("Important"):WaitForChild("Objects_Physical"):WaitForChild("PetEgg")
@@ -456,4 +494,7 @@ harvest filters
 auto place/hatch eggs
 auto place one-time plants
 pet feeding(if possible)
+scheduled harvesting
+	- harvest every n minutes
+	- for n minutes
 ]]
