@@ -111,6 +111,7 @@ function mouse(x,y,d,l)
 	vi:SendMouseButtonEvent(x,y,0,d,l or game,0)
 end
 function esp(v)
+	local par,name=v.Parent,v.Name
 	if v:IsA"BasePart"and"MeshPart"~=v.ClassName and not v:FindFirstChild"sdaisdada"then
 		local a=nil
 		if"UnionOperation"==v.ClassName or v.Shape==Enum.PartType.Ball then
@@ -126,7 +127,12 @@ function esp(v)
 		a.AlwaysOnTop=true
 		a.ZIndex=0
 		a.Transparency=.35
-		a.Color=v.BrickColor
+		task.spawn(function()
+			while par:FindFirstChild(name)and par[name]:FindFirstChild"sdaisdada"do
+				a.Color=v.BrickColor
+				task.wait(.05)
+			end
+		end)
 	end
 end
 binds.main=game:GetService"RunService".RenderStepped:Connect(function()
@@ -201,9 +207,7 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 		cd.gears=false
 		for k,v in pairs(gears)do
 			if v[2]then
-				for i=0,5 do
-					GE.BuyGearStock:FireServer(v[1])
-				end
+				GE.BuyGearStock:FireServer(v[1])
 			end
 		end
 		task.wait(1)
@@ -213,9 +217,7 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 		cd.evshop=false
 		for k,v in pairs(event)do
 			if v[2]then
-				for i=0,5 do
-					GE.BuyEventShopStock:FireServer(v[1])
-				end
+				GE.BuyEventShopStock:FireServer(v[1])
 			end
 		end
 		task.wait(1)
@@ -243,7 +245,7 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 			end)
 			repeat
 				task.wait()
-				platform.CFrame=hrp.CFrame-Vector3.new(0,2.1,0)
+				platform.CFrame=hrp.CFrame-Vector3.new(0,2.3,0)
 			until(goal-hrp.Position).Magnitude<2 or timeout
 		end)
 		cd.wander=true
@@ -400,41 +402,53 @@ for _,v in pairs({unpack(event)})do
 		end
 	end)
 end
-Esp.addToggle("Enable",tog.esp,function(v)
-	tog.esp=v
-	for _,e in pairs(UserFarm.Important.Plants_Physical:GetDescendants())do
-		if e.Name=="sdaisdada"then
-			e:Destroy()
+function rerender()
+	for _,v in pairs(UserFarm.Important.Plants_Physical:GetDescendants())do
+		if v.Name=="sdaisdada"then
+			v:Destroy()
 		end
 	end
+end
+Esp.addToggle("Enable",tog.esp,function(v)
+	tog.esp=v
+	rerender()
 end)
 Esp.addLabel"Filters"
 Esp.addToggle("Gold",vals.esp.gold,function(v)
 	vals.esp.gold=v
+	rerender()
 end)
 Esp.addToggle("Rainbow",vals.esp.rgb,function(v)
 	vals.esp.rgb=v
+	rerender()
 end)
 Esp.addToggle("Shocked",vals.esp.shock,function(v)
 	vals.esp.shock=v
+	rerender()
 end)
 Esp.addToggle("Wet",vals.esp.wet,function(v)
 	vals.esp.wet=v
+	rerender()
 end)
 Esp.addToggle("Chilled",vals.esp.chilled,function(v)
 	vals.esp.chilled=v
+	rerender()
 end)
 Esp.addToggle("Frozen",vals.esp.frozen,function(v)
 	vals.esp.frozen=v
+	rerender()
 end)
 Esp.addToggle("Moonlit",vals.esp.moonlit,function(v)
 	vals.esp.moonlit=v
+	rerender()
 end)
 Esp.addToggle("Bloodlit",vals.esp.bloodlit,function(v)
 	vals.esp.bloodlit=v
+	rerender()
 end)
 Esp.addToggle("Celestial",vals.esp.celestial,function(v)
 	vals.esp.celestial=v
+	rerender()
 end)
 Pets.addToggle("Buy Eggs",tog.eggs,function(v)
 	tog.eggs=v
@@ -464,17 +478,14 @@ Local.addButton("Inf Yield",loadstring(game:HttpGet"https://infyiff.github.io/re
 Local.destroyGui(function()
 	for i,v in pairs(tog)do tog[i]=false end
 	for _,v in pairs(binds)do v:Disconnect()end
-	for _,v in pairs(UserFarm.Important.Plants_Physical:GetDescendants())do
-		if v.Name=="sdaisdada"then
-			v:Destroy()
-		end
-	end
+	rerender()
 end)
 local args = {
-	vector.create(20.227279663085938, 0.1355254054069519, 55.632606506347656),
-	"Carrot"
+	vector.create(15.864276885986328, 0.13552513718605042, -104.26924133300781),
+	"Cactus"
 }
---game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Plant_RE"):FireServer(unpack(args))
+---game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Plant_RE"):FireServer(unpack(args))
+end
 local args = {
 	"CreateEgg",
 	vector.create(-12.166780471801758, 0.1355251669883728, 50.8125)
