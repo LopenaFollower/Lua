@@ -110,30 +110,48 @@ local UI=GUI:CreateWindow"Garden"
 function mouse(x,y,d,l)
 	vi:SendMouseButtonEvent(x,y,0,d,l or game,0)
 end
+function checkFruitAge(p)
+	p=p.Parent
+	return p.Grow.Age.Value>=p:GetAttribute"MaxAge"
+end
 function esp(v)
 	local par,name=v.Parent,v.Name
-	if v:IsA"BasePart"and"MeshPart"~=v.ClassName and not v:FindFirstChild"sdaisdada"then
-		local a=nil
-		if"UnionOperation"==v.ClassName or v.Shape==Enum.PartType.Ball then
-			a=Instance.new("SphereHandleAdornment",v)
-			a.Radius=v.Size.X/2
-		else
-			a=Instance.new("BoxHandleAdornment",v)
-			a.Size=v.Size
-			a.CFrame=CFrame.Angles(v.CFrame:ToOrientation())
-		end
-		a.Name="sdaisdada"
-		a.Adornee=v
-		a.AlwaysOnTop=true
-		a.ZIndex=0
-		a.Transparency=.35
-		task.spawn(function()
-			while par:FindFirstChild(name)and par[name]:FindFirstChild"sdaisdada"do
+	task.spawn(function()
+		if v:IsA"BasePart"and"MeshPart"~=v.ClassName and not v:FindFirstChild"sdaisdada1"then
+			local a,b=nil,nil
+			if"UnionOperation"==v.ClassName or v.Shape==Enum.PartType.Ball then
+				a=Instance.new("SphereHandleAdornment",v)
+				b=Instance.new("SphereHandleAdornment",a)
+				a.Radius=v.Size.X/2
+				b.Radius=v.Size.X/2+.1
+			else
+				a=Instance.new("BoxHandleAdornment",v)
+				b=Instance.new("BoxHandleAdornment",a)
+				a.Size=v.Size
+				b.Size=v.Size+Vector3.new(.1,.1,.1)
+				a.CFrame=CFrame.Angles(v.CFrame:ToOrientation())
+				b.CFrame=CFrame.Angles(v.CFrame:ToOrientation())
+			end
+			a.Name="sdaisdada1"
+			b.Name="sdaisdada2"
+			a.Adornee=v
+			b.Adornee=v
+			a.AlwaysOnTop=true
+			b.AlwaysOnTop=true
+			a.ZIndex=1
+			b.ZIndex=0
+			a.Transparency=.4
+			b.Transparency=0
+			b.Color=BrickColor.new(1)
+			a.Visible=false
+			task.wait(.1)
+			a.Visible=true
+			while par:FindFirstChild(name)and par[name]:FindFirstChild"sdaisdada1"do
 				a.Color=v.BrickColor
 				task.wait(.05)
 			end
-		end)
-	end
+		end
+	end)
 end
 binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 	pcall(function()
@@ -169,24 +187,43 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 	if tog.harvest and cd.harvest then
 		cd.harvest=false
 		pcall(function()
-			if vals.harvestmode=="Aura"then
+			local mode=vals.harvestmode
+			if mode=="Aura"then
 				for _,v in pairs(UserFarm.Important.Plants_Physical:GetDescendants())do
-					if v:IsA"ProximityPrompt"and(v.Parent.Position-hrp.Position).Magnitude<17 then
+					if v:IsA"ProximityPrompt"and checkFruitAge(v.Parent)and(v.Parent.Position-hrp.Position).Magnitude<17 then
 						fireproximityprompt(v)
 					end
 				end
 				task.wait(.1)
-			else
+			elseif mode=="Random"then
 				local ps=UserFarm.Important.Plants_Physical:GetChildren()
 				local fs=ps[math.random(1,#ps)].Fruits:GetChildren()
 				local f=fs[math.random(1,#fs)]
 				for _,v in pairs(f:GetChildren())do
 					local p=v:FindFirstChildWhichIsA"ProximityPrompt"
-					if p then
+					if p and checkFruitAge(v)then
 						fireproximityprompt(p)
 						break
 					end
 				end
+			elseif mode=="Scuffed"then
+				local ps=UserFarm.Important.Plants_Physical:GetChildren()
+				local fs=ps[math.random(1,#ps)].Fruits:GetChildren()
+				local f=fs[math.random(1,#fs)]
+				for _,v in pairs(f:GetChildren())do
+					local p=v:FindFirstChildWhichIsA"ProximityPrompt"
+					if p and checkFruitAge(v)then
+						vi:SendKeyEvent(1,101,0,game)
+						vi:SendKeyEvent(0,101,0,game)
+						hrp.CFrame=v.CFrame
+						vi:SendKeyEvent(1,101,0,game)
+						vi:SendKeyEvent(0,101,0,game)
+						break
+					end
+				end
+			else
+				vi:SendKeyEvent(1,101,0,game)
+				vi:SendKeyEvent(0,101,0,game)
 			end
 		end)
 		cd.harvest=true
@@ -233,7 +270,7 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 			local fs=ps[math.random(1,#ps)].Fruits:GetChildren()
 			for _,v in pairs(fs[math.random(1,#fs)]:GetChildren())do
 				local p=v:FindFirstChildWhichIsA"ProximityPrompt"
-				if p then
+				if p and checkFruitAge(v)then
 					goal=p.Parent.Position+Vector3.new(0,4,0)
 					break
 				end
@@ -339,7 +376,7 @@ local EvShop=UI:addPage("Event Shop",1.15)
 local Esp=UI:addPage("ESP",1.5)
 local Pets=UI:addPage("Pets",1)
 local Local=UI:addPage("Local Player",1)
-Main.addDropdown("Harvest Mode",{"Aura","Random"},nil,function(v)
+Main.addDropdown("Harvest Mode",{"Aura","Random","Scuffed","E Spam"},nil,function(v)
 	vals.harvestmode=v
 end)
 Main.addToggle("Harvest",tog.harvest,function(v)
@@ -375,6 +412,9 @@ Main.addToggle("Render Plants",not tog.hideplants,function(v)
 		end
 	end
 end)
+Main.addToggle("Claim Daily Quest",tog.daily,function(v)
+	tog.daily=v
+end)
 for _,v in pairs({unpack(seeds)})do
 	Seeds.addToggle(v[1],false,function(n)
 		for k,j in pairs(seeds)do
@@ -404,7 +444,7 @@ for _,v in pairs({unpack(event)})do
 end
 function rerender()
 	for _,v in pairs(UserFarm.Important.Plants_Physical:GetDescendants())do
-		if v.Name=="sdaisdada"then
+		if v.Name=="sdaisdada1"or v.Name=="sdaisdada2"then
 			v:Destroy()
 		end
 	end
@@ -485,7 +525,7 @@ local args = {
 	"Cactus"
 }
 ---game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Plant_RE"):FireServer(unpack(args))
-end
+--end
 local args = {
 	"CreateEgg",
 	vector.create(-12.166780471801758, 0.1355251669883728, 50.8125)
