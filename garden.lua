@@ -549,3 +549,8 @@ scheduled harvesting
 	- harvest every n minutes
 	- for n minutes
 ]]
+game.StarterGui:SetCore("SendNotification",{
+	Title="this script is outdated btw";
+	Text="";
+	Duration=10;
+})
