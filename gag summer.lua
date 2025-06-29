@@ -53,7 +53,7 @@ if plr.PlayerGui:FindFirstChild"Top_Notification"then
 	plr.PlayerGui.Top_Notification:Destroy()
 end
 local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
-local UI=GUI:CreateWindow"Summer Harvest"
+local UI=GUI:CreateWindow("Summer Harvest","v1.2")
 binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 	if tog.submit and cd.submit then
 		cd.submit=false
@@ -108,7 +108,11 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 	if cd.o1 then
 		cd.o1=false
 		GE.BuyEventShopStock:FireServer"Summer Seed Pack"
-		task.wait(1)
+		GE.BuyEventShopStock:FireServer"Oasis Egg"
+		for i=1,3 do
+			GE.BuyPetEgg:FireServer(i)
+		end
+		task.wait(5)
 		cd.o1=true
 	end
 end)
