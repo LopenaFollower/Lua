@@ -70,14 +70,14 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 		for _,p in pairs(UserFarm.Important.Plants_Physical:GetChildren())do
 			if plants[p.Name]and#p.Fruits:GetChildren()>0 then
 				for _,v in pairs(p.Fruits:GetDescendants())do
-					if v:IsA"ProximityPrompt"and tog.harvest and v.Enabled then
+					if v:IsA"ProximityPrompt"and tog.harvest then
 						fireproximityprompt(v)
 					end
 				end
 				task.wait()
 			end
 		end
-		task.wait(.125)
+		task.wait(.1)
 		cd.harvest=true
 	end
 	if tog.trade and cd.trade then
