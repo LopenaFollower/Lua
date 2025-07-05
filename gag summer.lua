@@ -107,6 +107,7 @@ binds.main=game:GetService"RunService".RenderStepped:Connect(function()
 	end
 	if cd.o1 then
 		cd.o1=false
+		GE.BuyGearStock:FireServer"Master Sprinkler"
 		GE.BuyEventShopStock:FireServer"Summer Seed Pack"
 		GE.BuyEventShopStock:FireServer"Oasis Egg"
 		for i=1,3 do
