@@ -4,14 +4,16 @@ local evs=game.ReplicatedStorage.Events
 local badges={"Honey","Quest","Battle","Ability","Goo","Playtime","Sticker","Sunflower","Dandelion","Mushroom","Blue Flower","Clover","Spider","Strawberry","Bamboo","Pineapple","Pumpkin","Cactus","Rose","Pine Tree","Stump","Coconut","Pepper","Hive Hub","Mountain Top"}
 for _,v in pairs(badges)do
 	evs.BadgeEvent:FireServer("Collect",v)
+	task.wait()
 end
 
 local dispensers={"Stockings","Wealth Clock","Beesmas Feast","Gingerbread House","Free Royal Jelly Dispenser","Honey Dispenser","Treat Dispenser","Blueberry Dispenser","Strawberry Dispenser","Free Ant Pass Dispenser","Free Robo Pass Dispenser"}
 for _,v in pairs(dispensers)do
 	evs.ToyEvent:FireServer(v)
+	task.wait()
 end
 
-local qps={"Brown Bear 2","Black Bear 2","Polar Bear","Honey Bee","Black Bear","Bucko Bee","Riley Bee"}
+local qps={"Black Bear","Black Bear 2","Mother Bear","Brown Bear 2","Polar Bear","Honey Bee","Science Bear","Bucko Bee","Riley Bee","Spirit Bear"}
 for _,v in pairs(qps)do
 	evs.CompleteQuestFromPool:FireServer(v)
 	evs.GiveQuestFromPool:FireServer(v)
@@ -20,6 +22,7 @@ end
 function quest(name)
 	evs.CompleteQuest:FireServer(name)
 	evs.GiveQuest:FireServer(name)
+	task.wait()
 end
 
 pcall(function()
