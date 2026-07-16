@@ -1,35 +1,3 @@
---Example use:
---local GUI=loadstring(game:HttpGet"https://raw.githubusercontent.com/LopenaFollower/Lua/main/gui%20lib.lua")()
---local UI=GUI:CreateWindow("Window","info")
---local Main=UI:addPage("Main",3,true,1)
---local Tab2=UI:addPage("Tab2",3,false,1)
---
---Main:addLabel("Label","Info")
---
---Main:addButton("Button",function()
---	print("button pressed")
---end)
---
---Main:addToggle("Toggle",false,function(v)
---	print("toggle: "..v)
---end)
---
---Main:addSlider("Slider",{min=0,max=100,default=30,decimals=1},function(v)
---	print("slider value: "..v)
---end)
---
---Main:addTextBox("TextBox","default",function(v)
---	print("textbox: "..v)
---end)
---
---local list={1, 2, 3, "4"}
---Main:addDropdown("Dropdown",list,1,function(v)
---	print("dropdown selected: "..v)
---end)
---
---Tab2:destroyGui(function()
---	print("goodbye")
---end)
 local Version=327
 task.spawn(function()
 	print("Gui version: "..Version)
