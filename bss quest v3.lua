@@ -17,6 +17,7 @@ local qps={"Black Bear","Black Bear 2","Mother Bear","Brown Bear 2","Polar Bear"
 for _,v in pairs(qps)do
 	evs.CompleteQuestFromPool:FireServer(v)
 	evs.GiveQuestFromPool:FireServer(v)
+	task.wait()
 end
 
 function quest(name)
